@@ -1,6 +1,7 @@
 site_name: notion-py
 site_description: Type-safe Python client for Notion API
 site_author: Masafumi Higashi
+site_url: https://higashi-masafumi.github.io/notion-py/
 repo_url: https://github.com/Higashi-Masafumi/notion-py
 repo_name: Higashi-Masafumi/notion-py
 

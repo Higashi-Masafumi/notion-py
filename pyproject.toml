@@ -17,6 +17,7 @@ license-files = ["LICEN[CS]E*"]
 authors = [
     { name = "Masafumi Higashi", email = "cruiseeast@gmail.com" }
 ]
+urls = { "Homepage" = "https://higashi-masafumi.github.io/notion-py/" }
 
 [build-system]
 requires = ["hatchling"]
