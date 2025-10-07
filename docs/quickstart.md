@@ -1,13 +1,13 @@
 # Quick Start
 
-This guide will help you get started with notion-py.
+This guide will help you get started with notion-py-client.
 
 ## Installation
 
 Install the package:
 
 ```bash
-pip install notion-py
+pip install notion-py-client
 ```
 
 ## Authentication

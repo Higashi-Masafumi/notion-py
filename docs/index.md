@@ -1,12 +1,18 @@
-# notion-py
+# notion-py-client
 
-Type-safe Python client library for the Notion API, built with Pydantic v2.
+Install using pip:
+
+```bash
+pip install notion-py-client
+```
+
+## Quick Examplehon client library for the Notion API, built with Pydantic v2.
 
 ---
 
 ## Overview
 
-**notion-py** provides a complete type system mirroring Notion's TypeScript API definitions. It offers full coverage of Databases, Data Sources, Pages, Blocks (33 types), Filters, and Request types with strict runtime validation.
+**notion-py-client** provides a complete type system mirroring Notion's TypeScript API definitions. It offers full coverage of Databases, Data Sources, Pages, Blocks (33 types), Filters, and Request types with strict runtime validation.
 
 ## Key Features
 
@@ -21,7 +27,7 @@ Type-safe Python client library for the Notion API, built with Pydantic v2.
 Install using pip:
 
 ```bash
-pip install notion-py
+pip install notion-py-client
 ```
 
 Or using uv:

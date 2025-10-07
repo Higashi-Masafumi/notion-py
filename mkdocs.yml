@@ -1,4 +1,4 @@
-site_name: notion-py
+site_name: notion-py-client
 site_description: Type-safe Python client for Notion API
 site_author: Masafumi Higashi
 site_url: https://higashi-masafumi.github.io/notion-py/
