@@ -267,7 +267,7 @@ class NotionMapper(Generic[_TDomainModel], ABC):
         Raises:
             NotImplementedError: サブクラスで実装が必要
         """
-        raise NotImplementedError()
+        raise NotImplementedError
 
     @abstractmethod
     def build_update_properties(self, model: _TDomainModel) -> UpdatePageParameters:
@@ -282,7 +282,7 @@ class NotionMapper(Generic[_TDomainModel], ABC):
         Raises:
             NotImplementedError: サブクラスで実装が必要
         """
-        raise NotImplementedError()
+        raise NotImplementedError
 
     @abstractmethod
     def build_create_properties(
@@ -299,4 +299,4 @@ class NotionMapper(Generic[_TDomainModel], ABC):
         Raises:
             NotImplementedError: サブクラスで実装が必要
         """
-        raise NotImplementedError()
+        raise NotImplementedError

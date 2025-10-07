@@ -109,7 +109,7 @@ await client.dataSources.query(
 ### Domain Mapping
 
 ```python
-from notion_py.helpder import NotionMapper, Field
+from notion_py.helper import NotionMapper, Field
 from notion_py.requests.property_requests import (
     TitlePropertyRequest,
     StatusPropertyRequest,

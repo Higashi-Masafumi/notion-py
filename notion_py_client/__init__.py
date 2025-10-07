@@ -156,7 +156,7 @@ from .schema import (
     FormulaPropertyConfig,
 )
 from .notion_client import NotionAsyncClient, NotionErrorCode
-from .helpder import Field, NotionMapper, NotionPropertyDescriptor
+from .helper import Field, NotionMapper, NotionPropertyDescriptor
 
 __all__ = [
     # DataSource

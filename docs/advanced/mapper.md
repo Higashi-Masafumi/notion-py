@@ -18,7 +18,7 @@ The domain mapping pattern helps you work with Notion data using your own domain
 A descriptor that handles bidirectional conversion between Notion properties and domain values.
 
 ```python
-from notion_py.helpder import NotionPropertyDescriptor
+from notion_py.helper import NotionPropertyDescriptor
 
 descriptor = NotionPropertyDescriptor(
     notion_name="Status",  # Property name in Notion
@@ -32,7 +32,7 @@ descriptor = NotionPropertyDescriptor(
 The `Field()` function creates property descriptors with type inference:
 
 ```python
-from notion_py.helpder import Field
+from notion_py.helper import Field
 from notion_py.requests.property_requests import TitlePropertyRequest
 
 # Read-write field
@@ -57,7 +57,7 @@ duration_field = Field(
 Abstract base class for creating mappers:
 
 ```python
-from notion_py.helpder import NotionMapper
+from notion_py.helper import NotionMapper
 from pydantic import BaseModel
 
 class Task(BaseModel):
@@ -108,7 +108,7 @@ class ProjectTask(BaseModel):
 ### Create Mapper
 
 ```python
-from notion_py.helpder import NotionMapper, Field
+from notion_py.helper import NotionMapper, Field
 from notion_py import NotionPage
 from notion_py.requests.page_requests import (
     CreatePageParameters,
