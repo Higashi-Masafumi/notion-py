@@ -2,8 +2,8 @@
 
 A type-safe Python client library for the Notion API, built with Pydantic v2.
 
-[![PyPI version](https://badge.fury.io/py/notion-py.svg)](https://pypi.org/project/notion-py-client/0.1.2/)
-[![Python Version](https://img.shields.io/pypi/pyversions/notion-py.svg)](https://pypi.org/project/notion-py-client/0.1.2/)
+[![PyPI version](https://badge.fury.io/py/notion-py.svg)](https://pypi.org/project/notion-py-client/)
+[![Python Version](https://img.shields.io/pypi/pyversions/notion-py.svg)](https://pypi.org/project/notion-py-client/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Features
