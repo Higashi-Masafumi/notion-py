@@ -1,6 +1,6 @@
 [project]
 name = "notion-py-client"
-version = "0.1.4"
+version = "0.1.5"
 description = "A Python client for Notion API"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -18,6 +18,10 @@ authors = [
     { name = "Masafumi Higashi", email = "cruiseeast@gmail.com" }
 ]
 urls = { "Homepage" = "https://higashi-masafumi.github.io/notion-py/" }
+[project.urls]
+Repository = "https://github.com/higashi-masafumi/notion-py"
+Issues = "https://github.com/higashi-masafumi/notion-py/issues"
+
 
 [build-system]
 requires = ["hatchling"]
