@@ -17,7 +17,7 @@ A type-safe Python client library for the Notion API, built with Pydantic v2.
 ## Installation
 
 ```bash
-pip install notion-py-client==0.1.2
+pip install notion-py-client
 ```
 
 ## Quick Start
