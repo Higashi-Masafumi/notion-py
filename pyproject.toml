@@ -17,8 +17,8 @@ license-files = ["LICEN[CS]E*"]
 authors = [
     { name = "Masafumi Higashi", email = "cruiseeast@gmail.com" }
 ]
-urls = { "Homepage" = "https://higashi-masafumi.github.io/notion-py/" }
 [project.urls]
+Homepage = "https://higashi-masafumi.github.io/notion-py/"
 Repository = "https://github.com/higashi-masafumi/notion-py"
 Issues = "https://github.com/higashi-masafumi/notion-py/issues"
 
