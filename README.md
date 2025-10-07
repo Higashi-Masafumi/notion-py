@@ -2,8 +2,8 @@
 
 A type-safe Python client library for the Notion API, built with Pydantic v2.
 
-[![PyPI version](https://badge.fury.io/py/notion-py.svg)](https://test.pypi.org/project/notion-py/)
-[![Python Version](https://img.shields.io/pypi/pyversions/notion-py.svg)](https://test.pypi.org/project/notion-py/)
+[![PyPI version](https://badge.fury.io/py/notion-py.svg)](https://pypi.org/project/notion-py-client/0.1.2/)
+[![Python Version](https://img.shields.io/pypi/pyversions/notion-py.svg)](https://pypi.org/project/notion-py-client/0.1.2/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Features
@@ -17,7 +17,7 @@ A type-safe Python client library for the Notion API, built with Pydantic v2.
 ## Installation
 
 ```bash
-pip install -i https://test.pypi.org/simple/ notion-py
+pip install notion-py-client==0.1.2
 ```
 
 ## Quick Start
@@ -110,23 +110,51 @@ await client.dataSources.query(
 
 ```python
 from notion_py.helpder import NotionMapper, Field
+from notion_py.requests.property_requests import (
+    TitlePropertyRequest,
+    StatusPropertyRequest,
+)
 from pydantic import BaseModel
 
 class Task(BaseModel):
+    id: str
     name: str
     status: str
 
 class TaskMapper(NotionMapper[Task]):
-    name = Field("タスク名", "title")
-    status = Field("ステータス", "status")
+    # Define field descriptors
+    name_field = Field(
+        notion_name="タスク名",
+        parser=lambda p: p.title[0].plain_text if p.title else "",
+        request_builder=lambda v: TitlePropertyRequest(
+            title=[{"type": "text", "text": {"content": v}}]
+        )
+    )
 
-# Convert Notion page to domain model
-task = TaskMapper.to_model(notion_page)
+    status_field = Field(
+        notion_name="ステータス",
+        parser=lambda p: p.status.name if p.status else "",
+        request_builder=lambda v: StatusPropertyRequest(
+            status={"name": v}
+        )
+    )
+
+    def to_domain(self, notion_page):
+        """Convert Notion page to domain model."""
+        return Task(
+            id=notion_page.id,
+            name=self.name_field.parse(notion_page.properties["タスク名"]),
+            status=self.status_field.parse(notion_page.properties["ステータス"]),
+        )
+
+# Use the mapper
+mapper = TaskMapper()
+task = mapper.to_domain(notion_page)
 ```
 
 ## Requirements
 
-- Python >= 3.13
+- Python >= 3.10
 - Pydantic >= 2.11.10
 
 ## License
