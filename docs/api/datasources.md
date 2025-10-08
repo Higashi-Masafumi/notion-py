@@ -46,7 +46,7 @@ async def query(
 **Example**:
 
 ```python
-from notion_py import NotionAsyncClient
+from notion_py_client import NotionAsyncClient
 
 async with NotionAsyncClient(auth="secret_xxx") as client:
     # Basic query
@@ -232,7 +232,7 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
 Use filter builders for type safety:
 
 ```python
-from notion_py.filters import (
+from notion_py_client.filters import (
     TextPropertyFilter,
     StatusPropertyFilter,
     DatePropertyFilter,
@@ -420,7 +420,7 @@ properties = {
 ## Type Reference
 
 ```python
-from notion_py.responses.datasource import DataSource
+from notion_py_client.responses.datasource import DataSource
 
 # Data source object
 data_source: DataSource = {

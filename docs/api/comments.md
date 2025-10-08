@@ -21,7 +21,7 @@ async def create(
 **Example**:
 
 ```python
-from notion_py import NotionAsyncClient
+from notion_py_client import NotionAsyncClient
 
 async with NotionAsyncClient(auth="secret_xxx") as client:
     comment = await client.comments.create(

@@ -14,7 +14,7 @@ Properties come in two forms:
 ### TitleProperty
 
 ```python
-from notion_py.responses.property_types import TitleProperty
+from notion_py_client.responses.property_types import TitleProperty
 
 property: TitleProperty = {
     "id": "title",
@@ -35,7 +35,7 @@ title = property.title[0].plain_text if property.title else ""
 ### RichTextProperty
 
 ```python
-from notion_py.responses.property_types import RichTextProperty
+from notion_py_client.responses.property_types import RichTextProperty
 
 property: RichTextProperty = {
     "id": "abc123",
@@ -64,7 +64,7 @@ text = property.rich_text[0].plain_text if property.rich_text else ""
 ### NumberProperty
 
 ```python
-from notion_py.responses.property_types import NumberProperty
+from notion_py_client.responses.property_types import NumberProperty
 
 property: NumberProperty = {
     "id": "abc123",
@@ -79,7 +79,7 @@ value = property.number or 0
 ### SelectProperty
 
 ```python
-from notion_py.responses.property_types import SelectProperty
+from notion_py_client.responses.property_types import SelectProperty
 
 property: SelectProperty = {
     "id": "abc123",
@@ -98,7 +98,7 @@ status = property.select.name if property.select else None
 ### MultiSelectProperty
 
 ```python
-from notion_py.responses.property_types import MultiSelectProperty
+from notion_py_client.responses.property_types import MultiSelectProperty
 
 property: MultiSelectProperty = {
     "id": "abc123",
@@ -116,7 +116,7 @@ tags = [opt.name for opt in property.multi_select]
 ### DateProperty
 
 ```python
-from notion_py.responses.property_types import DateProperty
+from notion_py_client.responses.property_types import DateProperty
 
 # Single date
 property: DateProperty = {
@@ -147,7 +147,7 @@ start_date = property.date.start if property.date else None
 ### PeopleProperty
 
 ```python
-from notion_py.responses.property_types import PeopleProperty
+from notion_py_client.responses.property_types import PeopleProperty
 
 property: PeopleProperty = {
     "id": "abc123",
@@ -170,7 +170,7 @@ assignees = [person.name for person in property.people]
 ### FilesProperty
 
 ```python
-from notion_py.responses.property_types import FilesProperty
+from notion_py_client.responses.property_types import FilesProperty
 
 property: FilesProperty = {
     "id": "abc123",
@@ -191,7 +191,7 @@ file_urls = [f.external.url for f in property.files if f.type == "external"]
 ### CheckboxProperty
 
 ```python
-from notion_py.responses.property_types import CheckboxProperty
+from notion_py_client.responses.property_types import CheckboxProperty
 
 property: CheckboxProperty = {
     "id": "abc123",
@@ -206,7 +206,7 @@ is_done = property.checkbox
 ### UrlProperty
 
 ```python
-from notion_py.responses.property_types import UrlProperty
+from notion_py_client.responses.property_types import UrlProperty
 
 property: UrlProperty = {
     "id": "abc123",
@@ -221,7 +221,7 @@ url = property.url or ""
 ### EmailProperty
 
 ```python
-from notion_py.responses.property_types import EmailProperty
+from notion_py_client.responses.property_types import EmailProperty
 
 property: EmailProperty = {
     "id": "abc123",
@@ -236,7 +236,7 @@ email = property.email or ""
 ### PhoneNumberProperty
 
 ```python
-from notion_py.responses.property_types import PhoneNumberProperty
+from notion_py_client.responses.property_types import PhoneNumberProperty
 
 property: PhoneNumberProperty = {
     "id": "abc123",
@@ -251,7 +251,7 @@ phone = property.phone_number or ""
 ### StatusProperty
 
 ```python
-from notion_py.responses.property_types import StatusProperty
+from notion_py_client.responses.property_types import StatusProperty
 
 property: StatusProperty = {
     "id": "abc123",
@@ -272,7 +272,7 @@ status = property.status.name if property.status else None
 ### FormulaProperty
 
 ```python
-from notion_py.responses.property_types import FormulaProperty
+from notion_py_client.responses.property_types import FormulaProperty
 
 # Number formula
 property: FormulaProperty = {
@@ -324,7 +324,7 @@ elif property.formula.type == "string":
 ### RelationProperty
 
 ```python
-from notion_py.responses.property_types import RelationProperty
+from notion_py_client.responses.property_types import RelationProperty
 
 property: RelationProperty = {
     "id": "abc123",
@@ -343,7 +343,7 @@ related_ids = [item.id for item in property.relation]
 ### RollupProperty
 
 ```python
-from notion_py.responses.property_types import RollupProperty
+from notion_py_client.responses.property_types import RollupProperty
 
 # Number rollup
 property: RollupProperty = {
@@ -378,7 +378,7 @@ if property.rollup.type == "number":
 ### CreatedTimeProperty
 
 ```python
-from notion_py.responses.property_types import CreatedTimeProperty
+from notion_py_client.responses.property_types import CreatedTimeProperty
 
 property: CreatedTimeProperty = {
     "id": "abc123",
@@ -393,7 +393,7 @@ created = property.created_time
 ### CreatedByProperty
 
 ```python
-from notion_py.responses.property_types import CreatedByProperty
+from notion_py_client.responses.property_types import CreatedByProperty
 
 property: CreatedByProperty = {
     "id": "abc123",
@@ -412,7 +412,7 @@ creator = property.created_by.name
 ### LastEditedTimeProperty
 
 ```python
-from notion_py.responses.property_types import LastEditedTimeProperty
+from notion_py_client.responses.property_types import LastEditedTimeProperty
 
 property: LastEditedTimeProperty = {
     "id": "abc123",
@@ -427,7 +427,7 @@ edited = property.last_edited_time
 ### LastEditedByProperty
 
 ```python
-from notion_py.responses.property_types import LastEditedByProperty
+from notion_py_client.responses.property_types import LastEditedByProperty
 
 property: LastEditedByProperty = {
     "id": "abc123",
@@ -446,7 +446,7 @@ editor = property.last_edited_by.name
 ### UniqueIdProperty
 
 ```python
-from notion_py.responses.property_types import UniqueIdProperty
+from notion_py_client.responses.property_types import UniqueIdProperty
 
 property: UniqueIdProperty = {
     "id": "abc123",
@@ -464,7 +464,7 @@ uid = f"{property.unique_id.prefix}-{property.unique_id.number}"
 ### VerificationProperty
 
 ```python
-from notion_py.responses.property_types import VerificationProperty
+from notion_py_client.responses.property_types import VerificationProperty
 
 property: VerificationProperty = {
     "id": "abc123",

@@ -30,16 +30,10 @@ Install using pip:
 pip install notion-py-client
 ```
 
-Or using uv:
-
-```bash
-uv add notion-py
-```
-
 ## Quick Example
 
 ```python
-from notion_py import NotionAsyncClient
+from notion_py_client import NotionAsyncClient
 
 async with NotionAsyncClient(auth="secret_xxx") as client:
     # Query a data source (2025-09-03 API)

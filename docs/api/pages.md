@@ -38,9 +38,9 @@ async def create(
 **Example**:
 
 ```python
-from notion_py import NotionAsyncClient
-from notion_py.requests.page_requests import CreatePageParameters
-from notion_py.requests.property_requests import (
+from notion_py_client import NotionAsyncClient
+from notion_py_client.requests.page_requests import CreatePageParameters
+from notion_py_client.requests.property_requests import (
     TitlePropertyRequest,
     StatusPropertyRequest,
     DatePropertyRequest,
@@ -139,7 +139,7 @@ async def update(
 **Example**:
 
 ```python
-from notion_py.requests.page_requests import UpdatePageParameters
+from notion_py_client.requests.page_requests import UpdatePageParameters
 
 async with NotionAsyncClient(auth="secret_xxx") as client:
     params = UpdatePageParameters(
@@ -199,7 +199,7 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
 ### Using Type-Safe Requests
 
 ```python
-from notion_py.requests.property_requests import (
+from notion_py_client.requests.property_requests import (
     TitlePropertyRequest,
     RichTextPropertyRequest,
     NumberPropertyRequest,
@@ -408,7 +408,7 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
 ## Type Reference
 
 ```python
-from notion_py.responses.page import NotionPage
+from notion_py_client.responses.page import NotionPage
 
 # Page object structure
 page: NotionPage = {

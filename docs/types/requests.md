@@ -9,8 +9,8 @@ Complete reference for request parameter types.
 Create a new page in a database or as a child page.
 
 ```python
-from notion_py.requests.page_requests import CreatePageParameters
-from notion_py.requests.property_requests import (
+from notion_py_client.requests.page_requests import CreatePageParameters
+from notion_py_client.requests.property_requests import (
     TitlePropertyRequest,
     StatusPropertyRequest,
 )
@@ -69,7 +69,7 @@ params = CreatePageParameters(
 Update an existing page.
 
 ```python
-from notion_py.requests.page_requests import UpdatePageParameters
+from notion_py_client.requests.page_requests import UpdatePageParameters
 
 params = UpdatePageParameters(
     page_id="page_abc123",
@@ -103,7 +103,7 @@ All property request types are located in `notion_py.requests.property_requests`
 ### TitlePropertyRequest
 
 ```python
-from notion_py.requests.property_requests import TitlePropertyRequest
+from notion_py_client.requests.property_requests import TitlePropertyRequest
 
 request = TitlePropertyRequest(
     title=[
@@ -126,7 +126,7 @@ request = TitlePropertyRequest(
 ### RichTextPropertyRequest
 
 ```python
-from notion_py.requests.property_requests import RichTextPropertyRequest
+from notion_py_client.requests.property_requests import RichTextPropertyRequest
 
 request = RichTextPropertyRequest(
     rich_text=[
@@ -158,7 +158,7 @@ request = RichTextPropertyRequest(
 ### NumberPropertyRequest
 
 ```python
-from notion_py.requests.property_requests import NumberPropertyRequest
+from notion_py_client.requests.property_requests import NumberPropertyRequest
 
 request = NumberPropertyRequest(number=42.5)
 
@@ -169,7 +169,7 @@ request = NumberPropertyRequest(number=None)
 ### SelectPropertyRequest
 
 ```python
-from notion_py.requests.property_requests import SelectPropertyRequest
+from notion_py_client.requests.property_requests import SelectPropertyRequest
 
 request = SelectPropertyRequest(
     select={"name": "Option Name"}
@@ -182,7 +182,7 @@ request = SelectPropertyRequest(select=None)
 ### MultiSelectPropertyRequest
 
 ```python
-from notion_py.requests.property_requests import MultiSelectPropertyRequest
+from notion_py_client.requests.property_requests import MultiSelectPropertyRequest
 
 request = MultiSelectPropertyRequest(
     multi_select=[
@@ -198,7 +198,7 @@ request = MultiSelectPropertyRequest(multi_select=[])
 ### DatePropertyRequest
 
 ```python
-from notion_py.requests.property_requests import DatePropertyRequest
+from notion_py_client.requests.property_requests import DatePropertyRequest
 
 # Single date
 request = DatePropertyRequest(
@@ -228,7 +228,7 @@ request = DatePropertyRequest(date=None)
 ### PeoplePropertyRequest
 
 ```python
-from notion_py.requests.property_requests import PeoplePropertyRequest
+from notion_py_client.requests.property_requests import PeoplePropertyRequest
 
 request = PeoplePropertyRequest(
     people=[
@@ -244,7 +244,7 @@ request = PeoplePropertyRequest(people=[])
 ### FilesPropertyRequest
 
 ```python
-from notion_py.requests.property_requests import FilesPropertyRequest
+from notion_py_client.requests.property_requests import FilesPropertyRequest
 
 request = FilesPropertyRequest(
     files=[
@@ -263,7 +263,7 @@ request = FilesPropertyRequest(files=[])
 ### CheckboxPropertyRequest
 
 ```python
-from notion_py.requests.property_requests import CheckboxPropertyRequest
+from notion_py_client.requests.property_requests import CheckboxPropertyRequest
 
 # Check
 request = CheckboxPropertyRequest(checkbox=True)
@@ -275,7 +275,7 @@ request = CheckboxPropertyRequest(checkbox=False)
 ### UrlPropertyRequest
 
 ```python
-from notion_py.requests.property_requests import UrlPropertyRequest
+from notion_py_client.requests.property_requests import UrlPropertyRequest
 
 request = UrlPropertyRequest(url="https://example.com")
 
@@ -286,7 +286,7 @@ request = UrlPropertyRequest(url=None)
 ### EmailPropertyRequest
 
 ```python
-from notion_py.requests.property_requests import EmailPropertyRequest
+from notion_py_client.requests.property_requests import EmailPropertyRequest
 
 request = EmailPropertyRequest(email="user@example.com")
 
@@ -297,7 +297,7 @@ request = EmailPropertyRequest(email=None)
 ### PhoneNumberPropertyRequest
 
 ```python
-from notion_py.requests.property_requests import PhoneNumberPropertyRequest
+from notion_py_client.requests.property_requests import PhoneNumberPropertyRequest
 
 request = PhoneNumberPropertyRequest(phone_number="+1234567890")
 
@@ -308,7 +308,7 @@ request = PhoneNumberPropertyRequest(phone_number=None)
 ### RelationPropertyRequest
 
 ```python
-from notion_py.requests.property_requests import RelationPropertyRequest
+from notion_py_client.requests.property_requests import RelationPropertyRequest
 
 request = RelationPropertyRequest(
     relation=[
@@ -324,7 +324,7 @@ request = RelationPropertyRequest(relation=[])
 ### StatusPropertyRequest
 
 ```python
-from notion_py.requests.property_requests import StatusPropertyRequest
+from notion_py_client.requests.property_requests import StatusPropertyRequest
 
 request = StatusPropertyRequest(
     status={"name": "In Progress"}
@@ -339,7 +339,7 @@ request = StatusPropertyRequest(status=None)
 ### CreateDatabaseParameters
 
 ```python
-from notion_py.api_types import CreateDatabaseParameters
+from notion_py_client.api_types import CreateDatabaseParameters
 
 params: CreateDatabaseParameters = {
     "parent": {
@@ -373,7 +373,7 @@ params: CreateDatabaseParameters = {
 ### UpdateDatabaseParameters
 
 ```python
-from notion_py.api_types import UpdateDatabaseParameters
+from notion_py_client.api_types import UpdateDatabaseParameters
 
 params: UpdateDatabaseParameters = {
     "database_id": "db_abc123",
@@ -392,8 +392,8 @@ params: UpdateDatabaseParameters = {
 ### Building Requests Dynamically
 
 ```python
-from notion_py.requests.page_requests import CreatePageParameters
-from notion_py.requests.property_requests import PropertyRequest
+from notion_py_client.requests.page_requests import CreatePageParameters
+from notion_py_client.requests.property_requests import PropertyRequest
 
 def build_task_create_request(
     database_id: str,
@@ -424,7 +424,7 @@ def build_task_create_request(
 ### Partial Updates
 
 ```python
-from notion_py.requests.page_requests import UpdatePageParameters
+from notion_py_client.requests.page_requests import UpdatePageParameters
 
 # Only update specific properties
 params = UpdatePageParameters(
@@ -462,7 +462,7 @@ params = UpdatePageParameters(
 Convert requests to API format:
 
 ```python
-from notion_py.requests.page_requests import CreatePageParameters
+from notion_py_client.requests.page_requests import CreatePageParameters
 
 params = CreatePageParameters(...)
 

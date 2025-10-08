@@ -1,6 +1,6 @@
 # Type Reference
 
-notion-py provides a complete type system for the Notion API built with Pydantic v2.
+notion-py-client provides a complete type system for the Notion API built with Pydantic v2.
 
 ## Core Principles
 
@@ -208,30 +208,30 @@ Located in `notion_py.models`:
 
 ```python
 # Response types
-from notion_py import (
+from notion_py_client import (
     NotionPage,
     NotionDatabase,
     DataSource,
 )
 
 # Request types
-from notion_py.requests.page_requests import (
+from notion_py_client.requests.page_requests import (
     CreatePageParameters,
     UpdatePageParameters,
 )
-from notion_py.requests.property_requests import (
+from notion_py_client.requests.property_requests import (
     TitlePropertyRequest,
     StatusPropertyRequest,
 )
 
 # Filters
-from notion_py.filters import (
+from notion_py_client.filters import (
     TextPropertyFilter,
     CompoundFilter,
 )
 
 # Blocks
-from notion_py import (
+from notion_py_client import (
     ParagraphBlock,
     Heading1Block,
 )
@@ -240,7 +240,7 @@ from notion_py import (
 ### Type Guards
 
 ```python
-from notion_py import NotionPage
+from notion_py_client import NotionPage
 
 async with NotionAsyncClient(auth="secret_xxx") as client:
     page = await client.pages.retrieve({"page_id": "page_id"})
@@ -255,7 +255,7 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
 ### Model Validation
 
 ```python
-from notion_py import NotionPage
+from notion_py_client import NotionPage
 from pydantic import ValidationError
 
 try:
@@ -268,7 +268,7 @@ except ValidationError as e:
 ### Serialization
 
 ```python
-from notion_py.requests.page_requests import CreatePageParameters
+from notion_py_client.requests.page_requests import CreatePageParameters
 
 params = CreatePageParameters(
     parent={"type": "database_id", "database_id": "db_id"},

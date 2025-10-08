@@ -1,8 +1,8 @@
-# Copilot Instructions for notion-py
+# Copilot Instructions for notion-py-client
 
 ## Project Overview
 
-**notion-py** is a type-safe Python client library for the Notion API, built with Pydantic v2. It provides a complete type system mirroring Notion's TypeScript API definitions, covering Databases, DataSources, Pages, Blocks (33 types), Filters, and Request types.
+**notion-py-client** is a type-safe Python client library for the Notion API, built with Pydantic v2. It provides a complete type system mirroring Notion's TypeScript API definitions, covering Databases, DataSources, Pages, Blocks (33 types), Filters, and Request types.
 
 ## Notion API Reference
 
@@ -38,7 +38,7 @@ This pattern is used throughout: `BlockType`, `PropertyType`, `FilterType`, etc.
 ### 2. Module Organization
 
 ```
-notion_py/
+notion_py_client/
 ├── blocks/          # 33 block types (text, layout, media, special)
 ├── filters/         # Query filters (property, compound, date, timestamp)
 ├── models/          # Shared models (icon, cover, user, parent, rich_text)
@@ -50,7 +50,7 @@ notion_py/
 
 **Key Files**:
 
-- `notion_py/__init__.py` - Public API surface (all exports)
+- `notion_py_client/__init__.py` - Public API surface (all exports)
 - `blocks/base.py` - `BlockType` enum + `BaseBlockObject`
 - `responses/page.py` - `NotionPage` (main entity)
 - `requests/page_requests.py` - `CreatePageParameters`, `UpdatePageParameters`
@@ -60,7 +60,7 @@ notion_py/
 For page creation/updates, use typed property requests (not raw dicts):
 
 ```python
-from notion_py.requests.property_requests import (
+from notion_py_client.requests.property_requests import (
     TitlePropertyRequest,
     StatusPropertyRequest,
 )
@@ -82,7 +82,7 @@ properties = {
 Build type-safe database queries with filter builders:
 
 ```python
-from notion_py.filters import (
+from notion_py_client.filters import (
     TextPropertyFilter,
     StatusPropertyFilter,
     CompoundFilter,
@@ -179,7 +179,7 @@ from pydantic import BaseModel, Field, StrictStr
 - **Classes**: PascalCase (`NotionPage`, `ParagraphBlock`)
 - **Enums**: PascalCase for class, UPPER_SNAKE_CASE for values
 - **Files**: snake_case (`text_blocks.py`, `property_requests.py`)
-- **Module names**: Match import usage (`notion_py`, not `notion-py`)
+- **Module names**: Match import usage (`notion_py_client`, not `notion-py-client`)
 
 ## Testing & Quality
 
@@ -199,7 +199,7 @@ Currently no test suite. When adding tests:
 
   ```python
   import httpx
-  from notion_py import NotionPage, CreatePageParameters
+  from notion_py_client import NotionPage, CreatePageParameters
 
   # Use with your preferred HTTP client
   async with httpx.AsyncClient() as client:
@@ -212,9 +212,9 @@ Currently no test suite. When adding tests:
 
 ### Package Structure
 
-- **Package name**: `notion-py` (PyPI, with hyphen)
-- **Import name**: `notion_py` (Python, with underscore)
-- **Build backend**: `hatchling` (auto-detects `notion_py/` directory)
+- **Package name**: `notion-py-client` (PyPI, with hyphen)
+- **Import name**: `notion_py_client` (Python, with underscore)
+- **Build backend**: `hatchling` (auto-detects `notion_py_client/` directory)
 
 ## Common Tasks
 
@@ -223,7 +223,7 @@ Currently no test suite. When adding tests:
 1. Define in appropriate file (`blocks/text_blocks.py`, etc.)
 2. Use Enum+Literal pattern for `type` field
 3. Export in `blocks/__init__.py`
-4. Export in `notion_py/__init__.py`
+4. Export in `notion_py_client/__init__.py`
 
 **Add a new property request**:
 

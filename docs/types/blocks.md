@@ -1,13 +1,13 @@
 # Block Types
 
-Complete reference for all 33 block types supported by notion-py.
+Complete reference for all 33 block types supported by notion-py-client.
 
 ## Base Block
 
 All blocks inherit from `BaseBlockObject`:
 
 ```python
-from notion_py.blocks.base import BaseBlockObject, BlockType
+from notion_py_client.blocks.base import BaseBlockObject, BlockType
 
 class BaseBlockObject(BaseModel):
     object: Literal["block"] = "block"
@@ -27,7 +27,7 @@ class BaseBlockObject(BaseModel):
 ### ParagraphBlock
 
 ```python
-from notion_py import ParagraphBlock
+from notion_py_client import ParagraphBlock
 
 block = ParagraphBlock(
     id="block_id",
@@ -45,7 +45,7 @@ block = ParagraphBlock(
 ### Heading Blocks
 
 ```python
-from notion_py import Heading1Block, Heading2Block, Heading3Block
+from notion_py_client import Heading1Block, Heading2Block, Heading3Block
 
 heading = Heading1Block(
     id="block_id",
@@ -64,7 +64,7 @@ heading = Heading1Block(
 ### List Blocks
 
 ```python
-from notion_py import BulletedListItemBlock, NumberedListItemBlock
+from notion_py_client import BulletedListItemBlock, NumberedListItemBlock
 
 bullet = BulletedListItemBlock(
     id="block_id",
@@ -82,7 +82,7 @@ bullet = BulletedListItemBlock(
 ### ToDoBlock
 
 ```python
-from notion_py import ToDoBlock
+from notion_py_client import ToDoBlock
 
 todo = ToDoBlock(
     id="block_id",
@@ -101,7 +101,7 @@ todo = ToDoBlock(
 ### QuoteBlock
 
 ```python
-from notion_py import QuoteBlock
+from notion_py_client import QuoteBlock
 
 quote = QuoteBlock(
     id="block_id",
@@ -119,7 +119,7 @@ quote = QuoteBlock(
 ### ToggleBlock
 
 ```python
-from notion_py import ToggleBlock
+from notion_py_client import ToggleBlock
 
 toggle = ToggleBlock(
     id="block_id",
@@ -140,7 +140,7 @@ toggle = ToggleBlock(
 ### CodeBlock
 
 ```python
-from notion_py import CodeBlock
+from notion_py_client import CodeBlock
 
 code = CodeBlock(
     id="block_id",
@@ -161,7 +161,7 @@ code = CodeBlock(
 ### CalloutBlock
 
 ```python
-from notion_py import CalloutBlock
+from notion_py_client import CalloutBlock
 
 callout = CalloutBlock(
     id="block_id",
@@ -180,7 +180,7 @@ callout = CalloutBlock(
 ### EquationBlock
 
 ```python
-from notion_py import EquationBlock
+from notion_py_client import EquationBlock
 
 equation = EquationBlock(
     id="block_id",
@@ -195,7 +195,7 @@ equation = EquationBlock(
 ### ChildPageBlock
 
 ```python
-from notion_py import ChildPageBlock
+from notion_py_client import ChildPageBlock
 
 child_page = ChildPageBlock(
     id="block_id",
@@ -210,7 +210,7 @@ child_page = ChildPageBlock(
 ### ChildDatabaseBlock
 
 ```python
-from notion_py import ChildDatabaseBlock
+from notion_py_client import ChildDatabaseBlock
 
 child_db = ChildDatabaseBlock(
     id="block_id",
@@ -227,7 +227,7 @@ child_db = ChildDatabaseBlock(
 ### ImageBlock
 
 ```python
-from notion_py import ImageBlock
+from notion_py_client import ImageBlock
 
 image = ImageBlock(
     id="block_id",
@@ -244,7 +244,7 @@ image = ImageBlock(
 ### VideoBlock
 
 ```python
-from notion_py import VideoBlock
+from notion_py_client import VideoBlock
 
 video = VideoBlock(
     id="block_id",
@@ -261,7 +261,7 @@ video = VideoBlock(
 ### FileBlock
 
 ```python
-from notion_py import FileBlock
+from notion_py_client import FileBlock
 
 file = FileBlock(
     id="block_id",
@@ -278,7 +278,7 @@ file = FileBlock(
 ### BookmarkBlock
 
 ```python
-from notion_py import BookmarkBlock
+from notion_py_client import BookmarkBlock
 
 bookmark = BookmarkBlock(
     id="block_id",
@@ -294,7 +294,7 @@ bookmark = BookmarkBlock(
 ### EmbedBlock
 
 ```python
-from notion_py import EmbedBlock
+from notion_py_client import EmbedBlock
 
 embed = EmbedBlock(
     id="block_id",
@@ -311,7 +311,7 @@ embed = EmbedBlock(
 ### DividerBlock
 
 ```python
-from notion_py import DividerBlock
+from notion_py_client import DividerBlock
 
 divider = DividerBlock(
     id="block_id",
@@ -324,7 +324,7 @@ divider = DividerBlock(
 ### TableOfContentsBlock
 
 ```python
-from notion_py import TableOfContentsBlock
+from notion_py_client import TableOfContentsBlock
 
 toc = TableOfContentsBlock(
     id="block_id",
@@ -339,7 +339,7 @@ toc = TableOfContentsBlock(
 ### BreadcrumbBlock
 
 ```python
-from notion_py import BreadcrumbBlock
+from notion_py_client import BreadcrumbBlock
 
 breadcrumb = BreadcrumbBlock(
     id="block_id",
@@ -352,7 +352,7 @@ breadcrumb = BreadcrumbBlock(
 ### ColumnListBlock & ColumnBlock
 
 ```python
-from notion_py import ColumnListBlock, ColumnBlock
+from notion_py_client import ColumnListBlock, ColumnBlock
 
 column_list = ColumnListBlock(
     id="block_id",
@@ -374,7 +374,7 @@ column = ColumnBlock(
 ### TableBlock & TableRowBlock
 
 ```python
-from notion_py import TableBlock, TableRowBlock
+from notion_py_client import TableBlock, TableRowBlock
 
 table = TableBlock(
     id="block_id",
@@ -407,7 +407,7 @@ table_row = TableRowBlock(
 Available colors for text blocks:
 
 ```python
-from notion_py.blocks.base import ApiColor
+from notion_py_client.blocks.base import ApiColor
 
 # Text colors
 ApiColor.DEFAULT
@@ -441,7 +441,7 @@ ApiColor.RED_BACKGROUND
 Union of all block types:
 
 ```python
-from notion_py import BlockObject
+from notion_py_client import BlockObject
 
 # Can be any block type
 block: BlockObject = ...
@@ -460,7 +460,7 @@ elif block.type == "code":
 Minimal block representation (without type-specific content):
 
 ```python
-from notion_py import PartialBlock
+from notion_py_client import PartialBlock
 
 partial: PartialBlock = {
     "object": "block",

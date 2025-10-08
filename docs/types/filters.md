@@ -17,7 +17,7 @@ Filters are located in `notion_py.filters`:
 Filter text and rich text properties.
 
 ```python
-from notion_py.filters import TextPropertyFilter
+from notion_py_client.filters import TextPropertyFilter
 
 # Contains
 filter = TextPropertyFilter(
@@ -73,7 +73,7 @@ filter = TextPropertyFilter(
 Filter number properties.
 
 ```python
-from notion_py.filters import NumberPropertyFilter
+from notion_py_client.filters import NumberPropertyFilter
 
 # Equals
 filter = NumberPropertyFilter(
@@ -129,7 +129,7 @@ filter = NumberPropertyFilter(
 Filter checkbox properties.
 
 ```python
-from notion_py.filters import CheckboxPropertyFilter
+from notion_py_client.filters import CheckboxPropertyFilter
 
 # Checked
 filter = CheckboxPropertyFilter(
@@ -149,7 +149,7 @@ filter = CheckboxPropertyFilter(
 Filter select properties.
 
 ```python
-from notion_py.filters import SelectPropertyFilter
+from notion_py_client.filters import SelectPropertyFilter
 
 # Equals
 filter = SelectPropertyFilter(
@@ -181,7 +181,7 @@ filter = SelectPropertyFilter(
 Filter multi-select properties.
 
 ```python
-from notion_py.filters import MultiSelectPropertyFilter
+from notion_py_client.filters import MultiSelectPropertyFilter
 
 # Contains
 filter = MultiSelectPropertyFilter(
@@ -213,7 +213,7 @@ filter = MultiSelectPropertyFilter(
 Filter status properties.
 
 ```python
-from notion_py.filters import StatusPropertyFilter
+from notion_py_client.filters import StatusPropertyFilter
 
 # Equals
 filter = StatusPropertyFilter(
@@ -245,7 +245,7 @@ filter = StatusPropertyFilter(
 Filter date properties.
 
 ```python
-from notion_py.filters import DatePropertyFilter
+from notion_py_client.filters import DatePropertyFilter
 
 # Equals
 filter = DatePropertyFilter(
@@ -331,7 +331,7 @@ filter = DatePropertyFilter(
 Filter people properties.
 
 ```python
-from notion_py.filters import PeoplePropertyFilter
+from notion_py_client.filters import PeoplePropertyFilter
 
 # Contains
 filter = PeoplePropertyFilter(
@@ -363,7 +363,7 @@ filter = PeoplePropertyFilter(
 Filter files properties.
 
 ```python
-from notion_py.filters import FilesPropertyFilter
+from notion_py_client.filters import FilesPropertyFilter
 
 # Is empty
 filter = FilesPropertyFilter(
@@ -383,7 +383,7 @@ filter = FilesPropertyFilter(
 Filter relation properties.
 
 ```python
-from notion_py.filters import RelationPropertyFilter
+from notion_py_client.filters import RelationPropertyFilter
 
 # Contains
 filter = RelationPropertyFilter(
@@ -415,7 +415,7 @@ filter = RelationPropertyFilter(
 Filter formula properties.
 
 ```python
-from notion_py.filters import FormulaPropertyFilter
+from notion_py_client.filters import FormulaPropertyFilter
 
 # Number formula
 filter = FormulaPropertyFilter(
@@ -447,7 +447,7 @@ filter = FormulaPropertyFilter(
 Filter rollup properties.
 
 ```python
-from notion_py.filters import RollupPropertyFilter
+from notion_py_client.filters import RollupPropertyFilter
 
 # Number rollup
 filter = RollupPropertyFilter(
@@ -485,7 +485,7 @@ filter = RollupPropertyFilter(
 Combine multiple filters with AND/OR logic.
 
 ```python
-from notion_py.filters import CompoundFilter
+from notion_py_client.filters import CompoundFilter
 
 # AND - All conditions must match
 filter = CompoundFilter.and_(
@@ -515,7 +515,7 @@ filter = CompoundFilter.and_(
 Filter by created or last edited time.
 
 ```python
-from notion_py.filters import TimestampFilter
+from notion_py_client.filters import TimestampFilter
 
 # Created time - before
 filter = TimestampFilter(
@@ -545,8 +545,8 @@ filter = TimestampFilter(
 ## Usage with Query
 
 ```python
-from notion_py import NotionAsyncClient
-from notion_py.filters import (
+from notion_py_client import NotionAsyncClient
+from notion_py_client.filters import (
     StatusPropertyFilter,
     DatePropertyFilter,
     CompoundFilter,

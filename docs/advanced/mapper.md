@@ -18,7 +18,7 @@ The domain mapping pattern helps you work with Notion data using your own domain
 A descriptor that handles bidirectional conversion between Notion properties and domain values.
 
 ```python
-from notion_py.helper import NotionPropertyDescriptor
+from notion_py_client.helper import NotionPropertyDescriptor
 
 descriptor = NotionPropertyDescriptor(
     notion_name="Status",  # Property name in Notion
@@ -32,8 +32,8 @@ descriptor = NotionPropertyDescriptor(
 The `Field()` function creates property descriptors with type inference:
 
 ```python
-from notion_py.helper import Field
-from notion_py.requests.property_requests import TitlePropertyRequest
+from notion_py_client.helper import Field
+from notion_py_client.requests.property_requests import TitlePropertyRequest
 
 # Read-write field
 title_field = Field(
@@ -57,7 +57,7 @@ duration_field = Field(
 Abstract base class for creating mappers:
 
 ```python
-from notion_py.helper import NotionMapper
+from notion_py_client.helper import NotionMapper
 from pydantic import BaseModel
 
 class Task(BaseModel):
@@ -108,13 +108,13 @@ class ProjectTask(BaseModel):
 ### Create Mapper
 
 ```python
-from notion_py.helper import NotionMapper, Field
-from notion_py import NotionPage
-from notion_py.requests.page_requests import (
+from notion_py_client.helper import NotionMapper, NotionPropertyDescriptor, Field
+from notion_py_client import NotionPage
+from notion_py_client.requests.page_requests import (
     CreatePageParameters,
     UpdatePageParameters,
 )
-from notion_py.requests.property_requests import (
+from notion_py_client.requests.property_requests import (
     TitlePropertyRequest,
     SelectPropertyRequest,
     DatePropertyRequest,
@@ -122,10 +122,20 @@ from notion_py.requests.property_requests import (
     NumberPropertyRequest,
     StatusPropertyRequest,
 )
+from notion_py_client.responses.property_types import (
+    TitleProperty,
+    SelectProperty,
+    DateProperty,
+    PeopleProperty,
+    NumberProperty,
+    StatusProperty,
+    FormulaProperty,
+)
+from typing_extensions import Never
 
 class ProjectTaskMapper(NotionMapper[ProjectTask]):
-    # Define field descriptors
-    title_field = Field(
+    # Define field descriptors with type annotations
+    title_field: NotionPropertyDescriptor[TitleProperty, TitlePropertyRequest, str] = Field(
         notion_name="Task Name",
         parser=lambda p: p.title[0].plain_text if p.title else "",
         request_builder=lambda v: TitlePropertyRequest(
@@ -133,7 +143,7 @@ class ProjectTaskMapper(NotionMapper[ProjectTask]):
         )
     )
 
-    status_field = Field(
+    status_field: NotionPropertyDescriptor[StatusProperty, StatusPropertyRequest, str] = Field(
         notion_name="Status",
         parser=lambda p: p.status.name if p.status else "Not Started",
         request_builder=lambda v: StatusPropertyRequest(
@@ -141,7 +151,7 @@ class ProjectTaskMapper(NotionMapper[ProjectTask]):
         )
     )
 
-    priority_field = Field(
+    priority_field: NotionPropertyDescriptor[SelectProperty, SelectPropertyRequest, str] = Field(
         notion_name="Priority",
         parser=lambda p: p.select.name if p.select else "Medium",
         request_builder=lambda v: SelectPropertyRequest(
@@ -149,7 +159,7 @@ class ProjectTaskMapper(NotionMapper[ProjectTask]):
         )
     )
 
-    due_date_field = Field(
+    due_date_field: NotionPropertyDescriptor[DateProperty, DatePropertyRequest, date | None] = Field(
         notion_name="Due Date",
         parser=lambda p: date.fromisoformat(p.date.start) if p.date else None,
         request_builder=lambda v: DatePropertyRequest(
@@ -157,7 +167,7 @@ class ProjectTaskMapper(NotionMapper[ProjectTask]):
         )
     )
 
-    assignee_field = Field(
+    assignee_field: NotionPropertyDescriptor[PeopleProperty, PeoplePropertyRequest, str | None] = Field(
         notion_name="Assignee",
         parser=lambda p: p.people[0].name if p.people else None,
         request_builder=lambda v: PeoplePropertyRequest(
@@ -165,14 +175,14 @@ class ProjectTaskMapper(NotionMapper[ProjectTask]):
         )
     )
 
-    estimated_hours_field = Field(
+    estimated_hours_field: NotionPropertyDescriptor[NumberProperty, NumberPropertyRequest, float] = Field(
         notion_name="Estimated Hours",
         parser=lambda p: p.number or 0.0,
         request_builder=lambda v: NumberPropertyRequest(number=v)
     )
 
-    # Read-only formula field
-    actual_hours_field = Field(
+    # Read-only formula field (Never for request type)
+    actual_hours_field: NotionPropertyDescriptor[FormulaProperty, Never, float] = Field(
         notion_name="Actual Hours",
         parser=lambda p: p.formula.number or 0.0
         # No request_builder = read-only
@@ -229,7 +239,7 @@ class ProjectTaskMapper(NotionMapper[ProjectTask]):
 ### Use the Mapper
 
 ```python
-from notion_py import NotionAsyncClient
+from notion_py_client import NotionAsyncClient
 from datetime import date
 
 async with NotionAsyncClient(auth="secret_xxx") as client:

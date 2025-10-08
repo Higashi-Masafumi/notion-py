@@ -1,9 +1,9 @@
-# notion-py
+# notion-py-client
 
 A type-safe Python client library for the Notion API, built with Pydantic v2.
 
-[![PyPI version](https://badge.fury.io/py/notion-py.svg)](https://pypi.org/project/notion-py-client/)
-[![Python Version](https://img.shields.io/pypi/pyversions/notion-py.svg)](https://pypi.org/project/notion-py-client/)
+[![PyPI version](https://badge.fury.io/py/notion-py-client.svg)](https://pypi.org/project/notion-py-client/)
+[![Python Version](https://img.shields.io/pypi/pyversions/notion-py-client.svg)](https://pypi.org/project/notion-py-client/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Features
@@ -24,7 +24,7 @@ pip install notion-py-client
 
 ```python
 import asyncio
-from notion_py import NotionAsyncClient
+from notion_py_client import NotionAsyncClient
 
 async def main():
     client = NotionAsyncClient(auth="your_notion_api_key")
@@ -75,7 +75,7 @@ Full documentation is available at: [https://higashi-masafumi.github.io/notion-p
 
 ```python
 # Create a page
-from notion_py.requests import CreatePageParameters, TitlePropertyRequest
+from notion_py_client.requests import CreatePageParameters, TitlePropertyRequest
 
 await client.pages.create(
     parameters=CreatePageParameters(
@@ -92,7 +92,7 @@ await client.pages.create(
 ### Filters
 
 ```python
-from notion_py.filters import TextPropertyFilter, CompoundFilter
+from notion_py_client.filters import TextPropertyFilter, CompoundFilter
 
 # Type-safe query filters
 filter = CompoundFilter.and_(
@@ -109,11 +109,12 @@ await client.dataSources.query(
 ### Domain Mapping
 
 ```python
-from notion_py.helper import NotionMapper, Field
-from notion_py.requests.property_requests import (
+from notion_py_client.helper import NotionMapper, NotionPropertyDescriptor, Field
+from notion_py_client.requests.property_requests import (
     TitlePropertyRequest,
     StatusPropertyRequest,
 )
+from notion_py_client.responses.property_types import TitleProperty, StatusProperty
 from pydantic import BaseModel
 
 class Task(BaseModel):
@@ -122,17 +123,17 @@ class Task(BaseModel):
     status: str
 
 class TaskMapper(NotionMapper[Task]):
-    # Define field descriptors
-    name_field = Field(
-        notion_name="タスク名",
+    # Define field descriptors with type annotations
+    name_field: NotionPropertyDescriptor[TitleProperty, TitlePropertyRequest, str] = Field(
+        notion_name="Name",
         parser=lambda p: p.title[0].plain_text if p.title else "",
         request_builder=lambda v: TitlePropertyRequest(
             title=[{"type": "text", "text": {"content": v}}]
         )
     )
 
-    status_field = Field(
-        notion_name="ステータス",
+    status_field: NotionPropertyDescriptor[StatusProperty, StatusPropertyRequest, str] = Field(
+        notion_name="Status",
         parser=lambda p: p.status.name if p.status else "",
         request_builder=lambda v: StatusPropertyRequest(
             status={"name": v}
@@ -141,15 +142,16 @@ class TaskMapper(NotionMapper[Task]):
 
     def to_domain(self, notion_page):
         """Convert Notion page to domain model."""
+        props = notion_page.properties
         return Task(
             id=notion_page.id,
-            name=self.name_field.parse(notion_page.properties["タスク名"]),
-            status=self.status_field.parse(notion_page.properties["ステータス"]),
+            name=self.name_field.parse(props["Name"]),
+            status=self.status_field.parse(props["Status"]),
         )
 
 # Use the mapper
 mapper = TaskMapper()
-task = mapper.to_domain(notion_page)
+tasks = [mapper.to_domain(page) for page in response.results]
 ```
 
 ## Requirements

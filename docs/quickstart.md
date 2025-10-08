@@ -15,7 +15,7 @@ pip install notion-py-client
 Get your Notion integration token from [Notion Integrations](https://www.notion.so/my-integrations).
 
 ```python
-from notion_py import NotionAsyncClient
+from notion_py_client import NotionAsyncClient
 
 # Initialize the client
 client = NotionAsyncClient(auth="secret_xxx")
@@ -51,8 +51,8 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
 ### Create a Page
 
 ```python
-from notion_py.requests.page_requests import CreatePageParameters
-from notion_py.requests.property_requests import (
+from notion_py_client.requests.page_requests import CreatePageParameters
+from notion_py_client.requests.property_requests import (
     TitlePropertyRequest,
     StatusPropertyRequest,
 )
@@ -77,7 +77,7 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
 ### Update a Page
 
 ```python
-from notion_py.requests.page_requests import UpdatePageParameters
+from notion_py_client.requests.page_requests import UpdatePageParameters
 
 async with NotionAsyncClient(auth="secret_xxx") as client:
     params = UpdatePageParameters(
@@ -141,7 +141,7 @@ The key concept change in API 2025-09-03:
 Use typed filter builders for database queries:
 
 ```python
-from notion_py.filters import (
+from notion_py_client.filters import (
     TextPropertyFilter,
     StatusPropertyFilter,
     CompoundFilter,
@@ -174,7 +174,7 @@ response = await client.dataSources.query(
 ## Error Handling
 
 ```python
-from notion_py.notion_client import (
+from notion_py_client.notion_client import (
     APIResponseError,
     RequestTimeoutError,
     UnknownHTTPResponseError,

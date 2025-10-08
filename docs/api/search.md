@@ -31,7 +31,7 @@ async def search(
 ### Basic Search
 
 ```python
-from notion_py import NotionAsyncClient
+from notion_py_client import NotionAsyncClient
 
 async with NotionAsyncClient(auth="secret_xxx") as client:
     results = await client.search({
@@ -195,7 +195,7 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
 ## Response Structure
 
 ```python
-from notion_py.responses.list_response import SearchResponse
+from notion_py_client.responses.list_response import SearchResponse
 
 response: SearchResponse = {
     "object": "list",

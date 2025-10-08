@@ -39,7 +39,7 @@ async def retrieve(
 **Example**:
 
 ```python
-from notion_py import NotionAsyncClient
+from notion_py_client import NotionAsyncClient
 
 async with NotionAsyncClient(auth="secret_xxx") as client:
     db = await client.databases.retrieve(
@@ -200,7 +200,7 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
 ## Type Reference
 
 ```python
-from notion_py.responses.database import NotionDatabase
+from notion_py_client.responses.database import NotionDatabase
 
 # Database object structure
 database: NotionDatabase = {
