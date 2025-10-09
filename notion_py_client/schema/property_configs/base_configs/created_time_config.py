@@ -7,7 +7,9 @@ from ....models.primitives import EmptyObject
 from ....properties.base_properties._base_property import NotionPropertyType
 
 
-class CreatedTimePropertyConfig(BasePropertyConfig):
+class CreatedTimePropertyConfig(
+    BasePropertyConfig[Literal[NotionPropertyType.CREATED_TIME]]
+):
     """Notionのcreated_timeプロパティ設定"""
 
     type: Literal[NotionPropertyType.CREATED_TIME] = Field(

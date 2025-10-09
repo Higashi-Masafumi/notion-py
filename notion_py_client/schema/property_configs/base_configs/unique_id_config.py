@@ -12,7 +12,9 @@ class UniqueIdOptions(BaseModel):
     prefix: StrictStr | None = Field(None, description="ユニークIDのプレフィックス")
 
 
-class UniqueIdPropertyConfig(BasePropertyConfig):
+class UniqueIdPropertyConfig(
+    BasePropertyConfig[Literal[NotionPropertyType.UNIQUE_ID]]
+):
     """Notionのunique_idプロパティ設定"""
 
     type: Literal[NotionPropertyType.UNIQUE_ID] = Field(

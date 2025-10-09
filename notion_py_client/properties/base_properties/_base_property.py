@@ -1,6 +1,6 @@
 from abc import abstractmethod
 from enum import Enum
-from typing import Any
+from typing import Any, Generic, TypeVar
 
 from pydantic import BaseModel, Field, StrictStr
 
@@ -33,11 +33,15 @@ class NotionPropertyType(str, Enum):
     VERIFICATION = "verification"
 
 
-class BaseProperty(BaseModel):
+TPropertyType = TypeVar("TPropertyType", bound="NotionPropertyType")
+
+
+class BaseProperty(BaseModel, Generic[TPropertyType]):
     """Notionプロパティのベースクラス"""
 
     id: StrictStr | None = Field(None, description="プロパティID")
-    type: NotionPropertyType = Field(..., description="プロパティタイプ")
+    # 各サブクラスで特定の Literal[...] によって具体化される
+    type: TPropertyType = Field(..., description="プロパティタイプ")
 
     @abstractmethod
     def get_value(self) -> Any:

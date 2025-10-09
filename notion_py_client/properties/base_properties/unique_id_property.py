@@ -6,7 +6,7 @@ from ...models import UniqueId
 from ._base_property import BaseProperty, NotionPropertyType
 
 
-class UniqueIdProperty(BaseProperty):
+class UniqueIdProperty(BaseProperty[Literal[NotionPropertyType.UNIQUE_ID]]):
     """Notionのunique_idプロパティ"""
 
     type: Literal[NotionPropertyType.UNIQUE_ID] = Field(

@@ -4,7 +4,7 @@ from pydantic import Field
 from ._base_property import BaseProperty, NotionPropertyType
 
 
-class ButtonProperty(BaseProperty):
+class ButtonProperty(BaseProperty[Literal[NotionPropertyType.BUTTON]]):
     """Notionのbuttonプロパティ"""
 
     type: Literal[NotionPropertyType.BUTTON] = Field(

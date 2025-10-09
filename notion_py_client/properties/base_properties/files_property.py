@@ -6,7 +6,7 @@ from ...models import FileWithName
 from ._base_property import BaseProperty, NotionPropertyType
 
 
-class FilesProperty(BaseProperty):
+class FilesProperty(BaseProperty[Literal[NotionPropertyType.FILES]]):
     """Notionのfilesプロパティ"""
 
     type: Literal[NotionPropertyType.FILES] = Field(

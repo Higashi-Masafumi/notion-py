@@ -29,7 +29,7 @@ class SelectOptions(BaseModel):
     )
 
 
-class SelectPropertyConfig(BasePropertyConfig):
+class SelectPropertyConfig(BasePropertyConfig[Literal[NotionPropertyType.SELECT]]):
     """Notionのselectプロパティ設定"""
 
     type: Literal[NotionPropertyType.SELECT] = Field(

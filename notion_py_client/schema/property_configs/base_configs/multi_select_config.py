@@ -11,7 +11,9 @@ class MultiSelectOptions(SelectOptions):
     """multi_selectオプション定義"""
 
 
-class MultiSelectPropertyConfig(BasePropertyConfig):
+class MultiSelectPropertyConfig(
+    BasePropertyConfig[Literal[NotionPropertyType.MULTI_SELECT]]
+):
     """Notionのmulti_selectプロパティ設定"""
 
     type: Literal[NotionPropertyType.MULTI_SELECT] = Field(

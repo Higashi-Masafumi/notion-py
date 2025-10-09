@@ -7,7 +7,9 @@ from ....models.primitives import EmptyObject
 from ....properties.base_properties._base_property import NotionPropertyType
 
 
-class LastEditedTimePropertyConfig(BasePropertyConfig):
+class LastEditedTimePropertyConfig(
+    BasePropertyConfig[Literal[NotionPropertyType.LAST_EDITED_TIME]]
+):
     """Notionのlast_edited_timeプロパティ設定"""
 
     type: Literal[NotionPropertyType.LAST_EDITED_TIME] = Field(

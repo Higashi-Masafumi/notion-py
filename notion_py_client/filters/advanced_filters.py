@@ -2,11 +2,40 @@
 高度なフィルター定義
 
 Formula、Rollup、Verificationフィルター条件。
+TypedDict を使用して公式 Notion API 仕様に準拠。
+
+公式TypeScript定義:
+type FormulaPropertyFilter =
+  | { string: TextPropertyFilter }
+  | { checkbox: CheckboxPropertyFilter }
+  | { number: NumberPropertyFilter }
+  | { date: DatePropertyFilter }
+
+type RollupSubfilterPropertyFilter =
+  | { rich_text: TextPropertyFilter }
+  | { number: NumberPropertyFilter }
+  | { checkbox: CheckboxPropertyFilter }
+  | { select: SelectPropertyFilter }
+  | { multi_select: MultiSelectPropertyFilter }
+  | { relation: RelationPropertyFilter }
+  | { date: DatePropertyFilter }
+  | { people: PeoplePropertyFilter }
+  | { files: ExistencePropertyFilter }
+  | { status: StatusPropertyFilter }
+
+type RollupPropertyFilter =
+  | { any: RollupSubfilterPropertyFilter }
+  | { none: RollupSubfilterPropertyFilter }
+  | { every: RollupSubfilterPropertyFilter }
+  | { date: DatePropertyFilter }
+  | { number: NumberPropertyFilter }
+
+type VerificationPropertyStatusFilter = {
+  status: "verified" | "expired" | "none"
+}
 """
 
-from typing import Literal, Union
-
-from pydantic import BaseModel, Field
+from typing import Literal, TypedDict, Union
 
 from .base_filters import ExistencePropertyFilter
 from .date_filters import DatePropertyFilter
@@ -21,35 +50,44 @@ from .value_filters import (
 )
 
 
-# ===== Formulaフィルター =====
+# ============================================================================
+# Formula Property Filters
+# ============================================================================
 
 
-class FormulaFilterString(BaseModel):
-    """Formula文字列フィルター"""
+class FormulaFilterString(TypedDict):
+    """Formula文字列フィルター
 
-    string: TextPropertyFilter = Field(..., description="文字列フィルター")
+    Examples:
+        ```python
+        filter: FormulaFilterString = {
+            "string": {"contains": "test"}
+        }
+        ```
+    """
+
+    string: TextPropertyFilter
 
 
-class FormulaFilterCheckbox(BaseModel):
+class FormulaFilterCheckbox(TypedDict):
     """Formulaチェックボックスフィルター"""
 
-    checkbox: CheckboxPropertyFilter = Field(
-        ..., description="チェックボックスフィルター"
-    )
+    checkbox: CheckboxPropertyFilter
 
 
-class FormulaFilterNumber(BaseModel):
+class FormulaFilterNumber(TypedDict):
     """Formula数値フィルター"""
 
-    number: NumberPropertyFilter = Field(..., description="数値フィルター")
+    number: NumberPropertyFilter
 
 
-class FormulaFilterDate(BaseModel):
+class FormulaFilterDate(TypedDict):
     """Formula日付フィルター"""
 
-    date: DatePropertyFilter = Field(..., description="日付フィルター")
+    date: DatePropertyFilter
 
 
+# Matches TypeScript: type FormulaPropertyFilter
 FormulaPropertyFilter = Union[
     FormulaFilterString,
     FormulaFilterCheckbox,
@@ -58,73 +96,72 @@ FormulaPropertyFilter = Union[
 ]
 
 
-# ===== Rollupサブフィルター =====
+# ============================================================================
+# Rollup Subfilter Property Filters
+# ============================================================================
 
 
-class RollupSubfilterRichText(BaseModel):
+class RollupSubfilterRichText(TypedDict):
     """Rollupリッチテキストフィルター"""
 
-    rich_text: TextPropertyFilter = Field(..., description="リッチテキストフィルター")
+    rich_text: TextPropertyFilter
 
 
-class RollupSubfilterNumber(BaseModel):
+class RollupSubfilterNumber(TypedDict):
     """Rollup数値フィルター"""
 
-    number: NumberPropertyFilter = Field(..., description="数値フィルター")
+    number: NumberPropertyFilter
 
 
-class RollupSubfilterCheckbox(BaseModel):
+class RollupSubfilterCheckbox(TypedDict):
     """Rollupチェックボックスフィルター"""
 
-    checkbox: CheckboxPropertyFilter = Field(
-        ..., description="チェックボックスフィルター"
-    )
+    checkbox: CheckboxPropertyFilter
 
 
-class RollupSubfilterSelect(BaseModel):
+class RollupSubfilterSelect(TypedDict):
     """Rollupセレクトフィルター"""
 
-    select: SelectPropertyFilter = Field(..., description="セレクトフィルター")
+    select: SelectPropertyFilter
 
 
-class RollupSubfilterMultiSelect(BaseModel):
+class RollupSubfilterMultiSelect(TypedDict):
     """Rollupマルチセレクトフィルター"""
 
-    multi_select: MultiSelectPropertyFilter = Field(
-        ..., description="マルチセレクトフィルター"
-    )
+    multi_select: MultiSelectPropertyFilter
 
 
-class RollupSubfilterRelation(BaseModel):
+class RollupSubfilterRelation(TypedDict):
     """Rollup Relationフィルター"""
 
-    relation: RelationPropertyFilter = Field(..., description="Relationフィルター")
+    relation: RelationPropertyFilter
 
 
-class RollupSubfilterDate(BaseModel):
+class RollupSubfilterDate(TypedDict):
     """Rollup日付フィルター"""
 
-    date: DatePropertyFilter = Field(..., description="日付フィルター")
+    date: DatePropertyFilter
 
 
-class RollupSubfilterPeople(BaseModel):
+class RollupSubfilterPeople(TypedDict):
     """Rollup Peopleフィルター"""
 
-    people: PeoplePropertyFilter = Field(..., description="Peopleフィルター")
+    people: PeoplePropertyFilter
 
 
-class RollupSubfilterFiles(BaseModel):
+class RollupSubfilterFiles(TypedDict):
     """Rollupファイルフィルター"""
 
-    files: ExistencePropertyFilter = Field(..., description="ファイル存在性フィルター")
+    files: ExistencePropertyFilter
 
 
-class RollupSubfilterStatus(BaseModel):
+class RollupSubfilterStatus(TypedDict):
     """Rollupステータスフィルター"""
 
-    status: StatusPropertyFilter = Field(..., description="ステータスフィルター")
+    status: StatusPropertyFilter
 
 
+# Matches TypeScript: type RollupSubfilterPropertyFilter
 RollupSubfilterPropertyFilter = Union[
     RollupSubfilterRichText,
     RollupSubfilterNumber,
@@ -139,45 +176,50 @@ RollupSubfilterPropertyFilter = Union[
 ]
 
 
-# ===== Rollupフィルター =====
+# ============================================================================
+# Rollup Property Filters
+# ============================================================================
 
 
-class RollupFilterAny(BaseModel):
-    """Rollup いずれかが一致"""
+class RollupFilterAny(TypedDict):
+    """Rollup いずれかが一致
 
-    any: RollupSubfilterPropertyFilter = Field(
-        ..., description="いずれかが一致する条件"
-    )
+    Examples:
+        ```python
+        filter: RollupFilterAny = {
+            "any": {"number": {"greater_than": 100}}
+        }
+        ```
+    """
+
+    any: RollupSubfilterPropertyFilter
 
 
-class RollupFilterNone(BaseModel):
+class RollupFilterNone(TypedDict):
     """Rollup いずれも一致しない"""
 
-    none: RollupSubfilterPropertyFilter = Field(
-        ..., description="いずれも一致しない条件"
-    )
+    none: RollupSubfilterPropertyFilter
 
 
-class RollupFilterEvery(BaseModel):
+class RollupFilterEvery(TypedDict):
     """Rollup すべてが一致"""
 
-    every: RollupSubfilterPropertyFilter = Field(
-        ..., description="すべてが一致する条件"
-    )
+    every: RollupSubfilterPropertyFilter
 
 
-class RollupFilterDate(BaseModel):
+class RollupFilterDate(TypedDict):
     """Rollup日付フィルター"""
 
-    date: DatePropertyFilter = Field(..., description="日付フィルター")
+    date: DatePropertyFilter
 
 
-class RollupFilterNumber(BaseModel):
+class RollupFilterNumber(TypedDict):
     """Rollup数値フィルター"""
 
-    number: NumberPropertyFilter = Field(..., description="数値フィルター")
+    number: NumberPropertyFilter
 
 
+# Matches TypeScript: type RollupPropertyFilter
 RollupPropertyFilter = Union[
     RollupFilterAny,
     RollupFilterNone,
@@ -187,12 +229,18 @@ RollupPropertyFilter = Union[
 ]
 
 
-# ===== Verificationフィルター =====
+# ============================================================================
+# Verification Property Status Filter
+# ============================================================================
 
 
-class VerificationPropertyStatusFilter(BaseModel):
-    """検証ステータスフィルター"""
+class VerificationPropertyStatusFilter(TypedDict):
+    """検証ステータスフィルター
 
-    status: Literal["verified", "expired", "none"] = Field(
-        ..., description="検証ステータス"
-    )
+    Examples:
+        ```python
+        filter: VerificationPropertyStatusFilter = {"status": "verified"}
+        ```
+    """
+
+    status: Literal["verified", "expired", "none"]

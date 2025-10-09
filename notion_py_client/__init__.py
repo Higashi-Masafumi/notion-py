@@ -50,10 +50,11 @@ from .filters import (
     # フィルター基底型
     PropertyFilter,
     TimestampFilter,
-    PropertyOrTimestampFilter,
     FilterCondition,
-    AndFilter,
-    OrFilter,
+    AndFilterDict,
+    OrFilterDict,
+    create_and_filter,
+    create_or_filter,
     # プロパティフィルター
     PropertyFilterTitle,
     PropertyFilterRichText,
@@ -241,10 +242,11 @@ __all__ = [
     # フィルター基底型
     "PropertyFilter",
     "TimestampFilter",
-    "PropertyOrTimestampFilter",
     "FilterCondition",
-    "AndFilter",
-    "OrFilter",
+    "AndFilterDict",
+    "OrFilterDict",
+    "create_and_filter",
+    "create_or_filter",
     # プロパティフィルター
     "PropertyFilterTitle",
     "PropertyFilterRichText",

@@ -7,7 +7,9 @@ from ....models.primitives import EmptyObject
 from ....properties.base_properties._base_property import NotionPropertyType
 
 
-class CheckboxPropertyConfig(BasePropertyConfig):
+class CheckboxPropertyConfig(
+    BasePropertyConfig[Literal[NotionPropertyType.CHECKBOX]]
+):
     """Notionのcheckboxプロパティ設定"""
 
     type: Literal[NotionPropertyType.CHECKBOX] = Field(

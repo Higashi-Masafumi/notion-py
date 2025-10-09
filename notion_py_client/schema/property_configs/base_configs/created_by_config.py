@@ -7,7 +7,9 @@ from ....models.primitives import EmptyObject
 from ....properties.base_properties._base_property import NotionPropertyType
 
 
-class CreatedByPropertyConfig(BasePropertyConfig):
+class CreatedByPropertyConfig(
+    BasePropertyConfig[Literal[NotionPropertyType.CREATED_BY]]
+):
     """Notionのcreated_byプロパティ設定"""
 
     type: Literal[NotionPropertyType.CREATED_BY] = Field(

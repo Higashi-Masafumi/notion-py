@@ -6,7 +6,7 @@ from ...models import Verification
 from ._base_property import BaseProperty, NotionPropertyType
 
 
-class VerificationProperty(BaseProperty):
+class VerificationProperty(BaseProperty[Literal[NotionPropertyType.VERIFICATION]]):
     """Notionのverificationプロパティ"""
 
     type: Literal[NotionPropertyType.VERIFICATION] = Field(

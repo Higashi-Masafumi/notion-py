@@ -2,78 +2,115 @@
 複合フィルター定義
 
 AND/ORなどの複合条件フィルター。
-公式TypeScript SDKのGroupFilterOperatorArray型に対応。
+TypedDict を使用して公式 Notion API 仕様に準拠。
+
+公式TypeScript定義:
+type PropertyOrTimestampFilter = PropertyFilter | TimestampFilter
+type PropertyOrTimestampFilterArray = Array<PropertyOrTimestampFilter>
+type GroupFilterOperatorArray = Array<
+  | PropertyOrTimestampFilter
+  | { or: PropertyOrTimestampFilterArray }
+  | { and: PropertyOrTimestampFilterArray }
+>
 """
 
-from typing import Union
+from __future__ import annotations
 
-from pydantic import BaseModel, Field
+from typing import TYPE_CHECKING, Any, Union
 
-from .property_filters import PropertyFilter
-from .timestamp_filters import TimestampFilter
+if TYPE_CHECKING:
+    from typing import TypedDict
 
+    from .property_filters import PropertyFilter
+    from .timestamp_filters import TimestampFilter
 
-# 公式SDK: PropertyOrTimestampFilter = PropertyFilter | TimestampFilter
-PropertyOrTimestampFilter = Union[PropertyFilter, TimestampFilter]
+    # TYPE_CHECKING時のみ使用: 正確な型定義
+    PropertyOrTimestampFilter = Union[PropertyFilter, TimestampFilter]
 
+    class AndFilterDict(TypedDict):
+        """ANDフィルター (型チェック用)"""
 
-class AndFilter(BaseModel):
-    """
-    ANDフィルター (公式SDK: { and: PropertyOrTimestampFilterArray })
+        and_: list[Union[PropertyOrTimestampFilter, "AndFilterDict", "OrFilterDict"]]  # type: ignore
 
-    複数の条件をすべて満たすレコードを抽出する。
+    class OrFilterDict(TypedDict):
+        """ORフィルター (型チェック用)"""
 
-    Examples:
-        ```python
-        # ステータスが"Active" かつ 金額が10000より大きい
-        filter_obj = AndFilter(
-            **{
-                "and": [
-                    PropertyFilterStatus(...),
-                    PropertyFilterNumber(...),
-                ]
-            }
-        )
-        ```
-    """
+        or_: list[Union[PropertyOrTimestampFilter, "AndFilterDict", "OrFilterDict"]]  # type: ignore
 
-    and_: list["FilterCondition"] = Field(
-        ..., alias="and", description="AND条件のリスト (すべて満たす必要がある)"
-    )
-
-
-class OrFilter(BaseModel):
-    """
-    ORフィルター (公式SDK: { or: PropertyOrTimestampFilterArray })
-
-    複数の条件のいずれかを満たすレコードを抽出する。
-
-    Examples:
-        ```python
-        # サービスが"A" または "B"
-        filter_obj = OrFilter(
-            **{
-                "or": [
-                    PropertyFilterSelect(...),
-                    PropertyFilterSelect(...),
-                ]
-            }
-        )
-        ```
-    """
-
-    or_: list["FilterCondition"] = Field(
-        ..., alias="or", description="OR条件のリスト (いずれかを満たせばよい)"
-    )
+    # 完全な FilterCondition 型定義
+    FilterCondition = Union[
+        PropertyFilter,
+        TimestampFilter,
+        AndFilterDict,
+        OrFilterDict,
+    ]
+else:
+    # 実行時: 循環参照を避けるため dict を使用
+    AndFilterDict = dict[str, list[Any]]  # {"and": [...]}
+    OrFilterDict = dict[str, list[Any]]  # {"or": [...]}
+    FilterCondition = dict[str, Any]
 
 
-# 公式SDK: GroupFilterOperatorArray = Array<PropertyOrTimestampFilter | { and: ... } | { or: ... }>
-FilterCondition = Union[
-    PropertyOrTimestampFilter,
-    AndFilter,
-    OrFilter,
-]
+# ============================================================================
+# Helper Functions for Type-Safe Filter Construction
+# ============================================================================
 
-# 前方参照を解決 (Pydantic v2)
-AndFilter.model_rebuild()
-OrFilter.model_rebuild()
+if TYPE_CHECKING:
+    # 型チェック時: 正確な型シグネチャ
+    def create_and_filter(
+        *conditions: Union[PropertyFilter, TimestampFilter, AndFilterDict, OrFilterDict]
+    ) -> AndFilterDict: ...
+
+    def create_or_filter(
+        *conditions: Union[PropertyFilter, TimestampFilter, AndFilterDict, OrFilterDict]
+    ) -> OrFilterDict: ...
+
+else:
+    # 実行時: 実装
+    def create_and_filter(*conditions: dict[str, Any]) -> AndFilterDict:
+        """AND フィルターを作成するヘルパー関数
+
+        すべての条件を満たすレコードを抽出する。
+
+        Examples:
+            ```python
+            from notion_py_client.filters import create_and_filter
+
+            filter = create_and_filter(
+                {"property": "Status", "status": {"equals": "Active"}},
+                {"property": "Amount", "number": {"greater_than": 10000}},
+            )
+            # => {"and": [{...}, {...}]}
+            ```
+
+        Args:
+            *conditions: フィルター条件（PropertyFilter, TimestampFilter, または入れ子の複合フィルター）
+
+        Returns:
+            ANDフィルター辞書 `{"and": [...]}`
+        """
+        return {"and": list(conditions)}
+
+    def create_or_filter(*conditions: dict[str, Any]) -> OrFilterDict:
+        """OR フィルターを作成するヘルパー関数
+
+        いずれかの条件を満たすレコードを抽出する。
+
+        Examples:
+            ```python
+            from notion_py_client.filters import create_or_filter
+
+            filter = create_or_filter(
+                {"property": "Service", "select": {"equals": "A"}},
+                {"property": "Service", "select": {"equals": "B"}},
+            )
+            # => {"or": [{...}, {...}]}
+            ```
+
+        Args:
+            *conditions: フィルター条件（PropertyFilter, TimestampFilter, または入れ子の複合フィルター）
+
+        Returns:
+            ORフィルター辞書 `{"or": [...]}`
+        """
+        return {"or": list(conditions)}

@@ -5,7 +5,7 @@ from pydantic import Field, StrictStr
 from ._base_property import BaseProperty, NotionPropertyType
 
 
-class PhoneNumberProperty(BaseProperty):
+class PhoneNumberProperty(BaseProperty[Literal[NotionPropertyType.PHONE_NUMBER]]):
     """Notionのphone_numberプロパティ"""
 
     type: Literal[NotionPropertyType.PHONE_NUMBER] = Field(

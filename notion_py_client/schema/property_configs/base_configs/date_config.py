@@ -7,7 +7,7 @@ from ....models.primitives import EmptyObject
 from ....properties.base_properties._base_property import NotionPropertyType
 
 
-class DatePropertyConfig(BasePropertyConfig):
+class DatePropertyConfig(BasePropertyConfig[Literal[NotionPropertyType.DATE]]):
     """Notionのdateプロパティ設定"""
 
     type: Literal[NotionPropertyType.DATE] = Field(

@@ -1,16 +1,18 @@
-from typing import Any
+from typing import Any, Generic, TypeVar
 
 from pydantic import BaseModel, ConfigDict, Field, StrictStr
 
 from ....properties.base_properties._base_property import NotionPropertyType
 
+_TPropertyType = TypeVar("_TPropertyType", bound=NotionPropertyType)
 
-class BasePropertyConfig(BaseModel):
+
+class BasePropertyConfig(BaseModel, Generic[_TPropertyType]):
     """Notionのプロパティ設定のベースクラス"""
 
-    model_config = ConfigDict(extra="forbid", use_enum_values=True)
-
-    type: NotionPropertyType = Field(..., description="プロパティタイプ")
+    id: StrictStr = Field(..., description="プロパティID")
+    name: StrictStr = Field(..., description="プロパティ名")
+    type: _TPropertyType
     description: StrictStr | None = Field(None, description="プロパティの説明")
 
     def to_dict(self) -> dict[str, Any]:

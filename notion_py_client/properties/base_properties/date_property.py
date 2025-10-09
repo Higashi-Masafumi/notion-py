@@ -5,7 +5,7 @@ from ._base_property import BaseProperty, NotionPropertyType
 from typing import Literal
 
 
-class DateProperty(BaseProperty):
+class DateProperty(BaseProperty[Literal[NotionPropertyType.DATE]]):
     """Notionのdateプロパティ"""
 
     type: Literal[NotionPropertyType.DATE] = Field(

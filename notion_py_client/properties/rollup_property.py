@@ -93,7 +93,7 @@ class Rollup(BaseModel):
                 return None
 
 
-class RollupProperty(BaseProperty):
+class RollupProperty(BaseProperty[Literal[NotionPropertyType.ROLLUP]]):
     """Notionのrollupプロパティ"""
 
     type: Literal[NotionPropertyType.ROLLUP] = Field(

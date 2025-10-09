@@ -5,7 +5,7 @@ from ...models import RichTextItem
 from ._base_property import BaseProperty, NotionPropertyType
 
 
-class RichTextProperty(BaseProperty):
+class RichTextProperty(BaseProperty[Literal[NotionPropertyType.RICH_TEXT]]):
     """
     Notionのrich_textプロパティ
 

@@ -12,7 +12,7 @@ class NumberOptions(BaseModel):
     format: StrictStr | None = Field(None, description="数値フォーマット")
 
 
-class NumberPropertyConfig(BasePropertyConfig):
+class NumberPropertyConfig(BasePropertyConfig[Literal[NotionPropertyType.NUMBER]]):
     """Notionのnumberプロパティ設定"""
 
     type: Literal[NotionPropertyType.NUMBER] = Field(

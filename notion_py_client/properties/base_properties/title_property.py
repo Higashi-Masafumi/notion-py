@@ -5,7 +5,7 @@ from ...models import RichTextItem
 from ._base_property import BaseProperty, NotionPropertyType
 
 
-class TitleProperty(BaseProperty):
+class TitleProperty(BaseProperty[Literal[NotionPropertyType.TITLE]]):
     """Notionのtitleプロパティ"""
 
     type: Literal[NotionPropertyType.TITLE] = Field(

@@ -1,55 +1,68 @@
 """
 値フィルター定義
 
-テキスト、数値、チェックボックス、セレクト系のフィルター条件。
+テキスト、数値、選択肢等の値に対するフィルター条件。
+TypedDict を使用して公式 Notion API 仕様に準拠。
+
+公式TypeScript定義:
+- type TextPropertyFilter = { equals: string } | { does_not_equal: string } | ...
+- type NumberPropertyFilter = { equals: number } | { does_not_equal: number } | ...
+- type CheckboxPropertyFilter = { equals: boolean } | { does_not_equal: boolean }
 """
 
-from typing import Union
+from typing import TypedDict, Union
 
-from pydantic import BaseModel, Field, StrictBool, StrictStr
-
-from .base_filters import ExistenceFilterEmpty, ExistenceFilterNotEmpty
+from .base_filters import ExistencePropertyFilter
 
 
-# ===== テキストフィルター =====
+# ============================================================================
+# Text Property Filters
+# ============================================================================
 
 
-class TextFilterEquals(BaseModel):
-    """テキストが等しい"""
+class TextFilterEquals(TypedDict):
+    """テキストが等しい
 
-    equals: StrictStr = Field(..., description="一致する文字列")
+    Examples:
+        ```python
+        filter: TextFilterEquals = {"equals": "Important"}
+        ```
+    """
+
+    equals: str
 
 
-class TextFilterDoesNotEqual(BaseModel):
+class TextFilterDoesNotEqual(TypedDict):
     """テキストが等しくない"""
 
-    does_not_equal: StrictStr = Field(..., description="一致しない文字列")
+    does_not_equal: str
 
 
-class TextFilterContains(BaseModel):
+class TextFilterContains(TypedDict):
     """テキストを含む"""
 
-    contains: StrictStr = Field(..., description="含む文字列")
+    contains: str
 
 
-class TextFilterDoesNotContain(BaseModel):
+class TextFilterDoesNotContain(TypedDict):
     """テキストを含まない"""
 
-    does_not_contain: StrictStr = Field(..., description="含まない文字列")
+    does_not_contain: str
 
 
-class TextFilterStartsWith(BaseModel):
+class TextFilterStartsWith(TypedDict):
     """テキストで始まる"""
 
-    starts_with: StrictStr = Field(..., description="開始文字列")
+    starts_with: str
 
 
-class TextFilterEndsWith(BaseModel):
+class TextFilterEndsWith(TypedDict):
     """テキストで終わる"""
 
-    ends_with: StrictStr = Field(..., description="終了文字列")
+    ends_with: str
 
 
+# Matches TypeScript: type TextPropertyFilter = { equals: string } | ... | ExistencePropertyFilter
 TextPropertyFilter = Union[
     TextFilterEquals,
     TextFilterDoesNotEqual,
@@ -57,50 +70,58 @@ TextPropertyFilter = Union[
     TextFilterDoesNotContain,
     TextFilterStartsWith,
     TextFilterEndsWith,
-    ExistenceFilterEmpty,
-    ExistenceFilterNotEmpty,
+    ExistencePropertyFilter,
 ]
 
 
-# ===== 数値フィルター =====
+# ============================================================================
+# Number Property Filters
+# ============================================================================
 
 
-class NumberFilterEquals(BaseModel):
-    """数値が等しい"""
+class NumberFilterEquals(TypedDict):
+    """数値が等しい
 
-    equals: int | float = Field(..., description="一致する数値")
+    Examples:
+        ```python
+        filter: NumberFilterEquals = {"equals": 100}
+        ```
+    """
+
+    equals: float
 
 
-class NumberFilterDoesNotEqual(BaseModel):
+class NumberFilterDoesNotEqual(TypedDict):
     """数値が等しくない"""
 
-    does_not_equal: int | float = Field(..., description="一致しない数値")
+    does_not_equal: float
 
 
-class NumberFilterGreaterThan(BaseModel):
-    """数値より大きい"""
+class NumberFilterGreaterThan(TypedDict):
+    """数値がより大きい"""
 
-    greater_than: int | float = Field(..., description="比較する数値")
-
-
-class NumberFilterLessThan(BaseModel):
-    """数値より小さい"""
-
-    less_than: int | float = Field(..., description="比較する数値")
+    greater_than: float
 
 
-class NumberFilterGreaterThanOrEqualTo(BaseModel):
-    """数値以上"""
+class NumberFilterLessThan(TypedDict):
+    """数値がより小さい"""
 
-    greater_than_or_equal_to: int | float = Field(..., description="比較する数値")
-
-
-class NumberFilterLessThanOrEqualTo(BaseModel):
-    """数値以下"""
-
-    less_than_or_equal_to: int | float = Field(..., description="比較する数値")
+    less_than: float
 
 
+class NumberFilterGreaterThanOrEqualTo(TypedDict):
+    """数値が以上"""
+
+    greater_than_or_equal_to: float
+
+
+class NumberFilterLessThanOrEqualTo(TypedDict):
+    """数値が以下"""
+
+    less_than_or_equal_to: float
+
+
+# Matches TypeScript: type NumberPropertyFilter = { equals: number } | ... | ExistencePropertyFilter
 NumberPropertyFilter = Union[
     NumberFilterEquals,
     NumberFilterDoesNotEqual,
@@ -108,96 +129,125 @@ NumberPropertyFilter = Union[
     NumberFilterLessThan,
     NumberFilterGreaterThanOrEqualTo,
     NumberFilterLessThanOrEqualTo,
-    ExistenceFilterEmpty,
-    ExistenceFilterNotEmpty,
+    ExistencePropertyFilter,
 ]
 
 
-# ===== チェックボックスフィルター =====
+# ============================================================================
+# Checkbox Property Filters
+# ============================================================================
 
 
-class CheckboxFilterEquals(BaseModel):
-    """チェックボックスが等しい"""
+class CheckboxFilterEquals(TypedDict):
+    """チェックボックスが等しい
 
-    equals: StrictBool = Field(..., description="一致する真偽値")
+    Examples:
+        ```python
+        filter: CheckboxFilterEquals = {"equals": True}
+        ```
+    """
+
+    equals: bool
 
 
-class CheckboxFilterDoesNotEqual(BaseModel):
+class CheckboxFilterDoesNotEqual(TypedDict):
     """チェックボックスが等しくない"""
 
-    does_not_equal: StrictBool = Field(..., description="一致しない真偽値")
+    does_not_equal: bool
 
 
-CheckboxPropertyFilter = Union[
-    CheckboxFilterEquals,
-    CheckboxFilterDoesNotEqual,
-]
+# Matches TypeScript: type CheckboxPropertyFilter = { equals: boolean } | { does_not_equal: boolean }
+CheckboxPropertyFilter = Union[CheckboxFilterEquals, CheckboxFilterDoesNotEqual]
 
 
-# ===== セレクトフィルター =====
+# ============================================================================
+# Select Property Filters
+# ============================================================================
 
 
-class SelectFilterEquals(BaseModel):
-    """セレクトが等しい"""
+class SelectFilterEquals(TypedDict):
+    """選択肢が等しい
 
-    equals: StrictStr = Field(..., description="一致する選択肢")
+    Examples:
+        ```python
+        filter: SelectFilterEquals = {"equals": "Option A"}
+        ```
+    """
+
+    equals: str
 
 
-class SelectFilterDoesNotEqual(BaseModel):
-    """セレクトが等しくない"""
+class SelectFilterDoesNotEqual(TypedDict):
+    """選択肢が等しくない"""
 
-    does_not_equal: StrictStr = Field(..., description="一致しない選択肢")
+    does_not_equal: str
 
 
+# Matches TypeScript: type SelectPropertyFilter = { equals: string } | { does_not_equal: string } | ExistencePropertyFilter
 SelectPropertyFilter = Union[
     SelectFilterEquals,
     SelectFilterDoesNotEqual,
-    ExistenceFilterEmpty,
-    ExistenceFilterNotEmpty,
+    ExistencePropertyFilter,
 ]
 
 
-# ===== マルチセレクトフィルター =====
+# ============================================================================
+# Multi-Select Property Filters
+# ============================================================================
 
 
-class MultiSelectFilterContains(BaseModel):
-    """マルチセレクトが含む"""
+class MultiSelectFilterContains(TypedDict):
+    """マルチセレクトが含む
 
-    contains: StrictStr = Field(..., description="含む選択肢")
+    Examples:
+        ```python
+        filter: MultiSelectFilterContains = {"contains": "Tag A"}
+        ```
+    """
+
+    contains: str
 
 
-class MultiSelectFilterDoesNotContain(BaseModel):
+class MultiSelectFilterDoesNotContain(TypedDict):
     """マルチセレクトが含まない"""
 
-    does_not_contain: StrictStr = Field(..., description="含まない選択肢")
+    does_not_contain: str
 
 
+# Matches TypeScript: type MultiSelectPropertyFilter = { contains: string } | { does_not_contain: string } | ExistencePropertyFilter
 MultiSelectPropertyFilter = Union[
     MultiSelectFilterContains,
     MultiSelectFilterDoesNotContain,
-    ExistenceFilterEmpty,
-    ExistenceFilterNotEmpty,
+    ExistencePropertyFilter,
 ]
 
 
-# ===== ステータスフィルター =====
+# ============================================================================
+# Status Property Filters
+# ============================================================================
 
 
-class StatusFilterEquals(BaseModel):
-    """ステータスが等しい"""
+class StatusFilterEquals(TypedDict):
+    """ステータスが等しい
 
-    equals: StrictStr = Field(..., description="一致するステータス")
+    Examples:
+        ```python
+        filter: StatusFilterEquals = {"equals": "In Progress"}
+        ```
+    """
+
+    equals: str
 
 
-class StatusFilterDoesNotEqual(BaseModel):
+class StatusFilterDoesNotEqual(TypedDict):
     """ステータスが等しくない"""
 
-    does_not_equal: StrictStr = Field(..., description="一致しないステータス")
+    does_not_equal: str
 
 
+# Matches TypeScript: type StatusPropertyFilter = { equals: string } | { does_not_equal: string } | ExistencePropertyFilter
 StatusPropertyFilter = Union[
     StatusFilterEquals,
     StatusFilterDoesNotEqual,
-    ExistenceFilterEmpty,
-    ExistenceFilterNotEmpty,
+    ExistencePropertyFilter,
 ]

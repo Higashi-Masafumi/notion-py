@@ -859,10 +859,34 @@ class _DataSourcesAPI:
         データソース内のページ（データ行）を取得します。
         これは旧APIのdatabases.query()に相当します。
 
+        **型安全なフィルター作成:**
+        公式TypeScript SDKの型定義に準拠したフィルター型を使用可能です。
+        ```typescript
+        // PropertyFilter (23種類)
+        type PropertyFilter =
+          | { title: TextPropertyFilter; property: string; type?: "title" }
+          | { rich_text: TextPropertyFilter; property: string; type?: "rich_text" }
+          | { number: NumberPropertyFilter; property: string; type?: "number" }
+          // ... その他のプロパティタイプ
+
+        // TimestampFilter
+        type TimestampFilter =
+          | { created_time: DatePropertyFilter; timestamp: "created_time" }
+          | { last_edited_time: DatePropertyFilter; timestamp: "last_edited_time" }
+
+        // CompoundFilter
+        filter?: PropertyFilter | TimestampFilter
+          | { or: Array<PropertyFilter | TimestampFilter> }
+          | { and: Array<PropertyFilter | TimestampFilter> }
+        ```
+
         Args:
             data_source_id: データソースID
-            filter: フィルター条件
-            sorts: ソート条件
+            filter: フィルター条件（PropertyFilter | TimestampFilter | 複合フィルター）
+                型安全な作成には `create_and_filter()`, `create_or_filter()` を使用
+            sorts: ソート条件のリスト
+                - `[{"property": "名前", "direction": "ascending"}]`
+                - `[{"timestamp": "created_time", "direction": "descending"}]`
             start_cursor: ページネーション用カーソル
             page_size: 取得件数（最大100）
             auth: 認証トークン（オプション）
@@ -872,27 +896,50 @@ class _DataSourcesAPI:
 
         Examples:
             ```python
-            # データソースからページを取得
+            from notion_py_client import NotionAsyncClient
+            from notion_py_client.filters import create_and_filter
+
+            client = NotionAsyncClient(auth="secret_xxx")
+
+            # シンプルなフィルター (直接辞書 - IDE補完あり)
             response = await client.dataSources.query(
                 data_source_id="ds_abc123",
-                page_size=50,
+                filter={"property": "Status", "status": {"equals": "Done"}}
+            )
+
+            # 複数条件 (型安全なヘルパー関数 - IDE補完あり)
+            response = await client.dataSources.query(
+                data_source_id="ds_abc123",
+                filter=create_and_filter(
+                    {"property": "Status", "status": {"equals": "Active"}},
+                    {"property": "Amount", "number": {"greater_than": 10000}},
+                )
+            )
+
+            # タイムスタンプフィルター
+            response = await client.dataSources.query(
+                data_source_id="ds_abc123",
                 filter={
-                    "property": "Status",
-                    "select": {"equals": "Done"}
+                    "timestamp": "created_time",
+                    "created_time": {"past_week": {}}
                 }
             )
 
+            # ページネーション
             for page in response.results:
                 if isinstance(page, NotionPage):
                     print(f"Page: {page.id}")
 
-            # ページネーション
             if response.has_more:
                 next_response = await client.dataSources.query(
                     data_source_id="ds_abc123",
                     start_cursor=response.next_cursor
                 )
             ```
+
+        Note:
+            IDE補完を活用するには、型安全な`create_and_filter()`などのヘルパー関数を使用してください。
+            公式ドキュメント: https://developers.notion.com/reference/post-database-query
         """
         body = pick(
             {

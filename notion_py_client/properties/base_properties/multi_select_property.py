@@ -5,7 +5,7 @@ from ...models import SelectOption
 from ._base_property import BaseProperty, NotionPropertyType
 
 
-class MultiSelectProperty(BaseProperty):
+class MultiSelectProperty(BaseProperty[Literal[NotionPropertyType.MULTI_SELECT]]):
     """Notionのmulti_selectプロパティ"""
 
     type: Literal[NotionPropertyType.MULTI_SELECT] = Field(

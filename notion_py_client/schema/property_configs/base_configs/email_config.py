@@ -7,7 +7,7 @@ from ....models.primitives import EmptyObject
 from ....properties.base_properties._base_property import NotionPropertyType
 
 
-class EmailPropertyConfig(BasePropertyConfig):
+class EmailPropertyConfig(BasePropertyConfig[Literal[NotionPropertyType.EMAIL]]):
     """Notionのemailプロパティ設定"""
 
     type: Literal[NotionPropertyType.EMAIL] = Field(

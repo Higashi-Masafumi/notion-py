@@ -5,7 +5,7 @@ from pydantic import Field, StrictStr
 from ._base_property import BaseProperty, NotionPropertyType
 
 
-class CreatedTimeProperty(BaseProperty):
+class CreatedTimeProperty(BaseProperty[Literal[NotionPropertyType.CREATED_TIME]]):
     """Notionのcreated_timeプロパティ"""
 
     type: Literal[NotionPropertyType.CREATED_TIME] = Field(

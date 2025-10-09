@@ -7,7 +7,9 @@ from ....models.primitives import EmptyObject
 from ....properties.base_properties._base_property import NotionPropertyType
 
 
-class PhoneNumberPropertyConfig(BasePropertyConfig):
+class PhoneNumberPropertyConfig(
+    BasePropertyConfig[Literal[NotionPropertyType.PHONE_NUMBER]]
+):
     """Notionのphone_numberプロパティ設定"""
 
     type: Literal[NotionPropertyType.PHONE_NUMBER] = Field(

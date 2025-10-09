@@ -6,7 +6,7 @@ from ...models import PartialUser, User
 from ._base_property import BaseProperty, NotionPropertyType
 
 
-class CreatedByProperty(BaseProperty):
+class CreatedByProperty(BaseProperty[Literal[NotionPropertyType.CREATED_BY]]):
     """Notionのcreated_byプロパティ"""
 
     type: Literal[NotionPropertyType.CREATED_BY] = Field(

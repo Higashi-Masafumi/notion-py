@@ -2,12 +2,35 @@
 プロパティフィルター統合型
 
 各プロパティタイプに対応するフィルタークラス。
-公式TypeScript SDKのPropertyFilter型に対応。
+TypedDict を使用して公式 Notion API 仕様に準拠。
+
+公式TypeScript定義:
+type PropertyFilter =
+  | { title: TextPropertyFilter; property: string; type?: "title" }
+  | { rich_text: TextPropertyFilter; property: string; type?: "rich_text" }
+  | { number: NumberPropertyFilter; property: string; type?: "number" }
+  | { checkbox: CheckboxPropertyFilter; property: string; type?: "checkbox" }
+  | { select: SelectPropertyFilter; property: string; type?: "select" }
+  | { multi_select: MultiSelectPropertyFilter; property: string; type?: "multi_select" }
+  | { status: StatusPropertyFilter; property: string; type?: "status" }
+  | { date: DatePropertyFilter; property: string; type?: "date" }
+  | { people: PeoplePropertyFilter; property: string; type?: "people" }
+  | { files: ExistencePropertyFilter; property: string; type?: "files" }
+  | { url: TextPropertyFilter; property: string; type?: "url" }
+  | { email: TextPropertyFilter; property: string; type?: "email" }
+  | { phone_number: TextPropertyFilter; property: string; type?: "phone_number" }
+  | { relation: RelationPropertyFilter; property: string; type?: "relation" }
+  | { created_by: PeoplePropertyFilter; property: string; type?: "created_by" }
+  | { created_time: DatePropertyFilter; property: string; type?: "created_time" }
+  | { last_edited_by: PeoplePropertyFilter; property: string; type?: "last_edited_by" }
+  | { last_edited_time: DatePropertyFilter; property: string; type?: "last_edited_time" }
+  | { formula: FormulaPropertyFilter; property: string; type?: "formula" }
+  | { unique_id: NumberPropertyFilter; property: string; type?: "unique_id" }
+  | { rollup: RollupPropertyFilter; property: string; type?: "rollup" }
+  | { verification: VerificationPropertyStatusFilter; property: string; type?: "verification" }
 """
 
-from typing import Literal, Union
-
-from pydantic import BaseModel, Field
+from typing import Literal, NotRequired, TypedDict, Union
 
 from .advanced_filters import (
     FormulaPropertyFilter,
@@ -27,216 +50,201 @@ from .value_filters import (
 )
 
 
-class PropertyFilterTitle(BaseModel):
-    """タイトルプロパティフィルター (title: TextPropertyFilter)"""
+# ============================================================================
+# Property Filter TypedDicts
+# ============================================================================
 
-    property: str = Field(..., description="プロパティ名")
-    title: TextPropertyFilter = Field(..., description="タイトルフィルター条件")
-    type: Literal["title"] = Field(default="title", description="プロパティタイプ")
 
+class PropertyFilterTitle(TypedDict):
+    """タイトルプロパティフィルター
 
-class PropertyFilterRichText(BaseModel):
-    """リッチテキストプロパティフィルター (rich_text: TextPropertyFilter)"""
+    Examples:
+        ```python
+        filter: PropertyFilterTitle = {
+            "property": "Name",
+            "title": {"contains": "Important"}
+        }
+        ```
+    """
 
-    property: str = Field(..., description="プロパティ名")
-    rich_text: TextPropertyFilter = Field(
-        ..., description="リッチテキストフィルター条件"
-    )
-    type: Literal["rich_text"] = Field(
-        default="rich_text", description="プロパティタイプ"
-    )
+    property: str
+    title: TextPropertyFilter
+    type: NotRequired[Literal["title"]]
 
 
-class PropertyFilterNumber(BaseModel):
-    """数値プロパティフィルター (number: NumberPropertyFilter)"""
+class PropertyFilterRichText(TypedDict):
+    """リッチテキストプロパティフィルター"""
 
-    property: str = Field(..., description="プロパティ名")
-    number: NumberPropertyFilter = Field(..., description="数値フィルター条件")
-    type: Literal["number"] = Field(default="number", description="プロパティタイプ")
+    property: str
+    rich_text: TextPropertyFilter
+    type: NotRequired[Literal["rich_text"]]
 
 
-class PropertyFilterCheckbox(BaseModel):
-    """チェックボックスプロパティフィルター (checkbox: CheckboxPropertyFilter)"""
+class PropertyFilterNumber(TypedDict):
+    """数値プロパティフィルター"""
 
-    property: str = Field(..., description="プロパティ名")
-    checkbox: CheckboxPropertyFilter = Field(
-        ..., description="チェックボックスフィルター条件"
-    )
-    type: Literal["checkbox"] = Field(
-        default="checkbox", description="プロパティタイプ"
-    )
+    property: str
+    number: NumberPropertyFilter
+    type: NotRequired[Literal["number"]]
 
 
-class PropertyFilterSelect(BaseModel):
-    """セレクトプロパティフィルター (select: SelectPropertyFilter)"""
+class PropertyFilterCheckbox(TypedDict):
+    """チェックボックスプロパティフィルター"""
 
-    property: str = Field(..., description="プロパティ名")
-    select: SelectPropertyFilter = Field(..., description="セレクトフィルター条件")
-    type: Literal["select"] = Field(default="select", description="プロパティタイプ")
+    property: str
+    checkbox: CheckboxPropertyFilter
+    type: NotRequired[Literal["checkbox"]]
 
 
-class PropertyFilterMultiSelect(BaseModel):
-    """マルチセレクトプロパティフィルター (multi_select: MultiSelectPropertyFilter)"""
+class PropertyFilterSelect(TypedDict):
+    """セレクトプロパティフィルター"""
 
-    property: str = Field(..., description="プロパティ名")
-    multi_select: MultiSelectPropertyFilter = Field(
-        ..., description="マルチセレクトフィルター条件"
-    )
-    type: Literal["multi_select"] = Field(
-        default="multi_select", description="プロパティタイプ"
-    )
+    property: str
+    select: SelectPropertyFilter
+    type: NotRequired[Literal["select"]]
 
 
-class PropertyFilterStatus(BaseModel):
-    """ステータスプロパティフィルター (status: StatusPropertyFilter)"""
+class PropertyFilterMultiSelect(TypedDict):
+    """マルチセレクトプロパティフィルター"""
 
-    property: str = Field(..., description="プロパティ名")
-    status: StatusPropertyFilter = Field(..., description="ステータスフィルター条件")
-    type: Literal["status"] = Field(default="status", description="プロパティタイプ")
+    property: str
+    multi_select: MultiSelectPropertyFilter
+    type: NotRequired[Literal["multi_select"]]
 
 
-class PropertyFilterDate(BaseModel):
-    """日付プロパティフィルター (date: DatePropertyFilter)"""
+class PropertyFilterStatus(TypedDict):
+    """ステータスプロパティフィルター"""
 
-    property: str = Field(..., description="プロパティ名")
-    date: DatePropertyFilter = Field(..., description="日付フィルター条件")
-    type: Literal["date"] = Field(default="date", description="プロパティタイプ")
+    property: str
+    status: StatusPropertyFilter
+    type: NotRequired[Literal["status"]]
 
 
-class PropertyFilterPeople(BaseModel):
-    """Peopleプロパティフィルター (people: PeoplePropertyFilter)"""
+class PropertyFilterDate(TypedDict):
+    """日付プロパティフィルター"""
 
-    property: str = Field(..., description="プロパティ名")
-    people: PeoplePropertyFilter = Field(..., description="Peopleフィルター条件")
-    type: Literal["people"] = Field(default="people", description="プロパティタイプ")
+    property: str
+    date: DatePropertyFilter
+    type: NotRequired[Literal["date"]]
 
 
-class PropertyFilterFiles(BaseModel):
-    """ファイルプロパティフィルター (files: ExistencePropertyFilter)"""
+class PropertyFilterPeople(TypedDict):
+    """Peopleプロパティフィルター"""
 
-    property: str = Field(..., description="プロパティ名")
-    files: ExistencePropertyFilter = Field(..., description="ファイルフィルター条件")
-    type: Literal["files"] = Field(default="files", description="プロパティタイプ")
+    property: str
+    people: PeoplePropertyFilter
+    type: NotRequired[Literal["people"]]
 
 
-class PropertyFilterUrl(BaseModel):
-    """URLプロパティフィルター (url: TextPropertyFilter)"""
+class PropertyFilterFiles(TypedDict):
+    """ファイルプロパティフィルター"""
 
-    property: str = Field(..., description="プロパティ名")
-    url: TextPropertyFilter = Field(..., description="URLフィルター条件")
-    type: Literal["url"] = Field(default="url", description="プロパティタイプ")
+    property: str
+    files: ExistencePropertyFilter
+    type: NotRequired[Literal["files"]]
 
 
-class PropertyFilterEmail(BaseModel):
-    """メールプロパティフィルター (email: TextPropertyFilter)"""
+class PropertyFilterUrl(TypedDict):
+    """URLプロパティフィルター"""
 
-    property: str = Field(..., description="プロパティ名")
-    email: TextPropertyFilter = Field(..., description="メールフィルター条件")
-    type: Literal["email"] = Field(default="email", description="プロパティタイプ")
+    property: str
+    url: TextPropertyFilter
+    type: NotRequired[Literal["url"]]
 
 
-class PropertyFilterPhoneNumber(BaseModel):
-    """電話番号プロパティフィルター (phone_number: TextPropertyFilter)"""
+class PropertyFilterEmail(TypedDict):
+    """メールプロパティフィルター"""
 
-    property: str = Field(..., description="プロパティ名")
-    phone_number: TextPropertyFilter = Field(..., description="電話番号フィルター条件")
-    type: Literal["phone_number"] = Field(
-        default="phone_number", description="プロパティタイプ"
-    )
+    property: str
+    email: TextPropertyFilter
+    type: NotRequired[Literal["email"]]
 
 
-class PropertyFilterRelation(BaseModel):
-    """Relationプロパティフィルター (relation: RelationPropertyFilter)"""
+class PropertyFilterPhoneNumber(TypedDict):
+    """電話番号プロパティフィルター"""
 
-    property: str = Field(..., description="プロパティ名")
-    relation: RelationPropertyFilter = Field(..., description="Relationフィルター条件")
-    type: Literal["relation"] = Field(
-        default="relation", description="プロパティタイプ"
-    )
+    property: str
+    phone_number: TextPropertyFilter
+    type: NotRequired[Literal["phone_number"]]
 
 
-class PropertyFilterCreatedBy(BaseModel):
-    """作成者プロパティフィルター (created_by: PeoplePropertyFilter)"""
+class PropertyFilterRelation(TypedDict):
+    """Relationプロパティフィルター"""
 
-    property: str = Field(..., description="プロパティ名")
-    created_by: PeoplePropertyFilter = Field(..., description="作成者フィルター条件")
-    type: Literal["created_by"] = Field(
-        default="created_by", description="プロパティタイプ"
-    )
+    property: str
+    relation: RelationPropertyFilter
+    type: NotRequired[Literal["relation"]]
 
 
-class PropertyFilterCreatedTime(BaseModel):
-    """作成日時プロパティフィルター (created_time: DatePropertyFilter)"""
+class PropertyFilterCreatedBy(TypedDict):
+    """作成者プロパティフィルター"""
 
-    property: str = Field(..., description="プロパティ名")
-    created_time: DatePropertyFilter = Field(..., description="作成日時フィルター条件")
-    type: Literal["created_time"] = Field(
-        default="created_time", description="プロパティタイプ"
-    )
+    property: str
+    created_by: PeoplePropertyFilter
+    type: NotRequired[Literal["created_by"]]
 
 
-class PropertyFilterLastEditedBy(BaseModel):
-    """最終編集者プロパティフィルター (last_edited_by: PeoplePropertyFilter)"""
+class PropertyFilterCreatedTime(TypedDict):
+    """作成日時プロパティフィルター"""
 
-    property: str = Field(..., description="プロパティ名")
-    last_edited_by: PeoplePropertyFilter = Field(
-        ..., description="最終編集者フィルター条件"
-    )
-    type: Literal["last_edited_by"] = Field(
-        default="last_edited_by", description="プロパティタイプ"
-    )
+    property: str
+    created_time: DatePropertyFilter
+    type: NotRequired[Literal["created_time"]]
 
 
-class PropertyFilterLastEditedTime(BaseModel):
-    """最終編集日時プロパティフィルター (last_edited_time: DatePropertyFilter)"""
+class PropertyFilterLastEditedBy(TypedDict):
+    """最終編集者プロパティフィルター"""
 
-    property: str = Field(..., description="プロパティ名")
-    last_edited_time: DatePropertyFilter = Field(
-        ..., description="最終編集日時フィルター条件"
-    )
-    type: Literal["last_edited_time"] = Field(
-        default="last_edited_time", description="プロパティタイプ"
-    )
+    property: str
+    last_edited_by: PeoplePropertyFilter
+    type: NotRequired[Literal["last_edited_by"]]
 
 
-class PropertyFilterFormula(BaseModel):
-    """Formulaプロパティフィルター (formula: FormulaPropertyFilter)"""
+class PropertyFilterLastEditedTime(TypedDict):
+    """最終編集日時プロパティフィルター"""
 
-    property: str = Field(..., description="プロパティ名")
-    formula: FormulaPropertyFilter = Field(..., description="Formulaフィルター条件")
-    type: Literal["formula"] = Field(default="formula", description="プロパティタイプ")
+    property: str
+    last_edited_time: DatePropertyFilter
+    type: NotRequired[Literal["last_edited_time"]]
 
 
-class PropertyFilterUniqueId(BaseModel):
-    """ユニークIDプロパティフィルター (unique_id: NumberPropertyFilter)"""
+class PropertyFilterFormula(TypedDict):
+    """Formulaプロパティフィルター"""
 
-    property: str = Field(..., description="プロパティ名")
-    unique_id: NumberPropertyFilter = Field(..., description="ユニークIDフィルター条件")
-    type: Literal["unique_id"] = Field(
-        default="unique_id", description="プロパティタイプ"
-    )
+    property: str
+    formula: FormulaPropertyFilter
+    type: NotRequired[Literal["formula"]]
 
 
-class PropertyFilterRollup(BaseModel):
-    """Rollupプロパティフィルター (rollup: RollupPropertyFilter)"""
+class PropertyFilterUniqueId(TypedDict):
+    """ユニークIDプロパティフィルター"""
 
-    property: str = Field(..., description="プロパティ名")
-    rollup: RollupPropertyFilter = Field(..., description="Rollupフィルター条件")
-    type: Literal["rollup"] = Field(default="rollup", description="プロパティタイプ")
+    property: str
+    unique_id: NumberPropertyFilter
+    type: NotRequired[Literal["unique_id"]]
 
 
-class PropertyFilterVerification(BaseModel):
-    """検証プロパティフィルター (verification: VerificationPropertyStatusFilter)"""
+class PropertyFilterRollup(TypedDict):
+    """Rollupプロパティフィルター"""
 
-    property: str = Field(..., description="プロパティ名")
-    verification: VerificationPropertyStatusFilter = Field(
-        ..., description="検証フィルター条件"
-    )
-    type: Literal["verification"] = Field(
-        default="verification", description="プロパティタイプ"
-    )
+    property: str
+    rollup: RollupPropertyFilter
+    type: NotRequired[Literal["rollup"]]
 
 
+class PropertyFilterVerification(TypedDict):
+    """検証プロパティフィルター"""
+
+    property: str
+    verification: VerificationPropertyStatusFilter
+    type: NotRequired[Literal["verification"]]
+
+
+# ============================================================================
+# Property Filter Union Type
+# ============================================================================
+
+# Matches TypeScript: type PropertyFilter = ...
 PropertyFilter = Union[
     PropertyFilterTitle,
     PropertyFilterRichText,

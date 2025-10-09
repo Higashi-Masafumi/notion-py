@@ -4,7 +4,7 @@ from pydantic import Field, StrictStr
 from ._base_property import BaseProperty, NotionPropertyType
 
 
-class UrlProperty(BaseProperty):
+class UrlProperty(BaseProperty[Literal[NotionPropertyType.URL]]):
     """Notionのurlプロパティ"""
 
     type: Literal[NotionPropertyType.URL] = Field(

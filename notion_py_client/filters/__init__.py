@@ -2,17 +2,28 @@
 Notion API フィルター型定義
 
 データベースクエリ時のフィルタ条件を型安全に定義する。
+TypedDict を使用して公式 Notion API 仕様に準拠。
 
 主要なエクスポート:
 - PropertyFilter: プロパティフィルター統合型
 - TimestampFilter: タイムスタンプフィルター
-- AndFilter/OrFilter: 複合フィルター
-- 各種具体的なフィルタークラス
+- create_and_filter/create_or_filter: 複合フィルターヘルパー
+- 各種具体的なフィルタータイプ
+
+使用例:
+    ```python
+    from notion_py_client.filters import create_and_filter
+
+    # TypedDict形式で型安全にフィルター作成
+    filter = create_and_filter(
+        {"property": "Status", "status": {"equals": "Active"}},
+        {"property": "Amount", "number": {"greater_than": 10000}},
+    )
+    ```
 """
 
 # 基本フィルター
 from .base_filters import (
-    ExistenceFilter,
     ExistenceFilterEmpty,
     ExistenceFilterNotEmpty,
     ExistencePropertyFilter,
@@ -138,15 +149,15 @@ from .timestamp_filters import (
 
 # 複合フィルター
 from .compound_filters import (
-    AndFilter,
+    AndFilterDict,
     FilterCondition,
-    OrFilter,
-    PropertyOrTimestampFilter,
+    OrFilterDict,
+    create_and_filter,
+    create_or_filter,
 )
 
 __all__ = [
     # 基本フィルター
-    "ExistenceFilter",
     "ExistenceFilterEmpty",
     "ExistenceFilterNotEmpty",
     "ExistencePropertyFilter",
@@ -259,8 +270,9 @@ __all__ = [
     "TimestampLastEditedTimeFilter",
     "TimestampFilter",
     # 複合フィルター
-    "PropertyOrTimestampFilter",
-    "AndFilter",
-    "OrFilter",
+    "AndFilterDict",
+    "OrFilterDict",
     "FilterCondition",
+    "create_and_filter",
+    "create_or_filter",
 ]

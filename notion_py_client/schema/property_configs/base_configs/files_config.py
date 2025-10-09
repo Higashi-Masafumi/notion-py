@@ -7,7 +7,7 @@ from ....models.primitives import EmptyObject
 from ....properties.base_properties._base_property import NotionPropertyType
 
 
-class FilesPropertyConfig(BasePropertyConfig):
+class FilesPropertyConfig(BasePropertyConfig[Literal[NotionPropertyType.FILES]]):
     """Notionのfilesプロパティ設定"""
 
     type: Literal[NotionPropertyType.FILES] = Field(

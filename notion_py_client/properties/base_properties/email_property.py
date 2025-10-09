@@ -5,7 +5,7 @@ from pydantic import Field, StrictStr
 from ._base_property import BaseProperty, NotionPropertyType
 
 
-class EmailProperty(BaseProperty):
+class EmailProperty(BaseProperty[Literal[NotionPropertyType.EMAIL]]):
     """Notionのemailプロパティ"""
 
     type: Literal[NotionPropertyType.EMAIL] = Field(

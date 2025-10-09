@@ -2,87 +2,127 @@
 日付フィルター定義
 
 日付プロパティに対するフィルター条件。
+TypedDict を使用して公式 Notion API 仕様に準拠。
+
+公式TypeScript定義:
+type DatePropertyFilter =
+  | { equals: string }
+  | { before: string }
+  | { after: string }
+  | { on_or_before: string }
+  | { on_or_after: string }
+  | { this_week: EmptyObject }
+  | { past_week: EmptyObject }
+  | { past_month: EmptyObject }
+  | { past_year: EmptyObject }
+  | { next_week: EmptyObject }
+  | { next_month: EmptyObject }
+  | { next_year: EmptyObject }
+  | ExistencePropertyFilter
 """
 
-from typing import Union
+from typing import TypedDict, Union
 
-from pydantic import BaseModel, Field, StrictStr
-
-from .base_filters import ExistenceFilterEmpty, ExistenceFilterNotEmpty
+from .base_filters import ExistencePropertyFilter
 
 
-class DateFilterEquals(BaseModel):
-    """日付が等しい"""
+# EmptyObject for relative date filters
+class EmptyObject(TypedDict):
+    """空オブジェクト（相対日付フィルター用）"""
 
-    equals: StrictStr = Field(..., description="一致する日付(ISO 8601)")
+    pass
 
 
-class DateFilterBefore(BaseModel):
+# ============================================================================
+# Date Property Filters
+# ============================================================================
+
+
+class DateFilterEquals(TypedDict):
+    """日付が等しい
+
+    Examples:
+        ```python
+        filter: DateFilterEquals = {"equals": "2025-01-01"}
+        ```
+    """
+
+    equals: str
+
+
+class DateFilterBefore(TypedDict):
     """日付より前"""
 
-    before: StrictStr = Field(..., description="基準日付(ISO 8601)")
+    before: str
 
 
-class DateFilterAfter(BaseModel):
+class DateFilterAfter(TypedDict):
     """日付より後"""
 
-    after: StrictStr = Field(..., description="基準日付(ISO 8601)")
+    after: str
 
 
-class DateFilterOnOrBefore(BaseModel):
+class DateFilterOnOrBefore(TypedDict):
     """日付以前"""
 
-    on_or_before: StrictStr = Field(..., description="基準日付(ISO 8601)")
+    on_or_before: str
 
 
-class DateFilterOnOrAfter(BaseModel):
+class DateFilterOnOrAfter(TypedDict):
     """日付以降"""
 
-    on_or_after: StrictStr = Field(..., description="基準日付(ISO 8601)")
+    on_or_after: str
 
 
-class DateFilterThisWeek(BaseModel):
-    """今週"""
+class DateFilterThisWeek(TypedDict):
+    """今週
 
-    this_week: dict = Field(default_factory=dict, description="今週")
+    Examples:
+        ```python
+        filter: DateFilterThisWeek = {"this_week": {}}
+        ```
+    """
+
+    this_week: EmptyObject
 
 
-class DateFilterPastWeek(BaseModel):
+class DateFilterPastWeek(TypedDict):
     """先週"""
 
-    past_week: dict = Field(default_factory=dict, description="先週")
+    past_week: EmptyObject
 
 
-class DateFilterPastMonth(BaseModel):
+class DateFilterPastMonth(TypedDict):
     """先月"""
 
-    past_month: dict = Field(default_factory=dict, description="先月")
+    past_month: EmptyObject
 
 
-class DateFilterPastYear(BaseModel):
+class DateFilterPastYear(TypedDict):
     """昨年"""
 
-    past_year: dict = Field(default_factory=dict, description="昨年")
+    past_year: EmptyObject
 
 
-class DateFilterNextWeek(BaseModel):
+class DateFilterNextWeek(TypedDict):
     """来週"""
 
-    next_week: dict = Field(default_factory=dict, description="来週")
+    next_week: EmptyObject
 
 
-class DateFilterNextMonth(BaseModel):
+class DateFilterNextMonth(TypedDict):
     """来月"""
 
-    next_month: dict = Field(default_factory=dict, description="来月")
+    next_month: EmptyObject
 
 
-class DateFilterNextYear(BaseModel):
+class DateFilterNextYear(TypedDict):
     """来年"""
 
-    next_year: dict = Field(default_factory=dict, description="来年")
+    next_year: EmptyObject
 
 
+# Matches TypeScript DatePropertyFilter
 DatePropertyFilter = Union[
     DateFilterEquals,
     DateFilterBefore,
@@ -96,6 +136,5 @@ DatePropertyFilter = Union[
     DateFilterNextWeek,
     DateFilterNextMonth,
     DateFilterNextYear,
-    ExistenceFilterEmpty,
-    ExistenceFilterNotEmpty,
+    ExistencePropertyFilter,
 ]

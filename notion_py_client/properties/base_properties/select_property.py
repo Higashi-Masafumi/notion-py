@@ -5,7 +5,7 @@ from ...models import SelectOption
 from ._base_property import BaseProperty, NotionPropertyType
 
 
-class SelectProperty(BaseProperty):
+class SelectProperty(BaseProperty[Literal[NotionPropertyType.SELECT]]):
     """Notionのselectプロパティ"""
 
     type: Literal[NotionPropertyType.SELECT] = Field(

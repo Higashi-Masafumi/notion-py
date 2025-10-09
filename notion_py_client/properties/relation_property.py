@@ -12,7 +12,7 @@ class RelationItem(BaseModel):
     id: StrictStr = Field(..., description="関連項目ID")
 
 
-class RelationProperty(BaseProperty):
+class RelationProperty(BaseProperty[Literal[NotionPropertyType.RELATION]]):
     """Notionのrelationプロパティ"""
 
     type: Literal[NotionPropertyType.RELATION] = Field(

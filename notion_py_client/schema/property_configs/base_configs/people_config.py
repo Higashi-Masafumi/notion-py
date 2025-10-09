@@ -7,7 +7,7 @@ from ....models.primitives import EmptyObject
 from ....properties.base_properties._base_property import NotionPropertyType
 
 
-class PeoplePropertyConfig(BasePropertyConfig):
+class PeoplePropertyConfig(BasePropertyConfig[Literal[NotionPropertyType.PEOPLE]]):
     """Notionのpeopleプロパティ設定"""
 
     type: Literal[NotionPropertyType.PEOPLE] = Field(

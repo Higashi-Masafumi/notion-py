@@ -6,7 +6,7 @@ from ...models import FormulaResult
 from ._base_property import BaseProperty, NotionPropertyType
 
 
-class FormulaProperty(BaseProperty):
+class FormulaProperty(BaseProperty[Literal[NotionPropertyType.FORMULA]]):
     """Notionのformulaプロパティ"""
 
     type: Literal[NotionPropertyType.FORMULA] = Field(

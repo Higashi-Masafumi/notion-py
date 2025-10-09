@@ -12,7 +12,7 @@ class FormulaExpression(BaseModel):
     expression: StrictStr | None = Field(None, description="Notionの式")
 
 
-class FormulaPropertyConfig(BasePropertyConfig):
+class FormulaPropertyConfig(BasePropertyConfig[Literal[NotionPropertyType.FORMULA]]):
     """Notionのformulaプロパティ設定"""
 
     type: Literal[NotionPropertyType.FORMULA] = Field(

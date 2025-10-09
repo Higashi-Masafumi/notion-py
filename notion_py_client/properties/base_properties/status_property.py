@@ -5,7 +5,7 @@ from ...models import StatusOption
 from ._base_property import BaseProperty, NotionPropertyType
 
 
-class StatusProperty(BaseProperty):
+class StatusProperty(BaseProperty[Literal[NotionPropertyType.STATUS]]):
     """Notionのstatusプロパティ"""
 
     type: Literal[NotionPropertyType.STATUS] = Field(

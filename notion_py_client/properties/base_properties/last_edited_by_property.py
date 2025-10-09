@@ -6,7 +6,7 @@ from ...models import PartialUser, User
 from ._base_property import BaseProperty, NotionPropertyType
 
 
-class LastEditedByProperty(BaseProperty):
+class LastEditedByProperty(BaseProperty[Literal[NotionPropertyType.LAST_EDITED_BY]]):
     """Notionのlast_edited_byプロパティ"""
 
     type: Literal[NotionPropertyType.LAST_EDITED_BY] = Field(

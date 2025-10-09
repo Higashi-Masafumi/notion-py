@@ -4,7 +4,7 @@ from pydantic import Field, StrictBool
 from ._base_property import BaseProperty, NotionPropertyType
 
 
-class CheckboxProperty(BaseProperty):
+class CheckboxProperty(BaseProperty[Literal[NotionPropertyType.CHECKBOX]]):
     """Notionのcheckboxプロパティ"""
 
     type: Literal[NotionPropertyType.CHECKBOX] = Field(

@@ -46,7 +46,7 @@ class RelationDualConfig(BaseModel):
 RelationConfig = RelationSingleConfig | RelationDualConfig
 
 
-class RelationPropertyConfig(BasePropertyConfig):
+class RelationPropertyConfig(BasePropertyConfig[Literal[NotionPropertyType.RELATION]]):
     """Notionのrelationプロパティ設定"""
 
     type: Literal[NotionPropertyType.RELATION] = Field(

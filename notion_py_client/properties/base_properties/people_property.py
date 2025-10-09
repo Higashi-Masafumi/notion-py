@@ -5,7 +5,7 @@ from ...models import Group, PartialUser, User
 from ._base_property import BaseProperty, NotionPropertyType
 
 
-class PeopleProperty(BaseProperty):
+class PeopleProperty(BaseProperty[Literal[NotionPropertyType.PEOPLE]]):
     """Notionのpeopleプロパティ"""
 
     type: Literal[NotionPropertyType.PEOPLE] = Field(

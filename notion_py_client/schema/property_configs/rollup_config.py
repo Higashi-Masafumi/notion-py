@@ -39,7 +39,7 @@ class RollupSettings(BaseModel):
         return self
 
 
-class RollupPropertyConfig(BasePropertyConfig):
+class RollupPropertyConfig(BasePropertyConfig[Literal[NotionPropertyType.ROLLUP]]):
     """Notionのrollupプロパティ設定"""
 
     type: Literal[NotionPropertyType.ROLLUP] = Field(

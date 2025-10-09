@@ -4,7 +4,7 @@ from pydantic import Field, StrictStr
 from ._base_property import BaseProperty, NotionPropertyType
 
 
-class LastEditedTimeProperty(BaseProperty):
+class LastEditedTimeProperty(BaseProperty[Literal[NotionPropertyType.LAST_EDITED_TIME]]):
     """Notionのlast_edited_timeプロパティ"""
 
     type: Literal[NotionPropertyType.LAST_EDITED_TIME] = Field(

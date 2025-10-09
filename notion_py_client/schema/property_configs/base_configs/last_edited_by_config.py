@@ -7,7 +7,9 @@ from ....models.primitives import EmptyObject
 from ....properties.base_properties._base_property import NotionPropertyType
 
 
-class LastEditedByPropertyConfig(BasePropertyConfig):
+class LastEditedByPropertyConfig(
+    BasePropertyConfig[Literal[NotionPropertyType.LAST_EDITED_BY]]
+):
     """Notionのlast_edited_byプロパティ設定"""
 
     type: Literal[NotionPropertyType.LAST_EDITED_BY] = Field(

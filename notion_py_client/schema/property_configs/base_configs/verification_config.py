@@ -7,7 +7,9 @@ from ....models.primitives import EmptyObject
 from ....properties.base_properties._base_property import NotionPropertyType
 
 
-class VerificationPropertyConfig(BasePropertyConfig):
+class VerificationPropertyConfig(
+    BasePropertyConfig[Literal[NotionPropertyType.VERIFICATION]]
+):
     """Notionのverificationプロパティ設定"""
 
     type: Literal[NotionPropertyType.VERIFICATION] = Field(
