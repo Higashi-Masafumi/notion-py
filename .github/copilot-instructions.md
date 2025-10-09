@@ -236,3 +236,10 @@ Currently no test suite. When adding tests:
 1. Define in appropriate filter file (`filters/property_filters.py`, etc.)
 2. Follow existing filter patterns (existence, comparison, etc.)
 3. Export in `filters/__init__.py`
+
+
+## code of conduct
+do not let deprecated code remain in the codebase. Remove any code that is no longer needed.
+do not let temporary test code remain. Remove any temporary code used for debugging or testing.
+do not use emoji decorations in the documentation. Maintain a clean, professional style.
+do not write new documentation files without prior approval. Ensure all new docs are reviewed for quality and consistency.
