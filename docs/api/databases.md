@@ -12,6 +12,24 @@ The Databases API provides methods to:
 
 For querying data or managing schema, use the [Data Sources API](datasources.md).
 
+### Legacy Note: databases.query
+
+As of Notion-Version 2025-09-03, `databases.query` is considered legacy and is not
+available when the client uses the latest version header. Attempting to call it
+will emit a warning and raise an error. Please use `dataSources.query` instead.
+
+If you must call the legacy endpoint for compatibility, explicitly set an older
+version when constructing the client (not recommended):
+
+```python
+client = NotionAsyncClient(
+    auth="secret_xxx",
+    options={"notion_version": "2022-06-28"}
+)
+# Then:
+# await client.databases.query({...})
+```
+
 ## Methods
 
 ### retrieve

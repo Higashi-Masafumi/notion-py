@@ -21,8 +21,8 @@ Query pages from a data source.
 async def query(
     *,
     data_source_id: str,
-    filter: dict[str, Any] | None = None,
-    sorts: list[dict[str, Any]] | None = None,
+    filter: FilterCondition | None = None,
+    sorts: list[DatabaseQuerySort] | None = None,
     start_cursor: str | None = None,
     page_size: int | None = None,
     auth: AuthParam | None = None
@@ -32,8 +32,8 @@ async def query(
 **Parameters**:
 
 - `data_source_id` (str): Data source ID
-- `filter` (optional): Filter conditions
-- `sorts` (optional): Sort criteria
+- `filter` (optional): Filter conditions (`FilterCondition`)
+- `sorts` (optional): Sort criteria (`list[DatabaseQuerySort]`)
 - `start_cursor` (optional): Pagination cursor
 - `page_size` (optional): Results per page (max 100)
 
@@ -47,6 +47,8 @@ async def query(
 
 ```python
 from notion_py_client import NotionAsyncClient
+from notion_py_client.filters import FilterCondition, create_and_filter
+from notion_py_client.api_types import DatabaseQuerySort
 
 async with NotionAsyncClient(auth="secret_xxx") as client:
     # Basic query
@@ -58,24 +60,19 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
     for page in response.results:
         print(f"Page: {page.id}")
 
-    # With filter
+    # With filter (type-safe helpers)
     response = await client.dataSources.query(
         data_source_id="ds_abc123",
-        filter={
-            "property": "Status",
-            "select": {"equals": "Done"}
-        }
+        filter=create_and_filter(
+            {"property": "Status", "status": {"equals": "Done"}},
+            {"timestamp": "created_time", "created_time": {"past_week": {}}},
+        )
     )
 
     # With sorting
     response = await client.dataSources.query(
         data_source_id="ds_abc123",
-        sorts=[
-            {
-                "property": "Created",
-                "direction": "descending"
-            }
-        ]
+        sorts=[{"property": "Created", "direction": "descending"}]
     )
 ```
 
@@ -229,44 +226,21 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
 
 ### Type-Safe Filters
 
-Use filter builders for type safety:
+Use filter builders for type safety (TypedDict + helpers):
 
 ```python
-from notion_py_client.filters import (
-    TextPropertyFilter,
-    StatusPropertyFilter,
-    DatePropertyFilter,
-    CompoundFilter,
-)
-
-# Text filter
-filter = TextPropertyFilter(
-    property="Name",
-    rich_text={"contains": "urgent"}
-)
-
-# Status filter
-filter = StatusPropertyFilter(
-    property="Status",
-    status={"equals": "In Progress"}
-)
-
-# Date filter
-filter = DatePropertyFilter(
-    property="Due Date",
-    date={"on_or_after": "2025-01-01"}
-)
+from notion_py_client.filters import create_and_filter
 
 # Combine filters
-filter = CompoundFilter.and_(
-    StatusPropertyFilter(property="Status", status={"equals": "In Progress"}),
-    DatePropertyFilter(property="Due Date", date={"on_or_before": "2025-12-31"}),
+filter_dict = create_and_filter(
+    {"property": "Status", "status": {"equals": "In Progress"}},
+    {"property": "Due Date", "date": {"on_or_before": "2025-12-31"}},
 )
 
 # Use in query
 response = await client.dataSources.query(
     data_source_id="ds_abc123",
-    filter=filter.model_dump(by_alias=True, exclude_none=True)
+    filter=filter_dict
 )
 ```
 

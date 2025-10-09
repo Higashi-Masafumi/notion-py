@@ -141,33 +141,23 @@ The key concept change in API 2025-09-03:
 Use typed filter builders for database queries:
 
 ```python
-from notion_py_client.filters import (
-    TextPropertyFilter,
-    StatusPropertyFilter,
-    CompoundFilter,
+from notion_py_client.filters import create_and_filter
+
+# Single filter (dict)
+response = await client.dataSources.query(
+    data_source_id="ds_abc123",
+    filter={"property": "Name", "rich_text": {"contains": "urgent"}},
 )
 
-# Single filter
-filter = TextPropertyFilter(
-    property="Name",
-    rich_text={"contains": "urgent"}
-)
-
-# Compound filter
-filter = CompoundFilter.and_(
-    StatusPropertyFilter(
-        property="Status",
-        status={"equals": "In Progress"}
-    ),
-    TextPropertyFilter(
-        property="Name",
-        rich_text={"is_not_empty": True}
-    ),
+# Compound filter (helpers)
+filter_dict = create_and_filter(
+    {"property": "Status", "status": {"equals": "In Progress"}},
+    {"property": "Name", "rich_text": {"is_not_empty": True}},
 )
 
 response = await client.dataSources.query(
     data_source_id="ds_abc123",
-    filter=filter.model_dump(by_alias=True, exclude_none=True)
+    filter=filter_dict,
 )
 ```
 

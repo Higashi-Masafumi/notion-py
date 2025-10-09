@@ -168,22 +168,33 @@ Located in `notion_py.blocks`:
 
 ### Filter Types
 
-Located in `notion_py.filters`:
+Located in `notion_py_client.filters`:
 
-- `TextPropertyFilter` - Text/rich text filtering
-- `NumberPropertyFilter` - Numeric filtering
-- `CheckboxPropertyFilter` - Boolean filtering
-- `SelectPropertyFilter` - Select option filtering
-- `MultiSelectPropertyFilter` - Multi-select filtering
-- `StatusPropertyFilter` - Status filtering
-- `DatePropertyFilter` - Date filtering
-- `PeoplePropertyFilter` - People filtering
-- `FilesPropertyFilter` - Files filtering
-- `RelationPropertyFilter` - Relation filtering
-- `FormulaPropertyFilter` - Formula filtering
-- `RollupPropertyFilter` - Rollup filtering
-- `CompoundFilter` - AND/OR combinations
-- `TimestampFilter` - created_time/last_edited_time filtering
+- `PropertyFilter` - Union of all property filters (TypedDict)
+- `TimestampFilter` - created_time / last_edited_time (TypedDict)
+- `FilterCondition` - `PropertyFilter | TimestampFilter | {and: [...] } | {or: [...]}`
+- Helpers: `create_and_filter`, `create_or_filter`
+
+Common concrete filter dict shapes:
+
+- `Text (rich_text)`: `{ "property": "Name", "rich_text": {"contains": "..."} }`
+- `Number`: `{ "property": "Score", "number": {"greater_than": 80} }`
+- `Select`: `{ "property": "Priority", "select": {"equals": "High"} }`
+- `Multi-select`: `{ "property": "Tags", "multi_select": {"contains": "Important"} }`
+- `Status`: `{ "property": "Status", "status": {"does_not_equal": "Done"} }`
+- `Date`: `{ "property": "Due", "date": {"on_or_after": "2025-01-01"} }`
+- `People`: `{ "property": "Assignee", "people": {"is_not_empty": True} }`
+
+Use helpers to combine:
+
+```python
+from notion_py_client.filters import create_and_filter
+
+filter_dict = create_and_filter(
+    {"property": "Status", "status": {"equals": "In Progress"}},
+    {"timestamp": "created_time", "created_time": {"past_week": {}}},
+)
+```
 
 ### Model Types
 
@@ -226,8 +237,8 @@ from notion_py_client.requests.property_requests import (
 
 # Filters
 from notion_py_client.filters import (
-    TextPropertyFilter,
-    CompoundFilter,
+    FilterCondition,
+    create_and_filter,
 )
 
 # Blocks
