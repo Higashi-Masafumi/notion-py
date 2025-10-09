@@ -23,11 +23,11 @@ from .api_types import (
     AppendBlockChildrenParameters,
     CreateCommentParameters,
     CreateDatabaseParameters,
-    CreatePageParameters,
     DeleteBlockParameters,
     ListBlockChildrenParameters,
     ListCommentsParameters,
     ListUsersParameters,
+    DatabaseQuerySort,
     QueryDatabaseParameters,
     RetrieveBlockParameters,
     RetrieveDatabaseParameters,
@@ -36,8 +36,9 @@ from .api_types import (
     SearchParameters,
     UpdateBlockParameters,
     UpdateDatabaseParameters,
-    UpdatePageParameters,
 )
+from .filters import FilterCondition
+from .requests.page_requests import CreatePageParameters, UpdatePageParameters
 from .responses.database import NotionDatabase
 from .responses.datasource import DataSource
 from .responses.page import NotionPage
@@ -760,6 +761,48 @@ class _DatabasesAPI:
         )
         return NotionDatabase(**response)
 
+    async def query(
+        self, params: QueryDatabaseParameters, *, auth: AuthParam | None = None
+    ) -> QueryDatabaseResponse:
+        """Legacy databases.query endpoint.
+
+        If the client's Notion-Version is the latest (>= 2025-09-03), this
+        method is considered legacy and will warn then raise, guiding callers
+        to use dataSources.query instead. If an older Notion-Version is set,
+        the request is forwarded to the legacy endpoint.
+        """
+        nv = self._c._notion_version
+        latest = self._c.default_notion_version
+        if nv >= latest:
+            self._c._log(
+                LogLevel.WARN,
+                "databases.query is legacy; use dataSources.query instead",
+                {"notion_version": nv, "required": f"< {latest}"},
+            )
+            raise RuntimeError(
+                "databases.query is not available for Notion-Version >= 2025-09-03."
+                " Use dataSources.query or set an older Notion-Version explicitly."
+            )
+
+        # Forward to legacy endpoint for older versions
+        database_id = params["database_id"]
+        body = pick(
+            params,
+            ["filter", "sorts", "start_cursor", "page_size", "filter_properties", "archived"],
+        )
+        response = await self._c.request(
+            path=f"databases/{database_id}/query", method="post", body=body, auth=auth
+        )
+        # Build QueryDatabaseResponse
+        results: list[NotionPage] = [NotionPage(**item) for item in response.get("results", [])]
+        return QueryDatabaseResponse(
+            object="list",
+            results=results,
+            next_cursor=response.get("next_cursor"),
+            has_more=response.get("has_more", False),
+            type="page_or_database",
+        )
+
     async def update(
         self, params: UpdateDatabaseParameters, *, auth: AuthParam | None = None
     ) -> NotionDatabase:
@@ -847,8 +890,8 @@ class _DataSourcesAPI:
         self,
         *,
         data_source_id: str,
-        filter: dict[str, Any] | None = None,
-        sorts: list[dict[str, Any]] | None = None,
+        filter: FilterCondition | None = None,
+        sorts: list[DatabaseQuerySort] | None = None,
         start_cursor: str | None = None,
         page_size: int | None = None,
         auth: AuthParam | None = None,
@@ -975,6 +1018,37 @@ class _DataSourcesAPI:
             type="page_or_data_source",
         )
 
+    async def query_legacy(
+        self,
+        params: QueryDatabaseParameters,
+        *,
+        auth: AuthParam | None = None,
+    ) -> QueryDataSourceResponse:
+        """Compatibility wrapper (not for public use)."""
+        # Forward to dataSources.query since legacy databases.query is replaced
+        database_id = params["database_id"]
+        body = pick(
+            params,
+            ["filter", "sorts", "start_cursor", "page_size", "filter_properties", "archived"],
+        )
+        response = await self._c.request(
+            path=f"databases/{database_id}/query", method="post", body=body, auth=auth
+        )
+        from .responses.page import PartialPage
+        results = []
+        for item in response.get("results", []):
+            if "properties" in item:
+                results.append(NotionPage(**item))
+            else:
+                results.append(PartialPage(**item))
+        return QueryDataSourceResponse(
+            object="list",
+            results=results,
+            next_cursor=response.get("next_cursor"),
+            has_more=response.get("has_more", False),
+            type="page_or_data_source",
+        )
+
     async def create(
         self,
         *,
@@ -1078,9 +1152,8 @@ class _PagesAPI:
         Returns:
             NotionPage: 作成されたページオブジェクト
         """
-        response = await self._c.request(
-            path="pages", method="post", body=dict(params), auth=auth
-        )
+        body = params.model_dump(exclude_none=True, by_alias=True)
+        response = await self._c.request(path="pages", method="post", body=body, auth=auth)
         return NotionPage(**response)
 
     async def retrieve(
@@ -1111,11 +1184,9 @@ class _PagesAPI:
         Returns:
             NotionPage: 更新されたページオブジェクト
         """
-        page_id = params["page_id"]
-        body = {k: v for k, v in params.items() if k != "page_id"}
-        response = await self._c.request(
-            path=f"pages/{page_id}", method="patch", body=body, auth=auth
-        )
+        payload = params.model_dump(exclude_none=True, by_alias=True)
+        page_id = payload.pop("page_id")
+        response = await self._c.request(path=f"pages/{page_id}", method="patch", body=payload, auth=auth)
         return NotionPage(**response)
 
 

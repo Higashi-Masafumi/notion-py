@@ -132,34 +132,9 @@ class RetrievePageParameters(_RetrievePageRequired, total=False):
     filter_properties: list[str]
 
 
-class _CreatePageRequired(TypedDict):
-    """CreatePageParametersの必須フィールド."""
-
-    parent: dict[str, str]
-    properties: dict[str, Any]
-
-
-class CreatePageParameters(_CreatePageRequired, total=False):
-    """ページ作成のパラメータ."""
-
-    children: list[dict[str, Any]]
-    icon: dict[str, Any]
-    cover: dict[str, Any]
-
-
-class _UpdatePageRequired(TypedDict):
-    """UpdatePageParametersの必須フィールド."""
-
-    page_id: str
-
-
-class UpdatePageParameters(_UpdatePageRequired, total=False):
-    """ページ更新のパラメータ."""
-
-    properties: dict[str, Any]
-    archived: bool
-    icon: dict[str, Any]
-    cover: dict[str, Any]
+# Create/Update Page parameters are defined as Pydantic models
+# in notion_py_client.requests.page_requests to enable validation and IDE support.
+_ApiTypes_Page_Params_Doc = True
 
 
 # ========== Block API Types ==========

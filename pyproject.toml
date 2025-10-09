@@ -5,6 +5,7 @@ description = "A Python client for Notion API"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
+    "httpx>=0.28.1",
     "pydantic>=2.11.10",
 ]
 classifiers = [
@@ -22,7 +23,26 @@ Homepage = "https://higashi-masafumi.github.io/notion-py/"
 Repository = "https://github.com/higashi-masafumi/notion-py"
 Issues = "https://github.com/higashi-masafumi/notion-py/issues"
 
-
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["test"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+asyncio_mode = "auto"
+markers = [
+    "asyncio: mark test as async",
+    "integration: mark test as integration test (requires API key)",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.2",
+    "pytest-asyncio>=1.2.0",
+    "pytest-cov>=7.0.0",
+    "python-dotenv>=1.1.1",
+]

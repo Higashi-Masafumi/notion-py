@@ -27,7 +27,7 @@ import asyncio
 from notion_py_client import NotionAsyncClient
 
 async def main():
-    client = NotionAsyncClient(auth="your_notion_api_key")
+    client = NotionAsyncClient(auth="your_NOTION_API_TOKEN")
 
     # Query a database (API 2025-09-03)
     response = await client.dataSources.query(
@@ -92,12 +92,36 @@ await client.pages.create(
 ### Filters
 
 ```python
-from notion_py_client.filters import TextPropertyFilter, CompoundFilter
+from notion_py_client import NotionAsyncClient
+from notion_py_client.filters import create_and_filter, create_or_filter
 
-# Type-safe query filters
-filter = CompoundFilter.and_(
-    TextPropertyFilter(property="Name", rich_text={"contains": "urgent"}),
-    TextPropertyFilter(property="Status", rich_text={"equals": "In Progress"})
+client = NotionAsyncClient(auth="your_NOTION_API_TOKEN")
+
+# Simple filter (直接辞書 - IDE補完が効く)
+response = await client.dataSources.query(
+    data_source_id="your_database_id",
+    filter={"property": "Status", "status": {"equals": "Active"}}
+)
+
+# AND filter with helper function (型安全 - IDE補完が効く)
+filter = create_and_filter(
+    {"property": "Name", "rich_text": {"contains": "urgent"}},
+    {"property": "Status", "status": {"equals": "In Progress"}}
+)
+
+# OR filter with helper function
+filter = create_or_filter(
+    {"property": "Priority", "select": {"equals": "High"}},
+    {"property": "Priority", "select": {"equals": "Medium"}}
+)
+
+# Nested filters (AND + OR)
+filter = create_and_filter(
+    {"property": "Team", "select": {"equals": "Engineering"}},
+    create_or_filter(
+        {"property": "Status", "status": {"equals": "Active"}},
+        {"property": "Status", "status": {"equals": "Pending"}}
+    )
 )
 
 await client.dataSources.query(
@@ -105,6 +129,13 @@ await client.dataSources.query(
     filter=filter
 )
 ```
+
+**Key Benefits:**
+
+- **IDE Completion**: Type hints work correctly with dictionary literals
+- **Type Safety**: TypedDict definitions match official TypeScript SDK
+- **No `.model_dump()`**: Use filters directly without conversion
+- **Public API Compatible**: Follows official Notion API specification
 
 ### Domain Mapping
 
