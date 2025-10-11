@@ -49,6 +49,19 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
         print(f"{user.name} ({user.type})")
 ```
 
+> Tip: Use pagination helpers
+
+```python
+from notion_py_client.utils import iterate_paginated_api, collect_paginated_api
+
+# Iterate through all users
+async for user in iterate_paginated_api(client.users.list, {"page_size": 100}):
+    print(user.name)
+
+# Or collect into a list
+all_users = await collect_paginated_api(client.users.list, {"page_size": 100})
+```
+
 ### me
 
 Get details about the current bot user.

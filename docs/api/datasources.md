@@ -317,6 +317,27 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
     print(f"Total pages: {len(all_pages)}")
 ```
 
+> Tip: Use pagination helpers
+
+You can avoid manual cursor handling using `iterate_paginated_api` or collect all results at once with `collect_paginated_api`.
+
+```python
+from notion_py_client.utils import iterate_paginated_api, collect_paginated_api
+
+# Iterate
+async for page in iterate_paginated_api(
+    client.dataSources.query,
+    {"data_source_id": "ds_abc123", "page_size": 100},
+):
+    print(page.id)
+
+# Collect
+all_pages = await collect_paginated_api(
+    client.dataSources.query,
+    {"data_source_id": "ds_abc123", "page_size": 100},
+)
+```
+
 ## Property Types
 
 Common property configurations:

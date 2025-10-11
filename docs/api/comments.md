@@ -62,6 +62,18 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
         print(f"Comment: {text}")
 ```
 
+> Tip: Use pagination helpers
+
+```python
+from notion_py_client.utils import iterate_paginated_api
+
+async for c in iterate_paginated_api(
+    client.comments.list,
+    {"block_id": "page_abc123", "page_size": 100},
+):
+    print(c["id"])  # dict form
+```
+
 ### retrieve
 
 Retrieve a specific comment.

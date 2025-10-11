@@ -37,6 +37,8 @@ from typing import Annotated
 from pydantic import BaseModel, Field, StrictStr, StringConstraints
 from dotenv import load_dotenv
 
+from notion_py_client.utils import is_full_page
+
 load_dotenv()  # Load environment variables from .env file
 
 

@@ -72,6 +72,17 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
         print(f"- {ds['name']} (ID: {ds['id']})")
 ```
 
+> Tip: Extract a database ID from a URL
+
+```python
+from notion_py_client.utils import extract_database_id
+
+db_id = extract_database_id(
+    "https://notion.so/workspace/DB-abc123def456789012345678901234ab?v=viewid"
+)
+db = await client.databases.retrieve({"database_id": db_id})
+```
+
 ### create
 
 Create a new database with an initial data source.

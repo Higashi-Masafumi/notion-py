@@ -111,6 +111,20 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
         print(f"{block['type']}: {block['id']}")
 ```
 
+> Tip: Paginate and extract block IDs from URLs
+
+```python
+from notion_py_client.utils import iterate_paginated_api, extract_block_id
+
+block_id = extract_block_id("https://www.notion.so/Page-aaaa#block-12345678123412341234123456789abc")
+
+async for child in iterate_paginated_api(
+    client.blocks.children.list,
+    {"block_id": block_id, "page_size": 100},
+):
+    print(child["id"])
+```
+
 ### children.append
 
 Append child blocks to a block or page.

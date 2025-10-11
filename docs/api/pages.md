@@ -114,6 +114,17 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
         print(f"Status: {status_prop.status.name}")
 ```
 
+> Tip: Extract a page ID from a URL
+
+```python
+from notion_py_client.utils import extract_page_id
+
+page_id = extract_page_id(
+    "https://www.notion.so/workspace/Page-Title-12345678123412341234123456789abc"
+)
+page = await client.pages.retrieve({"page_id": page_id})
+```
+
 ### update
 
 Update a page.
@@ -192,6 +203,21 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
         page_id="page_abc123",
         property_id=relation_prop_id
     )
+```
+
+> Tip: Retrieve all items for paginated properties
+
+Some property values (e.g., relations, rollups) are paginated. Use `iterate_paginated_api` to traverse all results.
+
+```python
+from notion_py_client.utils import iterate_paginated_api
+
+async for item in iterate_paginated_api(
+    client.pages.properties.retrieve,
+    {"page_id": "page_abc123", "property_id": relation_prop_id, "page_size": 100},
+):
+    # Each item is part of the property item's `results` array
+    print(item)
 ```
 
 ## Property Requests

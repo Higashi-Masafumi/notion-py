@@ -1,7 +1,18 @@
 from __future__ import annotations
 
 import re
-from typing import Any, AsyncIterable, AsyncIterator, Awaitable, Callable, Mapping, Sequence, TypeVar, Protocol
+from typing import (
+    Any,
+    AsyncIterator,
+    Awaitable,
+    Callable,
+    Mapping,
+    Sequence,
+    TypeVar,
+    Protocol,
+    TypeGuard,
+    Literal,
+)
 
 try:
     from pydantic import BaseModel  # type: ignore
@@ -89,68 +100,127 @@ async def collect_paginated_api(
     return out
 
 
-# ========= Type predicate helpers =========
+# ========= Type predicate helpers (TypeScript-like type guards) =========
+# Import concrete models for precise TypeGuard targets
+from .responses.page import NotionPage, PartialPage
+from .responses.datasource import DataSource, PartialDataSource
+from .responses.database import NotionDatabase, PartialDatabase
+from .blocks.base import BaseBlockObject, PartialBlock
+from .models.rich_text_item import RichTextItem
+from .models.primitives import Text, Mention, Equation
+
 
 def _get_object_type(obj: Any) -> str | None:
     return _get_attr(obj, "object")
 
 
-def is_full_block(response: Any) -> bool:
-    """Return True if `response` is a full Block object (has `type`)."""
-    return _get_object_type(response) == "block" and _get_attr(response, "type") is not None
+def is_full_block(
+    response: BaseBlockObject | PartialBlock | Mapping[str, Any] | Any,
+) -> TypeGuard[BaseBlockObject]:
+    """Type guard: block object with full fields (`type` present)."""
+    return (
+        _get_object_type(response) == "block"
+        and _get_attr(response, "type") is not None
+    )
 
 
-def is_full_page(response: Any) -> bool:
-    """Return True if `response` is a full Page object (has `url`)."""
-    return _get_object_type(response) == "page" and _get_attr(response, "url") is not None
+def is_full_page(
+    response: NotionPage | PartialPage | Mapping[str, Any] | Any,
+) -> TypeGuard[NotionPage]:
+    """Type guard: page object with full fields (`url` present)."""
+    return (
+        _get_object_type(response) == "page" and _get_attr(response, "url") is not None
+    )
 
 
-def is_full_data_source(response: Any) -> bool:
-    """Return True if `response` is a DataSource object.
-
-    Note: In the TypeScript helper, this check only confirms the `object` type.
-    """
-    return _get_object_type(response) == "data_source"
-
-
-def is_full_database(response: Any) -> bool:
-    """Return True if `response` is a Database object.
-
-    Note: Mirrors the TypeScript helper behavior.
-    """
-    return _get_object_type(response) == "database"
+def is_full_data_source(
+    response: DataSource | PartialDataSource | Mapping[str, Any] | Any,
+) -> TypeGuard[DataSource]:
+    """Type guard: data source (full schema object)."""
+    return (
+        _get_object_type(response) == "data_source"
+        and _get_attr(response, "url") is not None
+    )
 
 
-def is_full_page_or_data_source(response: Any) -> bool:
-    """Return True if `response` is a full DataSource or full Page object."""
+def is_full_database(
+    response: NotionDatabase | PartialDatabase | Mapping[str, Any] | Any,
+) -> TypeGuard[NotionDatabase]:
+    """Type guard: database (full metadata object)."""
+    return _get_object_type(response) == "database" and hasattr(response, "title")
+
+
+def is_full_page_or_data_source(
+    response: (
+        NotionPage
+        | PartialPage
+        | DataSource
+        | PartialDataSource
+        | Mapping[str, Any]
+        | Any
+    ),
+) -> TypeGuard[NotionPage | DataSource]:
+    """Type guard: full Page or full DataSource."""
     obj = _get_object_type(response)
     if obj == "data_source":
         return is_full_data_source(response)
     return is_full_page(response)
 
 
-def is_full_user(response: Any) -> bool:
-    """Return True if `response` is a full User object (has `type`)."""
-    return _get_attr(response, "type") is not None
+from .models.user import PartialUser, User  # type: ignore
 
 
-def is_full_comment(response: Any) -> bool:
-    """Return True if `response` is a full Comment object (has `created_by`)."""
-    return _get_attr(response, "created_by") is not None
+def is_full_user(
+    response: PartialUser | User | Mapping[str, Any] | Any,
+) -> TypeGuard[User]:
+    """Type guard: full User object (has `type`)."""
+    return _get_attr(response, "type") in ("person", "bot")
 
 
-def is_text_rich_text_item_response(rich_text: Any) -> bool:
-    """Return True if the rich text item is of type `text`."""
+def is_full_comment(response: Mapping[str, Any] | Any) -> TypeGuard[Mapping[str, Any]]:
+    """Best-effort type guard for comment dicts (created_by present)."""
+    return isinstance(response, Mapping) and "created_by" in response
+
+
+class TextRichTextItem(Protocol):
+    type: Literal["text"]
+    text: Text
+    mention: None
+    equation: None
+
+
+class EquationRichTextItem(Protocol):
+    type: Literal["equation"]
+    equation: Equation
+    text: None
+    mention: None
+
+
+class MentionRichTextItem(Protocol):
+    type: Literal["mention"]
+    mention: Mention
+    text: None
+    equation: None
+
+
+def is_text_rich_text_item_response(
+    rich_text: RichTextItem | Mapping[str, Any] | Any,
+) -> TypeGuard[TextRichTextItem]:
+    """Type guard: rich text item is `text` variant (ensures `.text` not None)."""
     return _get_attr(rich_text, "type") == "text"
 
 
-def is_equation_rich_text_item_response(rich_text: Any) -> bool:
-    """Return True if the rich text item is of type `equation`."""
+def is_equation_rich_text_item_response(
+    rich_text: RichTextItem | Mapping[str, Any] | Any,
+) -> TypeGuard[EquationRichTextItem]:
+    """Type guard: rich text item is `equation` variant (ensures `.equation` not None)."""
     return _get_attr(rich_text, "type") == "equation"
 
 
-def is_mention_rich_text_item_response(rich_text: Any) -> bool:
-    """Return True if the rich text item is of type `mention`."""
+def is_mention_rich_text_item_response(
+    rich_text: RichTextItem | Mapping[str, Any] | Any,
+) -> TypeGuard[MentionRichTextItem]:
+    """Type guard: rich text item is `mention` variant (ensures `.mention` not None)."""
     return _get_attr(rich_text, "type") == "mention"
 
 
@@ -198,7 +268,9 @@ def extract_notion_id(url_or_id: str | None) -> str | None:
         return _format_uuid(m.group(1))
 
     # Then query parameters like ?p=<32hex> or ?page_id=<32hex> or ?database_id=<32hex>
-    m = re.search(r"[?&](?:p|page_id|database_id)=([0-9a-f]{32})", s, flags=re.IGNORECASE)
+    m = re.search(
+        r"[?&](?:p|page_id|database_id)=([0-9a-f]{32})", s, flags=re.IGNORECASE
+    )
     if m and m.group(1):
         return _format_uuid(m.group(1))
 

@@ -105,6 +105,18 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
     print(f"Total results: {len(all_results)}")
 ```
 
+> Tip: Use pagination helpers
+
+```python
+from notion_py_client.utils import iterate_paginated_api
+
+async for result in iterate_paginated_api(
+    client.search,
+    {"query": "task", "page_size": 100},
+):
+    print(result.id)
+```
+
 ## Search Parameters
 
 ### Filter Options
