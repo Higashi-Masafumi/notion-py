@@ -1,4 +1,4 @@
-from ._base_property import BaseProperty
+from ._base_property import BaseProperty, NotionPropertyType
 from .button_property import ButtonProperty
 from .checkbox_property import CheckboxProperty
 from .created_by_property import CreatedByProperty
@@ -23,6 +23,7 @@ from .verification_property import VerificationProperty
 
 __all__ = [
     "BaseProperty",
+    "NotionPropertyType",
     "ButtonProperty",
     "CheckboxProperty",
     "CreatedByProperty",
