@@ -21,6 +21,7 @@ from notion_py_client.properties.base_properties._base_property import (
 )
 from notion_py_client.properties.base_properties.date_property import DateProperty
 from notion_py_client.requests.common import (
+    DateRequest,
     PartialUserObjectRequest,
     SelectPropertyItemRequest,
 )
@@ -92,17 +93,22 @@ class MockMapper(NotionMapper[MemberResource]):
         ),
     )
     date_range_field: NotionPropertyDescriptor[
-        DateProperty, DatePropertyRequest, DateRange | None
+        DateProperty, DatePropertyRequest, DateRange
     ] = NotionField(
         notion_name="DateRange",
         parser=lambda p: (
             DateRange(
-                start_date=date.fromisoformat(p.date.start),
-                end_date=date.fromisoformat(p.date.end),
-                time_zone=p.date.time_zone,
+                start_date=p.get_start_date(),
+                end_date=p.get_end_date(),
+                time_zone=p.date.time_zone if p.date and p.date.time_zone else None,
             )
-            if p.date and p.date.end
-            else None
+        ),
+        request_builder=lambda v: DatePropertyRequest(
+            date=DateRequest(
+                start=v.start_date.isoformat(),
+                end=v.end_date.isoformat(),
+                time_zone=v.time_zone,
+            )
         ),
     )
     project_range_field: NotionPropertyDescriptor[
