@@ -11,6 +11,7 @@ from enum import Enum
 from pydantic import BaseModel, Field, StrictStr
 
 from .file import ExternalFile, InternalFile
+from .primitives import CustomEmoji
 
 
 class IconType(str, Enum):
@@ -19,6 +20,7 @@ class IconType(str, Enum):
     EMOJI = "emoji"
     EXTERNAL = "external"
     FILE = "file"
+    CUSTOM_EMOJI = "custom_emoji"
 
 
 class NotionIcon(BaseModel):
@@ -50,3 +52,6 @@ class NotionIcon(BaseModel):
     emoji: StrictStr | None = Field(None, description="絵文字アイコン")
     external: ExternalFile | None = Field(None, description="外部ファイル")
     file: InternalFile | None = Field(None, description="内部ファイル")
+    custom_emoji: CustomEmoji | None = Field(
+        None, description="カスタム絵文字（typeがcustom_emojiの場合のみ）"
+    )

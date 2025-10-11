@@ -26,6 +26,9 @@ from .base_configs import (
     UniqueIdPropertyConfig,
     UrlPropertyConfig,
     VerificationPropertyConfig,
+    LocationPropertyConfig,
+    LastVisitedTimePropertyConfig,
+    PlacePropertyConfig,
 )
 from .relation_config import (
     RelationConfig,
@@ -59,6 +62,9 @@ PropertyConfig = Union[
     UniqueIdPropertyConfig,
     UrlPropertyConfig,
     VerificationPropertyConfig,
+    LocationPropertyConfig,
+    LastVisitedTimePropertyConfig,
+    PlacePropertyConfig,
 ]
 
 # データベースプロパティ設定のレスポンス型（PropertyConfigのエイリアス）
@@ -96,6 +102,9 @@ __all__ = [
     "UniqueIdPropertyConfig",
     "UrlPropertyConfig",
     "VerificationPropertyConfig",
+    "LocationPropertyConfig",
+    "LastVisitedTimePropertyConfig",
+    "PlacePropertyConfig",
     "PropertyConfig",
     "DatabasePropertyConfigResponse",
 ]

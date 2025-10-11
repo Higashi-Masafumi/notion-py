@@ -8,11 +8,14 @@ from .formula_property import FormulaProperty
 from .email_property import EmailProperty
 from .files_property import FilesProperty
 from .last_edited_time_property import LastEditedTimeProperty
+from .last_visited_time_property import LastVisitedTimeProperty
 from .last_edited_by_property import LastEditedByProperty
 from .multi_select_property import MultiSelectProperty
+from .location_property import LocationProperty
 from .number_property import NumberProperty
 from .people_property import PeopleProperty
 from .phone_number_property import PhoneNumberProperty
+from .place_property import PlaceProperty
 from .rich_text_property import RichTextProperty
 from .select_property import SelectProperty
 from .status_property import StatusProperty
@@ -33,6 +36,7 @@ __all__ = [
     "EmailProperty",
     "FilesProperty",
     "LastEditedTimeProperty",
+    "LastVisitedTimeProperty",
     "LastEditedByProperty",
     "RichTextProperty",
     "StatusProperty",
@@ -43,6 +47,8 @@ __all__ = [
     "PeopleProperty",
     "NumberProperty",
     "PhoneNumberProperty",
+    "LocationProperty",
+    "PlaceProperty",
     "UniqueIdProperty",
     "VerificationProperty",
 ]

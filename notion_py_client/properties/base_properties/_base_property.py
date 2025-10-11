@@ -31,6 +31,10 @@ class NotionPropertyType(str, Enum):
     LAST_EDITED_BY = "last_edited_by"
     UNIQUE_ID = "unique_id"
     VERIFICATION = "verification"
+    # Newer property types
+    LOCATION = "location"
+    LAST_VISITED_TIME = "last_visited_time"
+    PLACE = "place"
 
 
 TPropertyType = TypeVar("TPropertyType", bound="NotionPropertyType")

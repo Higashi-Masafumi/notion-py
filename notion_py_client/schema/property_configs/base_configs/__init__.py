@@ -20,6 +20,9 @@ from .title_config import TitlePropertyConfig
 from .unique_id_config import UniqueIdPropertyConfig
 from .url_config import UrlPropertyConfig
 from .verification_config import VerificationPropertyConfig
+from .location_config import LocationPropertyConfig
+from .last_visited_time_config import LastVisitedTimePropertyConfig
+from .place_config import PlacePropertyConfig
 
 __all__ = [
     "BasePropertyConfig",
@@ -47,4 +50,7 @@ __all__ = [
     "UniqueIdPropertyConfig",
     "UrlPropertyConfig",
     "VerificationPropertyConfig",
+    "LocationPropertyConfig",
+    "LastVisitedTimePropertyConfig",
+    "PlacePropertyConfig",
 ]
