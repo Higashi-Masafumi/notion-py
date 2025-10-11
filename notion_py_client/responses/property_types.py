@@ -17,6 +17,7 @@ from ..properties.base_properties import (
     FormulaProperty,
     FilesProperty,
     LastEditedByProperty,
+    LastEditedTimeProperty,
     LastVisitedTimeProperty,
     MultiSelectProperty,
     LocationProperty,
@@ -31,7 +32,6 @@ from ..properties.base_properties import (
     UniqueIdProperty,
     UrlProperty,
     VerificationProperty,
-    LastEditedTimeProperty,
 )
 
 

@@ -74,3 +74,92 @@ class SelectPropertyItemRequest(BaseModel):
         # IDまたは名前のいずれかが必須
         # どちらも指定された場合はIDが優先される
         pass
+
+
+# ===== Files (request payloads) =====
+
+
+class InternalFileRequest(BaseModel):
+    """内部ファイルの参照（Notionが発行する一時URL）."""
+
+    url: StrictStr
+    expiry_time: StrictStr | None = None
+
+
+class ExternalFileRequest(BaseModel):
+    """外部ファイルの参照."""
+
+    url: TextRequest
+
+
+class InternalOrExternalFileWithNameRequest(BaseModel):
+    """filesプロパティ用: 内部/外部ファイル + 名前."""
+
+    type: Literal["file", "external"] | None = None
+    name: StringRequest
+    file: InternalFileRequest | None = None
+    external: ExternalFileRequest | None = None
+
+
+class FileUploadIdRequest(BaseModel):
+    """ファイルアップロードID参照."""
+
+    id: IdRequest
+
+
+class FileUploadWithOptionalNameRequest(BaseModel):
+    """filesプロパティ用: file_upload 参照 + 任意の名前."""
+
+    type: Literal["file_upload"] | None = None
+    file_upload: FileUploadIdRequest
+    name: StringRequest | None = None
+
+
+# ===== Page icon / cover (request payloads) =====
+
+
+class FileUploadPageIconRequest(BaseModel):
+    type: Literal["file_upload"] | None = None
+    file_upload: FileUploadIdRequest
+
+
+class EmojiPageIconRequest(BaseModel):
+    type: Literal["emoji"] | None = None
+    emoji: EmojiRequest
+
+
+class ExternalPageIconRequest(BaseModel):
+    type: Literal["external"] | None = None
+    external: ExternalFileRequest
+
+
+class CustomEmojiRef(BaseModel):
+    id: IdRequest
+    name: StrictStr | None = None
+    url: StrictStr | None = None
+
+
+class CustomEmojiPageIconRequest(BaseModel):
+    type: Literal["custom_emoji"] | None = None
+    custom_emoji: CustomEmojiRef
+
+
+PageIconRequest = (
+    FileUploadPageIconRequest
+    | EmojiPageIconRequest
+    | ExternalPageIconRequest
+    | CustomEmojiPageIconRequest
+)
+
+
+class FileUploadPageCoverRequest(BaseModel):
+    type: Literal["file_upload"] | None = None
+    file_upload: FileUploadIdRequest
+
+
+class ExternalPageCoverRequest(BaseModel):
+    type: Literal["external"] | None = None
+    external: ExternalFileRequest
+
+
+PageCoverRequest = FileUploadPageCoverRequest | ExternalPageCoverRequest

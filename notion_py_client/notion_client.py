@@ -17,24 +17,17 @@ from typing import (
     NotRequired,
 )
 
+from pydantic import TypeAdapter
+
 import httpx
 
 from .api_types import (
-    AppendBlockChildrenParameters,
-    CreateCommentParameters,
     CreateDatabaseParameters,
-    DeleteBlockParameters,
-    ListBlockChildrenParameters,
-    ListCommentsParameters,
-    ListUsersParameters,
     DatabaseQuerySort,
     QueryDatabaseParameters,
-    RetrieveBlockParameters,
     RetrieveDatabaseParameters,
     RetrievePageParameters,
-    RetrieveUserParameters,
     SearchParameters,
-    UpdateBlockParameters,
     UpdateDatabaseParameters,
 )
 from .filters import FilterCondition
@@ -42,12 +35,16 @@ from .requests.page_requests import CreatePageParameters, UpdatePageParameters
 from .responses.database import NotionDatabase
 from .responses.datasource import DataSource
 from .responses.page import NotionPage
+from .responses.file_upload import FileUploadObject
+from .responses.property_item import PropertyItemListResponse, PropertyItemObject
 from .responses.list_response import (
     QueryDatabaseResponse,
     QueryDataSourceResponse,
     ListUsersResponse,
     SearchResponse,
+    ListFileUploadsResponse,
 )
+from .models.user import PartialUser, User
 
 
 # ========== logging ==========
@@ -358,7 +355,7 @@ class NotionAsyncClient:
     async def __aenter__(self) -> "NotionAsyncClient":
         return self
 
-    async def __aexit__(self, exc_type, exc, tb) -> None:
+    async def __aexit__(self, exc_type: Any, exc: Any, tb: Any) -> None:
         await self.aclose()
 
     # ---------- auth header ----------
@@ -788,13 +785,22 @@ class _DatabasesAPI:
         database_id = params["database_id"]
         body = pick(
             params,
-            ["filter", "sorts", "start_cursor", "page_size", "filter_properties", "archived"],
+            [
+                "filter",
+                "sorts",
+                "start_cursor",
+                "page_size",
+                "filter_properties",
+                "archived",
+            ],
         )
         response = await self._c.request(
             path=f"databases/{database_id}/query", method="post", body=body, auth=auth
         )
         # Build QueryDatabaseResponse
-        results: list[NotionPage] = [NotionPage(**item) for item in response.get("results", [])]
+        results: list[NotionPage] = [
+            NotionPage(**item) for item in response.get("results", [])
+        ]
         return QueryDatabaseResponse(
             object="list",
             results=results,
@@ -1029,12 +1035,20 @@ class _DataSourcesAPI:
         database_id = params["database_id"]
         body = pick(
             params,
-            ["filter", "sorts", "start_cursor", "page_size", "filter_properties", "archived"],
+            [
+                "filter",
+                "sorts",
+                "start_cursor",
+                "page_size",
+                "filter_properties",
+                "archived",
+            ],
         )
         response = await self._c.request(
             path=f"databases/{database_id}/query", method="post", body=body, auth=auth
         )
         from .responses.page import PartialPage
+
         results = []
         for item in response.get("results", []):
             if "properties" in item:
@@ -1153,7 +1167,9 @@ class _PagesAPI:
             NotionPage: 作成されたページオブジェクト
         """
         body = params.model_dump(exclude_none=True, by_alias=True)
-        response = await self._c.request(path="pages", method="post", body=body, auth=auth)
+        response = await self._c.request(
+            path="pages", method="post", body=body, auth=auth
+        )
         return NotionPage(**response)
 
     async def retrieve(
@@ -1186,7 +1202,9 @@ class _PagesAPI:
         """
         payload = params.model_dump(exclude_none=True, by_alias=True)
         page_id = payload.pop("page_id")
-        response = await self._c.request(path=f"pages/{page_id}", method="patch", body=payload, auth=auth)
+        response = await self._c.request(
+            path=f"pages/{page_id}", method="patch", body=payload, auth=auth
+        )
         return NotionPage(**response)
 
 
@@ -1202,7 +1220,7 @@ class _PagePropertiesAPI:
         start_cursor: str | None = None,
         page_size: int | None = None,
         auth: AuthParam | None = None,
-    ) -> dict[str, Any]:
+    ) -> PropertyItemListResponse | PropertyItemObject:
         """Retrieve a page property item
 
         Returns:
@@ -1212,12 +1230,17 @@ class _PagePropertiesAPI:
             {"start_cursor": start_cursor, "page_size": page_size},
             ["start_cursor", "page_size"],
         )
-        return await self._c.request(
+        res = await self._c.request(
             path=f"pages/{page_id}/properties/{property_id}",
             method="get",
             query=query,
             auth=auth,
         )
+        if isinstance(res, dict) and res.get("object") == "list":
+            return PropertyItemListResponse.model_validate(res)
+        # PropertyItemObject is a Union, use TypeAdapter
+        adapter = TypeAdapter(PropertyItemObject)
+        return adapter.validate_python(res)
 
 
 class _UsersAPI:
@@ -1226,13 +1249,19 @@ class _UsersAPI:
 
     async def retrieve(
         self, *, user_id: str, auth: AuthParam | None = None
-    ) -> dict[str, Any]:
+    ) -> PartialUser | User:
         """Retrieve a user
 
         Returns:
             UserObjectResponse: ユーザーオブジェクト
         """
-        return await self._c.request(path=f"users/{user_id}", method="get", auth=auth)
+        res = await self._c.request(path=f"users/{user_id}", method="get", auth=auth)
+        # User is a Union (PersonUser | BotUser), use TypeAdapter
+        try:
+            adapter = TypeAdapter(User)
+            return adapter.validate_python(res)
+        except Exception:
+            return PartialUser.model_validate(res)
 
     async def list(
         self,
@@ -1347,7 +1376,7 @@ class _FileUploadsAPI:
         size: int,
         mime_type: str | None = None,
         auth: AuthParam | None = None,
-    ) -> dict[str, Any]:
+    ) -> FileUploadObject:
         """Create a file upload
 
         Returns:
@@ -1358,21 +1387,23 @@ class _FileUploadsAPI:
             "size": size,
             **pick({"mime_type": mime_type}, ["mime_type"]),
         }
-        return await self._c.request(
+        res = await self._c.request(
             path="file_uploads", method="post", body=body, auth=auth
         )
+        return FileUploadObject(**res)
 
     async def retrieve(
         self, *, file_upload_id: str, auth: AuthParam | None = None
-    ) -> dict[str, Any]:
+    ) -> FileUploadObject:
         """Retrieve a file upload
 
         Returns:
             FileUploadObjectResponse: ファイルアップロードオブジェクト（status, upload_urlなどを含む）
         """
-        return await self._c.request(
+        res = await self._c.request(
             path=f"file_uploads/{file_upload_id}", method="get", auth=auth
         )
+        return FileUploadObject(**res)
 
     async def list(
         self,
@@ -1380,7 +1411,7 @@ class _FileUploadsAPI:
         start_cursor: str | None = None,
         page_size: int | None = None,
         auth: AuthParam | None = None,
-    ) -> dict[str, Any]:
+    ) -> ListFileUploadsResponse:
         """List file uploads
 
         Returns:
@@ -1390,8 +1421,15 @@ class _FileUploadsAPI:
             {"start_cursor": start_cursor, "page_size": page_size},
             ["start_cursor", "page_size"],
         )
-        return await self._c.request(
+        res = await self._c.request(
             path="file_uploads", method="get", query=query, auth=auth
+        )
+        return ListFileUploadsResponse(
+            object="list",
+            results=[FileUploadObject(**it) for it in res.get("results", [])],
+            next_cursor=res.get("next_cursor"),
+            has_more=res.get("has_more", False),
+            type="file_upload",
         )
 
     async def send(
@@ -1401,7 +1439,7 @@ class _FileUploadsAPI:
         file: dict[str, Any],
         part_number: str | None = None,
         auth: AuthParam | None = None,
-    ) -> dict[str, Any]:
+    ) -> FileUploadObject:
         """
         Send a file upload
 
@@ -1423,23 +1461,25 @@ class _FileUploadsAPI:
             "file": file,
             **pick({"part_number": part_number}, ["part_number"]),
         }
-        return await self._c.request(
+        res = await self._c.request(
             path=f"file_uploads/{file_upload_id}",
             method="post",
             form_data_params=form_data,
             auth=auth,
         )
+        return FileUploadObject(**res)
 
     async def complete(
         self, *, file_upload_id: str, auth: AuthParam | None = None
-    ) -> dict[str, Any]:
+    ) -> FileUploadObject:
         """Complete a file upload
 
         Returns:
             FileUploadObjectResponse: 完了したファイルアップロードオブジェクト（status="complete"）
         """
-        return await self._c.request(
+        res = await self._c.request(
             path=f"file_uploads/{file_upload_id}/complete",
             method="post",
             auth=auth,
         )
+        return FileUploadObject(**res)

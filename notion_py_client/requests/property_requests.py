@@ -22,6 +22,8 @@ from .common import (
     DateRequest,
     GroupObjectRequest,
     IdRequest,
+    InternalOrExternalFileWithNameRequest,
+    FileUploadWithOptionalNameRequest,
     PartialUserObjectRequest,
     RelationItemRequest,
     SelectPropertyItemRequest,
@@ -142,8 +144,8 @@ class FilesPropertyRequest(BaseModel):
     """Filesプロパティのリクエスト."""
 
     files: list[
-        Any
-    ]  # InternalOrExternalFileWithNameRequest | FileUploadWithOptionalNameRequest
+        InternalOrExternalFileWithNameRequest | FileUploadWithOptionalNameRequest
+    ]
     type: Literal["files"] | None = None
 
 

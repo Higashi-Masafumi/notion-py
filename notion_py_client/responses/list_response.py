@@ -11,6 +11,7 @@ from pydantic import BaseModel, Field, StrictBool, StrictStr
 from .page import NotionPage, PartialPage
 from .database import NotionDatabase, PartialDatabase
 from .datasource import DataSource, PartialDataSource
+from .file_upload import FileUploadObject
 from ..models.user import PartialUser
 
 T = TypeVar("T")
@@ -47,38 +48,38 @@ class ListResponse(BaseModel, Generic[T]):
 class QueryDatabaseResponse(ListResponse[NotionPage]):
     """databases.query() のレスポンス型.
 
-    Examples:
-        >>> response = await client.databases.query({"database_id": "abc"})
-        >>> pages: list[NotionPage] = response.results
-        >>> if response.has_more:
-        ...     next_response = await client.databases.query({
-        ...         "database_id": "abc",
-        ...         "start_cursor": response.next_cursor
-        ...     })
+    備考: リスト型の共通フィールド `type` は親クラスで定義済み。
+    サブクラスではオーバーライドしない（LSP/型チェッカー警告を避ける）。
     """
-
-    type: Literal["page_or_database"] = Field("page_or_database", description="結果型")
 
 
 class QueryDataSourceResponse(
     ListResponse[NotionPage | PartialPage | DataSource | PartialDataSource]
 ):
-    """dataSources.query() のレスポンス型."""
+    """dataSources.query() のレスポンス型.
 
-    type: Literal["page_or_data_source"] = Field(
-        "page_or_data_source", description="結果型"
-    )
+    備考: `type` は親クラス側の型（StrictStr | None）を使用。
+    """
 
 
 class ListUsersResponse(ListResponse[PartialUser]):
-    """users.list() のレスポンス型."""
+    """users.list() のレスポンス型.
 
-    type: Literal["user"] = Field("user", description="結果型")
+    備考: `type` は親クラスに準拠。
+    """
 
 
 class SearchResponse(
     ListResponse[NotionPage | PartialPage | NotionDatabase | PartialDatabase]
 ):
-    """search() のレスポンス型."""
+    """search() のレスポンス型.
 
-    type: Literal["page_or_database"] = Field("page_or_database", description="結果型")
+    備考: `type` は親クラスに準拠。
+    """
+
+
+class ListFileUploadsResponse(ListResponse[FileUploadObject]):
+    """file_uploads.list() のレスポンス型.
+
+    備考: `type` は親クラスに準拠（省略される場合あり）。
+    """

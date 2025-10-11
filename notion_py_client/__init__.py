@@ -1,6 +1,8 @@
 from .responses.datasource import DataSource, PartialDataSource
 from .responses.database import NotionDatabase, PartialDatabase
 from .responses.page import NotionPage, PartialPage
+from .responses.file_upload import FileUploadObject
+from .responses.property_item import PropertyItemObject, PropertyItemListResponse
 from .blocks import (
     BlockObject,
     PartialBlock,
@@ -157,6 +159,13 @@ from .schema import (
     FormulaPropertyConfig,
 )
 from .notion_client import NotionAsyncClient, NotionErrorCode
+from .responses.list_response import (
+    ListUsersResponse,
+    QueryDatabaseResponse,
+    QueryDataSourceResponse,
+    SearchResponse,
+    ListFileUploadsResponse,
+)
 from .helper import Field, NotionMapper, NotionPropertyDescriptor
 
 __all__ = [
@@ -169,6 +178,15 @@ __all__ = [
     # Page
     "NotionPage",
     "PartialPage",
+    "FileUploadObject",
+    "PropertyItemObject",
+    "PropertyItemListResponse",
+    # List responses
+    "ListUsersResponse",
+    "QueryDatabaseResponse",
+    "QueryDataSourceResponse",
+    "SearchResponse",
+    "ListFileUploadsResponse",
     # Block base
     "BlockObject",
     "PartialBlock",
