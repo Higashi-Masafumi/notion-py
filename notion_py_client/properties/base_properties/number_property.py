@@ -15,7 +15,7 @@ class NumberProperty(BaseProperty[Literal[NotionPropertyType.NUMBER]]):
         None, description="数値（設定されていない場合はnull）"
     )
 
-    def get_display_value(self) -> str | StrictInt | StrictFloat | bool | None:
+    def get_display_value(self) -> int | float | None:
         """数値を取得
 
         Returns:

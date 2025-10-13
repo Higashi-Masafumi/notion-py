@@ -14,7 +14,7 @@ class TitleProperty(BaseProperty[Literal[NotionPropertyType.TITLE]]):
 
     title: list[RichTextItem] = Field(..., description="タイトルのRichText配列")
 
-    def get_display_value(self) -> str | int | float | bool | None:
+    def get_display_value(self) -> str | None:
         """タイトルの内容を取得
 
         Returns:

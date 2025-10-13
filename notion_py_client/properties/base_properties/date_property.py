@@ -16,7 +16,7 @@ class DateProperty(BaseProperty[Literal[NotionPropertyType.DATE]]):
         None, description="日付情報（設定されていない場合はnull）"
     )
 
-    def get_display_value(self) -> str | int | float | bool | None:
+    def get_display_value(self) -> str | None:
         """日付情報を取得
 
         Returns:

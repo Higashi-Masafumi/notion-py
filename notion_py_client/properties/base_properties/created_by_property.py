@@ -15,7 +15,7 @@ class CreatedByProperty(BaseProperty[Literal[NotionPropertyType.CREATED_BY]]):
 
     created_by: PartialUser | User = Field(..., description="作成者情報")
 
-    def get_display_value(self) -> str | int | float | bool | None:
+    def get_display_value(self) -> str | None:
         """作成者情報を取得
 
         Returns:

@@ -20,7 +20,7 @@ class PlaceProperty(BaseProperty[Literal[NotionPropertyType.PLACE]]):
         default=None, description="place情報（API仕様未確定のため汎用辞書）"
     )
 
-    def get_display_value(self) -> str | int | float | bool | None:
+    def get_display_value(self) -> str | None:
         """place情報を取得
 
         Returns:

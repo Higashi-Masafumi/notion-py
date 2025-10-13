@@ -16,7 +16,7 @@ class StatusProperty(BaseProperty[Literal[NotionPropertyType.STATUS]]):
         None, description="現在のステータス（設定されていない場合はnull）"
     )
 
-    def get_display_value(self) -> str | int | float | bool | None:
+    def get_display_value(self) -> str | None:
         """選択されたステータス名を取得
 
         Returns:

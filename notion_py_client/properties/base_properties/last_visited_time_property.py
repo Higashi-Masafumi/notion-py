@@ -18,7 +18,7 @@ class LastVisitedTimeProperty(
         None, description="最終表示日時（ISO 8601形式）"
     )
 
-    def get_display_value(self) -> StrictStr | int | float | bool | None:
+    def get_display_value(self) -> str | None:
         """最終表示日時を取得
 
         Returns:

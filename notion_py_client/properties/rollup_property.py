@@ -102,7 +102,7 @@ class RollupProperty(BaseProperty[Literal[NotionPropertyType.ROLLUP]]):
 
     rollup: Rollup = Field(..., description="rollupデータ")
 
-    def get_display_value(self) -> StrictStr | StrictInt | StrictFloat | bool | None:
+    def get_display_value(self) -> str | int | float | bool | None:
         """rollupの表示値を取得
 
         Returns:

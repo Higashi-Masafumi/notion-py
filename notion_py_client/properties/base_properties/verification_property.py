@@ -15,7 +15,7 @@ class VerificationProperty(BaseProperty[Literal[NotionPropertyType.VERIFICATION]
 
     verification: Verification | None = Field(None, description="検証状態情報")
 
-    def get_display_value(self) -> str | int | float | bool | None:
+    def get_display_value(self) -> str | None:
         """検証状態情報を取得
 
         Returns:

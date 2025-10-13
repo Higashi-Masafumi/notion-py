@@ -16,7 +16,7 @@ class MultiSelectProperty(BaseProperty[Literal[NotionPropertyType.MULTI_SELECT]]
         default_factory=list, description="選択されたオプション配列"
     )
 
-    def get_display_value(self) -> str | int | float | bool | None:
+    def get_display_value(self) -> str | None:
         """選択されたオプション名のリストを取得
 
         Returns:

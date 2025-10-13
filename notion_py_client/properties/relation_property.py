@@ -24,7 +24,7 @@ class RelationProperty(BaseProperty[Literal[NotionPropertyType.RELATION]]):
     )
     has_more: StrictBool = Field(False, description="さらに関連項目があるかどうか")
 
-    def get_display_value(self) -> StrictStr | int | float | StrictBool | None:
+    def get_display_value(self) -> str | None:
         """関連項目のIDリストをカンマ区切りで取得
 
         Returns:

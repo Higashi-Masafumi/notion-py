@@ -18,7 +18,7 @@ class RichTextProperty(BaseProperty[Literal[NotionPropertyType.RICH_TEXT]]):
 
     rich_text: list[RichTextItem] = Field(..., description="RichText要素の配列")
 
-    def get_display_value(self) -> str | int | float | bool | None:
+    def get_display_value(self) -> str | None:
         """リッチテキストの内容を取得
 
         Returns:

@@ -14,7 +14,7 @@ class CreatedTimeProperty(BaseProperty[Literal[NotionPropertyType.CREATED_TIME]]
 
     created_time: StrictStr = Field(..., description="作成日時（ISO 8601形式）")
 
-    def get_display_value(self) -> StrictStr | int | float | bool | None:
+    def get_display_value(self) -> str:
         """作成日時を取得
 
         Returns:

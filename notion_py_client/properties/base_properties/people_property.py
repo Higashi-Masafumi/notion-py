@@ -16,7 +16,7 @@ class PeopleProperty(BaseProperty[Literal[NotionPropertyType.PEOPLE]]):
         default_factory=list, description="ユーザー/グループ配列"
     )
 
-    def get_display_value(self) -> str | int | float | bool | None:
+    def get_display_value(self) -> str | None:
         """ユーザー/グループ名のリストを取得
 
         Returns:

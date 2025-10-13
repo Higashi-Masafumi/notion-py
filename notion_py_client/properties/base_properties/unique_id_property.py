@@ -15,7 +15,7 @@ class UniqueIdProperty(BaseProperty[Literal[NotionPropertyType.UNIQUE_ID]]):
 
     unique_id: UniqueId = Field(..., description="ユニークIDの値")
 
-    def get_display_value(self) -> str | int | float | bool | None:
+    def get_display_value(self) -> str | None:
         """ユニークIDの表示値を取得
 
         - prefix と number の両方がある場合は `PREFIX-<number>`

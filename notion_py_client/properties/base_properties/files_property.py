@@ -17,7 +17,7 @@ class FilesProperty(BaseProperty[Literal[NotionPropertyType.FILES]]):
         default_factory=list, description="ファイル情報のリスト"
     )
 
-    def get_display_value(self) -> str | int | float | bool | None:
+    def get_display_value(self) -> str | None:
         """ファイル名のリストを取得
 
         Returns:

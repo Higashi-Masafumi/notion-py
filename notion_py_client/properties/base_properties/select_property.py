@@ -16,7 +16,7 @@ class SelectProperty(BaseProperty[Literal[NotionPropertyType.SELECT]]):
         None, description="選択されたオプション（設定されていない場合はnull）"
     )
 
-    def get_display_value(self) -> str | int | float | bool | None:
+    def get_display_value(self) -> str | None:
         """選択されたオプション名を取得
 
         Returns:

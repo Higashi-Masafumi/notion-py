@@ -16,7 +16,7 @@ class PhoneNumberProperty(BaseProperty[Literal[NotionPropertyType.PHONE_NUMBER]]
         None, description="電話番号（未設定の場合はnull）"
     )
 
-    def get_display_value(self) -> StrictStr | int | float | bool | None:
+    def get_display_value(self) -> str | None:
         """電話番号を取得
 
         Returns:

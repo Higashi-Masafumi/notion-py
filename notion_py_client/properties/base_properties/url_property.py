@@ -13,7 +13,7 @@ class UrlProperty(BaseProperty[Literal[NotionPropertyType.URL]]):
 
     url: StrictStr | None = Field(None, description="URL（設定されていない場合はnull）")
 
-    def get_display_value(self) -> StrictStr | int | float | bool | None:
+    def get_display_value(self) -> str | None:
         """URLを取得
 
         Returns:

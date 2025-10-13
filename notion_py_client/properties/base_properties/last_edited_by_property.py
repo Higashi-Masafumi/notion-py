@@ -15,7 +15,7 @@ class LastEditedByProperty(BaseProperty[Literal[NotionPropertyType.LAST_EDITED_B
 
     last_edited_by: PartialUser | User = Field(..., description="最終編集者情報")
 
-    def get_display_value(self) -> str | int | float | bool | None:
+    def get_display_value(self) -> str | None:
         """最終編集者情報を取得
 
         Returns:
