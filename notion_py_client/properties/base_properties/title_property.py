@@ -14,19 +14,12 @@ class TitleProperty(BaseProperty[Literal[NotionPropertyType.TITLE]]):
 
     title: list[RichTextItem] = Field(..., description="タイトルのRichText配列")
 
-    def get_value(self) -> str:
-        """
-        title プロパティからタイトルのプレーンテキストを取得
+    def get_display_value(self) -> str | int | float | bool | None:
+        """タイトルの内容を取得
 
         Returns:
-            str: タイトルの内容をプレーンテキストとして結合した文字列
-
-        Note:
-            - titleプロパティはrich_textと同様の構造ですが、ページのメインタイトルを表します
-            - 書式情報（太字、色等）は失われます
-
-        Examples:
-            - 通常タイトル: "プロジェクトA"
-            - 空のタイトル: ""
+            str | None: タイトルの内容を連結した文字列。タイトルが空の場合はNone
         """
+        if len(self.title) == 0:
+            return None
         return "".join(item.plain_text for item in self.title)

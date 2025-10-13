@@ -13,15 +13,10 @@ class CheckboxProperty(BaseProperty[Literal[NotionPropertyType.CHECKBOX]]):
 
     checkbox: StrictBool = Field(False, description="チェックボックスの状態")
 
-    def get_value(self) -> bool:
-        """
-        checkbox プロパティからチェック状態を取得
+    def get_display_value(self) -> str | int | float | StrictBool | None:
+        """チェックボックスの状態を取得
 
         Returns:
-            bool: チェック状態（True: チェック済み、False: 未チェック）
-
-        Examples:
-            - チェック済み: True
-            - 未チェック: False
+            StrictBool | None: チェックボックスの状態（True or False）
         """
         return self.checkbox

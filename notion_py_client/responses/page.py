@@ -46,8 +46,8 @@ class NotionPage(BaseModel):
 
         # プロパティにアクセス（実際の値が入っている）
         title_prop = page.properties.get("名前")
-        if title_prop and hasattr(title_prop, "get_value"):
-            title = title_prop.get_value()
+        if title_prop and hasattr(title_prop, "get_display_value"):
+            title = title_prop.get_display_value()
             print(f"Title: {title}")
 
         # メタデータにアクセス

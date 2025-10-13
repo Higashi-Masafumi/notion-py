@@ -15,19 +15,10 @@ class NumberProperty(BaseProperty[Literal[NotionPropertyType.NUMBER]]):
         None, description="数値（設定されていない場合はnull）"
     )
 
-    def get_value(self) -> int | float | None:
-        """
-        number プロパティから数値を取得
+    def get_display_value(self) -> str | StrictInt | StrictFloat | bool | None:
+        """数値を取得
 
         Returns:
-            int | float | None: 数値、未設定の場合はNone
-
-        Note:
-            - Notionで整数として入力されたint、小数として入力されたfloatで返されます
-
-        Examples:
-            - 整数: 100
-            - 小数: 99.5
-            - 未設定: None
+            StrictInt | StrictFloat | None: 数値（未設定の場合はnull）
         """
         return self.number

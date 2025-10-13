@@ -48,6 +48,6 @@ class BaseProperty(BaseModel, Generic[TPropertyType]):
     type: TPropertyType = Field(..., description="プロパティタイプ")
 
     @abstractmethod
-    def get_value(self) -> Any:
-        """プロパティの値を取得"""
+    def get_display_value(self) -> str | int | float | bool | None:
+        """Notion UI上でのプロパティの表示用の値を取得"""
         pass

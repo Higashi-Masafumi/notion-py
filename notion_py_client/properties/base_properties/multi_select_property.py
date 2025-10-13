@@ -16,16 +16,12 @@ class MultiSelectProperty(BaseProperty[Literal[NotionPropertyType.MULTI_SELECT]]
         default_factory=list, description="選択されたオプション配列"
     )
 
-    def get_value(self) -> list[str]:
-        """
-        multi_select プロパティから選択されたオプション名のリストを取得
+    def get_display_value(self) -> str | int | float | bool | None:
+        """選択されたオプション名のリストを取得
 
         Returns:
-            list[str]: 選択されたオプション名のリスト（未選択の場合は空リスト）
-
-        Examples:
-            - 単一選択: ["タグA"]
-            - 複数選択: ["タグA", "タグB", "タグC"]
-            - 未選択: []
+            str | None: 選択されたオプション名をカンマ区切りで連結した文字列。選択がない場合はNone
         """
-        return [option.name for option in self.multi_select]
+        if len(self.multi_select) == 0:
+            return None
+        return ", ".join(option.name for option in self.multi_select)

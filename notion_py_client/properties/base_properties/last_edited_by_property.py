@@ -15,7 +15,11 @@ class LastEditedByProperty(BaseProperty[Literal[NotionPropertyType.LAST_EDITED_B
 
     last_edited_by: PartialUser | User = Field(..., description="最終編集者情報")
 
-    def get_value(self) -> str:
-        """last_edited_by プロパティから最終編集者名を取得"""
+    def get_display_value(self) -> str | int | float | bool | None:
+        """最終編集者情報を取得
+
+        Returns:
+            str | None: 最終編集者名。最終編集者情報が不完全な場合はNone
+        """
         name = getattr(self.last_edited_by, "name", None)
-        return name or ""
+        return name if name else None

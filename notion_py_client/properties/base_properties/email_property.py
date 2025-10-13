@@ -16,6 +16,10 @@ class EmailProperty(BaseProperty[Literal[NotionPropertyType.EMAIL]]):
         None, description="メールアドレス（未設定の場合はnull）"
     )
 
-    def get_value(self) -> str | None:
-        """email プロパティからメールアドレスを取得"""
+    def get_display_value(self) -> StrictStr | int | float | bool | None:
+        """メールアドレスを取得
+
+        Returns:
+            StrictStr | None: メールアドレス（未設定の場合はnull）
+        """
         return self.email

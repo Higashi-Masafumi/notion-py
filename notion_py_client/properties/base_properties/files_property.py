@@ -17,12 +17,12 @@ class FilesProperty(BaseProperty[Literal[NotionPropertyType.FILES]]):
         default_factory=list, description="ファイル情報のリスト"
     )
 
-    def get_value(self) -> list[str]:
-        """files プロパティからURLのリストを取得"""
-        urls: list[str] = []
-        for file_item in self.files:
-            if file_item.type == "file" and file_item.file:
-                urls.append(file_item.file.url)
-            elif file_item.type == "external" and file_item.external:
-                urls.append(file_item.external.url)
-        return urls
+    def get_display_value(self) -> str | int | float | bool | None:
+        """ファイル名のリストを取得
+
+        Returns:
+            str | None: ファイル名をカンマ区切りで連結した文字列。ファイルがない場合はNone
+        """
+        if len(self.files) == 0:
+            return None
+        return ", ".join(file.name for file in self.files)

@@ -18,22 +18,12 @@ class RichTextProperty(BaseProperty[Literal[NotionPropertyType.RICH_TEXT]]):
 
     rich_text: list[RichTextItem] = Field(..., description="RichText要素の配列")
 
-    def get_value(self) -> str:
-        """
-        rich_text プロパティからプレーンテキストを取得
+    def get_display_value(self) -> str | int | float | bool | None:
+        """リッチテキストの内容を取得
 
         Returns:
-            str: リッチテキストの内容をプレーンテキストとして結合した文字列
-
-        Note:
-            - 複数のRichTextItemのplain_textを結合します
-            - 書式情報（太字、色等）は失われます
-            - 空の場合は空文字列を返します
-
-        Examples:
-            - 通常テキスト: "これは説明文です"
-            - 書式付き: "重要な情報です"（書式は除去）
-            - 複数要素: "第一段落第二段落"（結合される）
-            - 空: ""
+            str | None: リッチテキストの内容を連結した文字列。リッチテキストが空の場合はNone
         """
+        if len(self.rich_text) == 0:
+            return None
         return "".join(item.plain_text for item in self.rich_text)

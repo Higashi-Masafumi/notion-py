@@ -1,4 +1,5 @@
 from typing import Any, Literal
+import json
 
 from pydantic import Field
 
@@ -20,7 +21,15 @@ class LocationProperty(BaseProperty[Literal[NotionPropertyType.LOCATION]]):
         default=None, description="ロケーション情報（API仕様未確定のため汎用辞書）"
     )
 
-    def get_value(self) -> dict[str, Any] | None:
-        """ロケーション情報を辞書で返す"""
-        return self.location
+    def get_display_value(self) -> str | int | float | bool | None:
+        """ロケーション情報を取得
 
+        Returns:
+            str | None: ロケーション情報の文字列表現。未設定の場合はNone
+        """
+        if self.location is None:
+            return None
+        try:
+            return json.dumps(self.location, ensure_ascii=False, separators=(",", ":"))
+        except Exception:
+            return str(self.location)
