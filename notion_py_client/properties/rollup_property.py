@@ -72,7 +72,7 @@ class Rollup(BaseModel):
         | None
     ) = Field(None, description="配列（typeがarrayの場合のみ設定）")
 
-    def get_value(self) -> Any:
+    def get_display_value(self) -> int | StrictFloat | StrictStr | bool | None:
         """
         rollup プロパティからrollupデータを取得
 
@@ -83,10 +83,10 @@ class Rollup(BaseModel):
             case "number":
                 return self.number
             case "date":
-                return self.date
+                return self.date.get_display_value() if self.date else None
             case "array":
                 if self.array and len(self.array) > 0:
-                    return self.array[0].get_value()
+                    return self.array[0].get_display_value()
                 else:
                     return None
             case _:
@@ -102,11 +102,10 @@ class RollupProperty(BaseProperty[Literal[NotionPropertyType.ROLLUP]]):
 
     rollup: Rollup = Field(..., description="rollupデータ")
 
-    def get_value(self) -> Any:
-        """
-        rollup プロパティからrollupデータを取得
+    def get_display_value(self) -> StrictStr | StrictInt | StrictFloat | bool | None:
+        """rollupの表示値を取得
 
         Returns:
-            Any: rollupデータの値（number、arrayの最初の要素の値、またはNone）
+            StrictStr | StrictInt | StrictFloat | bool | None: rollupの表示値
         """
-        return self.rollup.get_value()
+        return self.rollup.get_display_value()

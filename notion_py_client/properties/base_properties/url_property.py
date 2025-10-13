@@ -13,15 +13,10 @@ class UrlProperty(BaseProperty[Literal[NotionPropertyType.URL]]):
 
     url: StrictStr | None = Field(None, description="URL（設定されていない場合はnull）")
 
-    def get_value(self) -> str | None:
-        """
-        url プロパティからURLを取得
+    def get_display_value(self) -> StrictStr | int | float | bool | None:
+        """URLを取得
 
         Returns:
-            str | None: URL文字列、未設定の場合はNone
-
-        Examples:
-            - 有効なURL: "https://example.com"
-            - 未設定: None
+            StrictStr | None: URL（未設定の場合はnull）
         """
         return self.url

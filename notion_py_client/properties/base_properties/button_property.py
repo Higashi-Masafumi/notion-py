@@ -25,3 +25,7 @@ class ButtonProperty(BaseProperty[Literal[NotionPropertyType.BUTTON]]):
             - buttonプロパティはNotionでクリックアクションを実行するためのものです
         """
         return None
+
+    def get_display_value(self) -> None:
+        """UI表示用の値（buttonは値を持たないため常にNone）。"""
+        return None

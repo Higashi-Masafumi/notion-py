@@ -16,15 +16,12 @@ class SelectProperty(BaseProperty[Literal[NotionPropertyType.SELECT]]):
         None, description="選択されたオプション（設定されていない場合はnull）"
     )
 
-    def get_value(self) -> str | None:
-        """
-        select プロパティから選択されたオプション名を取得
+    def get_display_value(self) -> str | int | float | bool | None:
+        """選択されたオプション名を取得
 
         Returns:
-            str | None: 選択されたオプション名、未選択の場合はNone
-
-        Examples:
-            - 選択済み: "進行中"
-            - 未選択: None
+            str | None: 選択されたオプション名。未設定の場合はNone
         """
-        return self.select.name if self.select else None
+        if self.select is None:
+            return None
+        return self.select.name

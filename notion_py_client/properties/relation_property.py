@@ -24,20 +24,12 @@ class RelationProperty(BaseProperty[Literal[NotionPropertyType.RELATION]]):
     )
     has_more: StrictBool = Field(False, description="さらに関連項目があるかどうか")
 
-    def get_value(self) -> list[str]:
-        """
-        relation プロパティから関連したページIDのリストを取得
+    def get_display_value(self) -> StrictStr | int | float | StrictBool | None:
+        """関連項目のIDリストをカンマ区切りで取得
 
         Returns:
-            list[str]: 関連したページIDのリスト（関連なしの場合は空リスト）
-
-        Note:
-            - ページIDは36文字のUUID形式です
-            - has_moreがtrueの場合、さらに関連項目が存在します
-
-        Examples:
-            - 単一関連: ["12345678-abcd-1234-efgh-123456789012"]
-            - 複数関連: ["12345678-...", "87654321-..."]
-            - 関連なし: []
+            StrictStr | None: 関連項目のIDをカンマ区切りで連結した文字列。関連項目がない場合はNone
         """
-        return [item.id for item in self.relation]
+        if len(self.relation) == 0:
+            return None
+        return ", ".join(item.id for item in self.relation)

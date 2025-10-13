@@ -15,32 +15,30 @@ class FormulaProperty(BaseProperty[Literal[NotionPropertyType.FORMULA]]):
 
     formula: FormulaResult = Field(..., description="フォーミュラの計算結果")
 
-    def get_value(self) -> Any:
-        """
-        formula プロパティから計算結果を型に応じて動的に取得
+    def get_display_value(self) -> str | int | float | bool | None:
+        """フォーミュラの計算結果を取得
 
         Returns:
-            Any: 計算結果の型に応じた値（str, int, float, bool, None）
-
+            str | int | float | bool | None: フォーミュラの計算結果
+        
         Note:
-            - formulaプロパティはNotionで設定された数式の計算結果です
-            - 結果の型は実行時まで不明で、動的に決定されます
-
-        Examples:
-            - 文字列結果: "結果文字列"
-            - 数値結果: 42 または 3.14
-            - 真偽値結果: True または False
-            - エラー/未定義: None
+            - フォーミュラの型に応じて、string, number, boolean, dateのいずれかの値を返す
+            - date型の場合、startとendの両方が存在する場合は "start→end" の形式で返す
+            - date型でstartのみ存在する場合はstartを返す
+            - フォーミュラが未設定の場合はNoneを返す
         """
-        match self.formula.type:
-            case "string":
-                return self.formula.string
-            case "number":
-                return self.formula.number
-            case "boolean":
-                return self.formula.boolean
-            case "date":
-                return self.formula.date
-            case _:
-                # 未知の型の場合はNoneを返す
+        if self.formula.type == "string":
+            return self.formula.string
+        elif self.formula.type == "number":
+            return self.formula.number
+        elif self.formula.type == "boolean":
+            return self.formula.boolean
+        elif self.formula.type == "date":
+            if self.formula.date is None:
                 return None
+            if self.formula.date.start and self.formula.date.end:
+                return f"{self.formula.date.start}→{self.formula.date.end}"
+            else:
+                return self.formula.date.start
+        else:
+            return None
