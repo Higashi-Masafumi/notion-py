@@ -1,6 +1,22 @@
-name-template: "Release v$NEXT_PATCH_VERSION"
-tag-template: "v$NEXT_PATCH_VERSION"
-version-template: "$MAJOR.$MINOR.$PATCH"
+name-template: "Release v$RESOLVED_VERSION"
+tag-template: "v$RESOLVED_VERSION"
+version-resolver:
+  major:
+    labels:
+      - major
+  minor:
+    labels:
+      - minor
+  patch:
+    labels:
+      - patch
+      - bug
+      - fix
+      - bugfix
+      - feature
+      - enhancement
+      - feat
+  default: patch
 prerelease: false
 
 categories:
