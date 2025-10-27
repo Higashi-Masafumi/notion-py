@@ -1,6 +1,6 @@
 [project]
 name = "notion-py-client"
-version = "0.1.14"
+version = "0.1.15"
 description = "A Python client for Notion API"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -46,3 +46,9 @@ dev = [
     "pytest-cov>=7.0.0",
     "python-dotenv>=1.1.1",
 ]
+
+[tool.hatch.build.targets.wheel]
+packages = ["notion_py_client"]
+
+[tool.hatch.build.targets.wheel.package-data]
+notion_py_client = ["py.typed"]

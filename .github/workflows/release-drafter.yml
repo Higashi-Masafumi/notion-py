@@ -1,0 +1,57 @@
+name: Release Drafter
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: "Publish the release and create the tag"
+        type: boolean
+        default: false
+      version:
+        description: "Override the semantic version (optional, e.g. 1.2.3)"
+        required: false
+        type: string
+
+jobs:
+  update-draft:
+    if: github.event_name != 'workflow_dispatch' || github.event.inputs.publish != 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: read
+    steps:
+      - uses: release-drafter/release-drafter@v6
+        with:
+          publish: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-release:
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.publish == 'true' && (github.event.inputs.version == '' || github.event.inputs.version == null)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: read
+    steps:
+      - uses: release-drafter/release-drafter@v6
+        with:
+          publish: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-release-with-version:
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.publish == 'true' && github.event.inputs.version != '' && github.event.inputs.version != null
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: read
+    steps:
+      - uses: release-drafter/release-drafter@v6
+        with:
+          publish: true
+          version: ${{ github.event.inputs.version }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
