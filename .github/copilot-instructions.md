@@ -15,25 +15,40 @@
 
 ## Architecture & Design Patterns
 
-### 1. Enum + Literal Pattern (Core Convention)
+### 1. String Literal Type Pattern (Core Convention)
 
-All type discriminators follow this pattern:
+All type discriminators use string literals for natural type checking:
 
-- **Base class**: Uses `Enum` for the `type` field
-- **Subclasses**: Override with `Literal` for specific types
+- **Base class**: Uses `Literal` union of all possible string values
+- **Subclasses**: Use specific `Literal` string for the `type` field
 
 ```python
-# Base class (blocks/base.py)
-class BaseBlockObject(BaseModel):
-    type: BlockType = Field(...)  # Enum
+# Base class type definition (properties/base_properties/_base_property.py)
+NotionPropertyType = Literal[
+    "title",
+    "rich_text",
+    "number",
+    "select",
+    # ... all property types
+]
 
-# Subclass (blocks/text_blocks.py)
-class ParagraphBlock(BaseBlockObject):
-    type: Literal[BlockType.PARAGRAPH] = BlockType.PARAGRAPH  # Literal override
-    paragraph: ParagraphBlockContent
+class BaseProperty(BaseModel):
+    type: NotionPropertyType  # Union of string literals
+
+# Subclass (properties/base_properties/title_property.py)
+class TitleProperty(BaseProperty):
+    type: Literal["title"] = "title"  # Specific string literal
+    title: list[RichTextItem]
 ```
 
-This pattern is used throughout: `BlockType`, `PropertyType`, `FilterType`, etc.
+This pattern enables:
+
+- **Natural comparison**: `if property.type == "title":` (no Enum imports)
+- **IDE autocomplete**: Full type hints with string literals
+- **TypeScript alignment**: Matches official Notion API patterns
+- **Type narrowing**: Automatic type inference in if blocks
+
+This pattern is used throughout: `NotionPropertyType`, `BlockType`, `FilterType`, etc.
 
 ### 2. Module Organization
 
@@ -237,8 +252,8 @@ Currently no test suite. When adding tests:
 2. Follow existing filter patterns (existence, comparison, etc.)
 3. Export in `filters/__init__.py`
 
-
 ## code of conduct
+
 do not let deprecated code remain in the codebase. Remove any code that is no longer needed.
 do not let temporary test code remain. Remove any temporary code used for debugging or testing.
 do not use emoji decorations in the documentation. Maintain a clean, professional style.
