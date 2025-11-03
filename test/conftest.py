@@ -140,7 +140,7 @@ class MockMapper(NotionMapper[MemberResource]):
                 f"Expected DateProperty for '{self.date_range_field.notion_name}', got {date_property.type}"
             )
         project_property = properties[self.project_range_field.notion_name]
-        if not project_property.type == "multi_select"  :
+        if not project_property.type == "multi_select":
             raise ValueError(
                 f"Expected MultiSelectProperty for '{self.project_range_field.notion_name}', got {project_property.type}"
             )
