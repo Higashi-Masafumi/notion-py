@@ -1,6 +1,7 @@
 """Pytest configuration and fixtures."""
 
 import pytest
+import pytest_asyncio
 
 from notion_py_client.notion_client import NotionAsyncClient
 from notion_py_client.properties.base_properties.multi_select_property import (
@@ -172,7 +173,7 @@ def mock_database():
     pass
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def mock_datasource():
     """Mock DataSource for testing."""
     # TODO: Add mock DataSource data
