@@ -1,6 +1,7 @@
 """Pytest configuration and fixtures."""
 
 import pytest
+import pytest_asyncio
 
 from notion_py_client.notion_client import NotionAsyncClient
 from notion_py_client.properties.base_properties.multi_select_property import (
@@ -15,9 +16,6 @@ from notion_py_client.helper import (
     NotionMapper,
     NotionPropertyDescriptor,
     Field as NotionField,
-)
-from notion_py_client.properties.base_properties._base_property import (
-    NotionPropertyType,
 )
 from notion_py_client.properties.base_properties.date_property import DateProperty
 from notion_py_client.requests.common import (
@@ -37,8 +35,6 @@ from typing import Annotated
 
 from pydantic import BaseModel, Field, StrictStr, StringConstraints
 from dotenv import load_dotenv
-
-from notion_py_client.utils import is_full_page
 
 load_dotenv()  # Load environment variables from .env file
 
@@ -177,12 +173,12 @@ def mock_database():
     pass
 
 
-@pytest.fixture
-def mock_datasource():
+@pytest_asyncio.fixture
+async def mock_datasource():
     """Mock DataSource for testing."""
     # TODO: Add mock DataSource data
     notion_client = NotionAsyncClient(auth="fake_api_key")
-    response = notion_client.dataSources.query(
+    response = await notion_client.dataSources.query(
         data_source_id="fake_datasource_id",
         page_size=1,
         filter={
@@ -190,6 +186,7 @@ def mock_datasource():
             "select": {"equals": "Active"},
         },
     )
+    return response
 
 
 @pytest.fixture

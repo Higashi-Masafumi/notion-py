@@ -4,38 +4,59 @@ notion-py-client provides a complete type system for the Notion API built with P
 
 ## Core Principles
 
-### Enum + Literal Pattern
+### String Literal Types
 
-All type discriminators follow this pattern:
+All type discriminators use string literals for natural type checking:
 
 ```python
-from enum import Enum
 from typing import Literal
 from pydantic import BaseModel, Field
 
-# Base class uses Enum
-class BlockType(str, Enum):
-    PARAGRAPH = "paragraph"
-    HEADING_1 = "heading_1"
+# Type is a union of all possible string literals
+NotionPropertyType = Literal[
+    "title",
+    "rich_text",
+    "number",
+    "select",
+    "multi_select",
+    "date",
+    "people",
+    "files",
+    "checkbox",
+    "url",
+    "email",
+    "phone_number",
+    "formula",
+    "relation",
+    "rollup",
+    "created_time",
+    "created_by",
+    "last_edited_time",
+    "last_edited_by",
+    "status",
+    # ... and more
+]
 
-class BaseBlockObject(BaseModel):
-    type: BlockType = Field(...)  # Enum
+class BaseProperty(BaseModel):
+    id: str
+    type: NotionPropertyType
 
-# Subclass overrides with Literal
-class ParagraphBlock(BaseBlockObject):
-    type: Literal[BlockType.PARAGRAPH] = BlockType.PARAGRAPH
-    paragraph: ParagraphBlockContent
+# Subclass uses specific string literal
+class TitleProperty(BaseProperty):
+    type: Literal["title"] = "title"
+    title: list[RichTextItem]
 
-class Heading1Block(BaseBlockObject):
-    type: Literal[BlockType.HEADING_1] = BlockType.HEADING_1
-    heading_1: Heading1BlockContent
+class NumberProperty(BaseProperty):
+    type: Literal["number"] = "number"
+    number: int | float | None
 ```
 
-This pattern ensures:
+This pattern enables:
 
-- Type safety at runtime
-- IDE autocomplete support
-- Discriminated unions work correctly
+- **Natural string comparison**: `if property.type == "title":`
+- **No Enum imports needed**: Direct string literals
+- **IDE autocomplete**: Type hints work seamlessly
+- **TypeScript SDK alignment**: Matches official Notion API patterns
 
 ### Strict Typing
 
@@ -256,11 +277,23 @@ from notion_py_client import NotionPage
 async with NotionAsyncClient(auth="secret_xxx") as client:
     page = await client.pages.retrieve({"page_id": "page_id"})
 
-    # Check property type
+    # Check property type with string literal
     name_prop = page.properties["Name"]
     if name_prop.type == "title":
-        # TypeScript-style type narrowing
+        # Type narrowing works automatically
         title = name_prop.title[0].plain_text if name_prop.title else ""
+
+    # Multiple type checks
+    status_prop = page.properties.get("Status")
+    if status_prop and status_prop.type == "status":
+        current_status = status_prop.status.name if status_prop.status else None
+
+    # Pattern matching (Python 3.10+)
+    match page.properties["Priority"].type:
+        case "select":
+            priority = page.properties["Priority"].select.name
+        case "multi_select":
+            tags = [opt.name for opt in page.properties["Priority"].multi_select]
 ```
 
 ### Model Validation
