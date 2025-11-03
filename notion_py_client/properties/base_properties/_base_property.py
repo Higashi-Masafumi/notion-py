@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import Any, Generic, TypeVar, Literal
+from typing import Generic, TypeVar, Literal
 
 from pydantic import BaseModel, Field, StrictStr
 
