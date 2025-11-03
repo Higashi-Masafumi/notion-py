@@ -3,15 +3,13 @@ from typing import Literal
 from pydantic import Field
 
 from ...models import UniqueId
-from ._base_property import BaseProperty, NotionPropertyType
+from ._base_property import BaseProperty
 
 
-class UniqueIdProperty(BaseProperty[Literal[NotionPropertyType.UNIQUE_ID]]):
+class UniqueIdProperty(BaseProperty[Literal["unique_id"]]):
     """Notionのunique_idプロパティ"""
 
-    type: Literal[NotionPropertyType.UNIQUE_ID] = Field(
-        NotionPropertyType.UNIQUE_ID, description="プロパティタイプ"
-    )
+    type: Literal["unique_id"] = Field("unique_id", description="プロパティタイプ")
 
     unique_id: UniqueId = Field(..., description="ユニークIDの値")
 

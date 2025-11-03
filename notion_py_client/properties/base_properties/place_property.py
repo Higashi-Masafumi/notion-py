@@ -3,18 +3,16 @@ import json
 
 from pydantic import Field
 
-from ._base_property import BaseProperty, NotionPropertyType
+from ._base_property import BaseProperty
 
 
-class PlaceProperty(BaseProperty[Literal[NotionPropertyType.PLACE]]):
+class PlaceProperty(BaseProperty[Literal["place"]]):
     """Notionのplaceプロパティ
 
     返却形状は仕様追加中のため、値は汎用の辞書として保持します。
     """
 
-    type: Literal[NotionPropertyType.PLACE] = Field(
-        NotionPropertyType.PLACE, description="プロパティタイプ"
-    )
+    type: Literal["place"] = Field("place", description="プロパティタイプ")
 
     place: dict[str, Any] | None = Field(
         default=None, description="place情報（API仕様未確定のため汎用辞書）"

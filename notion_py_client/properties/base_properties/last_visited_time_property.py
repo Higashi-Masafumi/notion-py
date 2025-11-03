@@ -2,16 +2,14 @@ from typing import Literal
 
 from pydantic import Field, StrictStr
 
-from ._base_property import BaseProperty, NotionPropertyType
+from ._base_property import BaseProperty
 
 
-class LastVisitedTimeProperty(
-    BaseProperty[Literal[NotionPropertyType.LAST_VISITED_TIME]]
-):
+class LastVisitedTimeProperty(BaseProperty[Literal["last_visited_time"]]):
     """Notionのlast_visited_timeプロパティ"""
 
-    type: Literal[NotionPropertyType.LAST_VISITED_TIME] = Field(
-        NotionPropertyType.LAST_VISITED_TIME, description="プロパティタイプ"
+    type: Literal["last_visited_time"] = Field(
+        "last_visited_time", description="プロパティタイプ"
     )
 
     last_visited_time: StrictStr | None = Field(

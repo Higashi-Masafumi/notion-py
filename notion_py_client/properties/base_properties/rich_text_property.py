@@ -2,19 +2,17 @@ from typing import Literal
 from pydantic import Field
 
 from ...models import RichTextItem
-from ._base_property import BaseProperty, NotionPropertyType
+from ._base_property import BaseProperty
 
 
-class RichTextProperty(BaseProperty[Literal[NotionPropertyType.RICH_TEXT]]):
+class RichTextProperty(BaseProperty[Literal["rich_text"]]):
     """
     Notionのrich_textプロパティ
 
     複数のRichTextItemで構成される、書式付きテキストを表現するプロパティ
     """
 
-    type: Literal[NotionPropertyType.RICH_TEXT] = Field(
-        NotionPropertyType.RICH_TEXT, description="プロパティタイプ"
-    )
+    type: Literal["rich_text"] = Field("rich_text", description="プロパティタイプ")
 
     rich_text: list[RichTextItem] = Field(..., description="RichText要素の配列")
 

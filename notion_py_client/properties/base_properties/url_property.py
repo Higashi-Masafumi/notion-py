@@ -1,15 +1,13 @@
 from typing import Literal
 from pydantic import Field, StrictStr
 
-from ._base_property import BaseProperty, NotionPropertyType
+from ._base_property import BaseProperty
 
 
-class UrlProperty(BaseProperty[Literal[NotionPropertyType.URL]]):
+class UrlProperty(BaseProperty[Literal["url"]]):
     """Notionのurlプロパティ"""
 
-    type: Literal[NotionPropertyType.URL] = Field(
-        NotionPropertyType.URL, description="プロパティタイプ"
-    )
+    type: Literal["url"] = Field("url", description="プロパティタイプ")
 
     url: StrictStr | None = Field(None, description="URL（設定されていない場合はnull）")
 

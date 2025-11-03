@@ -5,7 +5,6 @@ from typing import Literal, Self
 from pydantic import BaseModel, Field, StrictStr, model_validator
 
 from ._base_config import BasePropertyConfig
-from ....properties.base_properties._base_property import NotionPropertyType
 
 
 class SelectOptionConfig(BaseModel):
@@ -29,11 +28,11 @@ class SelectOptions(BaseModel):
     )
 
 
-class SelectPropertyConfig(BasePropertyConfig[Literal[NotionPropertyType.SELECT]]):
+class SelectPropertyConfig(BasePropertyConfig[Literal["select"]]):
     """Notionのselectプロパティ設定"""
 
-    type: Literal[NotionPropertyType.SELECT] = Field(
-        NotionPropertyType.SELECT, description="プロパティタイプ"
+    type: Literal["select"] = Field(
+        "select", description="プロパティタイプ"
     )
     select: SelectOptions = Field(
         default_factory=SelectOptions, description="select設定"

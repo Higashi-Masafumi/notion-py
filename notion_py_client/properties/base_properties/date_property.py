@@ -1,17 +1,15 @@
 from pydantic import Field
 
 from ...models import DateInfo
-from ._base_property import BaseProperty, NotionPropertyType
+from ._base_property import BaseProperty
 from typing import Literal
 from datetime import date as dt_date
 
 
-class DateProperty(BaseProperty[Literal[NotionPropertyType.DATE]]):
+class DateProperty(BaseProperty[Literal["date"]]):
     """Notionのdateプロパティ"""
 
-    type: Literal[NotionPropertyType.DATE] = Field(
-        NotionPropertyType.DATE, description="プロパティタイプ"
-    )
+    type: Literal["date"] = Field("date", description="プロパティタイプ")
     date: DateInfo | None = Field(
         None, description="日付情報（設定されていない場合はnull）"
     )

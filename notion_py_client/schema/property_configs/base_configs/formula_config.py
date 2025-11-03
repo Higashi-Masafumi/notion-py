@@ -3,7 +3,6 @@ from typing import Literal
 from pydantic import BaseModel, Field, StrictStr
 
 from ._base_config import BasePropertyConfig
-from ....properties.base_properties._base_property import NotionPropertyType
 
 
 class FormulaExpression(BaseModel):
@@ -12,10 +11,10 @@ class FormulaExpression(BaseModel):
     expression: StrictStr | None = Field(None, description="Notionの式")
 
 
-class FormulaPropertyConfig(BasePropertyConfig[Literal[NotionPropertyType.FORMULA]]):
+class FormulaPropertyConfig(BasePropertyConfig[Literal["formula"]]):
     """Notionのformulaプロパティ設定"""
 
-    type: Literal[NotionPropertyType.FORMULA] = Field(
-        NotionPropertyType.FORMULA, description="プロパティタイプ"
+    type: Literal["formula"] = Field(
+        "formula", description="プロパティタイプ"
     )
     formula: FormulaExpression = Field(..., description="formula設定")

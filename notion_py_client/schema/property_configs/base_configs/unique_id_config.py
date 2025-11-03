@@ -3,7 +3,6 @@ from typing import Literal
 from pydantic import BaseModel, Field, StrictStr
 
 from ._base_config import BasePropertyConfig
-from ....properties.base_properties._base_property import NotionPropertyType
 
 
 class UniqueIdOptions(BaseModel):
@@ -13,12 +12,12 @@ class UniqueIdOptions(BaseModel):
 
 
 class UniqueIdPropertyConfig(
-    BasePropertyConfig[Literal[NotionPropertyType.UNIQUE_ID]]
+    BasePropertyConfig[Literal["unique_id"]]
 ):
     """Notionのunique_idプロパティ設定"""
 
-    type: Literal[NotionPropertyType.UNIQUE_ID] = Field(
-        NotionPropertyType.UNIQUE_ID, description="プロパティタイプ"
+    type: Literal["unique_id"] = Field(
+        "unique_id", description="プロパティタイプ"
     )
     unique_id: UniqueIdOptions = Field(
         default_factory=lambda: UniqueIdOptions(prefix=None),

@@ -1,15 +1,13 @@
 from typing import Literal
 from pydantic import Field, StrictFloat, StrictInt
 
-from ._base_property import BaseProperty, NotionPropertyType
+from ._base_property import BaseProperty
 
 
-class NumberProperty(BaseProperty[Literal[NotionPropertyType.NUMBER]]):
+class NumberProperty(BaseProperty[Literal["number"]]):
     """Notionのnumberプロパティ"""
 
-    type: Literal[NotionPropertyType.NUMBER] = Field(
-        NotionPropertyType.NUMBER, description="プロパティタイプ"
-    )
+    type: Literal["number"] = Field("number", description="プロパティタイプ")
 
     number: StrictInt | StrictFloat | None = Field(
         None, description="数値（設定されていない場合はnull）"

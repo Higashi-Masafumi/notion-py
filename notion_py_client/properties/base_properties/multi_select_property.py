@@ -2,14 +2,14 @@ from typing import Literal
 from pydantic import Field
 
 from ...models import SelectOption
-from ._base_property import BaseProperty, NotionPropertyType
+from ._base_property import BaseProperty
 
 
-class MultiSelectProperty(BaseProperty[Literal[NotionPropertyType.MULTI_SELECT]]):
+class MultiSelectProperty(BaseProperty[Literal["multi_select"]]):
     """Notionのmulti_selectプロパティ"""
 
-    type: Literal[NotionPropertyType.MULTI_SELECT] = Field(
-        NotionPropertyType.MULTI_SELECT, description="プロパティタイプ"
+    type: Literal["multi_select"] = Field(
+        "multi_select", description="プロパティタイプ"
     )
 
     multi_select: list[SelectOption] = Field(

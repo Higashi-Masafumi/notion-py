@@ -3,14 +3,14 @@ from typing import Literal
 from pydantic import Field
 
 from ...models import Verification
-from ._base_property import BaseProperty, NotionPropertyType
+from ._base_property import BaseProperty
 
 
-class VerificationProperty(BaseProperty[Literal[NotionPropertyType.VERIFICATION]]):
+class VerificationProperty(BaseProperty[Literal["verification"]]):
     """Notionのverificationプロパティ"""
 
-    type: Literal[NotionPropertyType.VERIFICATION] = Field(
-        NotionPropertyType.VERIFICATION, description="プロパティタイプ"
+    type: Literal["verification"] = Field(
+        "verification", description="プロパティタイプ"
     )
 
     verification: Verification | None = Field(None, description="検証状態情報")

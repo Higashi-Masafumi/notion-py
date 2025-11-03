@@ -1,15 +1,13 @@
 from typing import Literal
 
 from pydantic import Field
-from ._base_property import BaseProperty, NotionPropertyType
+from ._base_property import BaseProperty
 
 
-class ButtonProperty(BaseProperty[Literal[NotionPropertyType.BUTTON]]):
+class ButtonProperty(BaseProperty[Literal["button"]]):
     """Notionのbuttonプロパティ"""
 
-    type: Literal[NotionPropertyType.BUTTON] = Field(
-        NotionPropertyType.BUTTON, description="プロパティタイプ"
-    )
+    type: Literal["button"] = Field("button", description="プロパティタイプ")
 
     # buttonプロパティは通常、値を持たない
     pass

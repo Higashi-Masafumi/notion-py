@@ -1,8 +1,6 @@
 from typing import Literal
 from pydantic import BaseModel, Field, StrictBool, StrictStr
 
-from .base_properties._base_property import NotionPropertyType
-
 from .base_properties import BaseProperty
 
 
@@ -12,12 +10,10 @@ class RelationItem(BaseModel):
     id: StrictStr = Field(..., description="関連項目ID")
 
 
-class RelationProperty(BaseProperty[Literal[NotionPropertyType.RELATION]]):
+class RelationProperty(BaseProperty[Literal["relation"]]):
     """Notionのrelationプロパティ"""
 
-    type: Literal[NotionPropertyType.RELATION] = Field(
-        NotionPropertyType.RELATION, description="プロパティタイプ"
-    )
+    type: Literal["relation"] = Field("relation", description="プロパティタイプ")
 
     relation: list[RelationItem] = Field(
         default_factory=list, description="関連項目配列"

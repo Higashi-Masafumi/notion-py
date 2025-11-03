@@ -130,17 +130,17 @@ class MockMapper(NotionMapper[MemberResource]):
     def to_domain(self, notion_page: NotionPage) -> MemberResource:
         properties = notion_page.properties
         member_property = properties[self.member_field.notion_name]
-        if not member_property.type == NotionPropertyType.PEOPLE:
+        if not member_property.type == "people":
             raise ValueError(
                 f"Expected PeopleProperty for '{self.member_field.notion_name}', got {member_property.type}"
             )
         date_property = properties[self.date_range_field.notion_name]
-        if not date_property.type == NotionPropertyType.DATE:
+        if not date_property.type == "date":
             raise ValueError(
                 f"Expected DateProperty for '{self.date_range_field.notion_name}', got {date_property.type}"
             )
         project_property = properties[self.project_range_field.notion_name]
-        if not project_property.type == NotionPropertyType.MULTI_SELECT:
+        if not project_property.type == "multi_select"  :
             raise ValueError(
                 f"Expected MultiSelectProperty for '{self.project_range_field.notion_name}', got {project_property.type}"
             )

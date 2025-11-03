@@ -1,43 +1,40 @@
 from abc import abstractmethod
-from enum import Enum
-from typing import Any, Generic, TypeVar
+from typing import Any, Generic, TypeVar, Literal
 
 from pydantic import BaseModel, Field, StrictStr
 
 
-class NotionPropertyType(str, Enum):
-    """Notionプロパティタイプの列挙型"""
+# Notion プロパティタイプの文字列リテラル型定義
+NotionPropertyType = Literal[
+    "title",
+    "rich_text",
+    "date",
+    "number",
+    "select",
+    "multi_select",
+    "people",
+    "relation",
+    "url",
+    "checkbox",
+    "formula",
+    "status",
+    "rollup",
+    "button",
+    "last_edited_time",
+    "email",
+    "phone_number",
+    "files",
+    "created_by",
+    "created_time",
+    "last_edited_by",
+    "unique_id",
+    "verification",
+    "location",
+    "last_visited_time",
+    "place",
+]
 
-    TITLE = "title"
-    RICH_TEXT = "rich_text"
-    DATE = "date"
-    NUMBER = "number"
-    SELECT = "select"
-    MULTI_SELECT = "multi_select"
-    PEOPLE = "people"
-    RELATION = "relation"
-    URL = "url"
-    CHECKBOX = "checkbox"
-    FORMULA = "formula"
-    STATUS = "status"
-    ROLLUP = "rollup"
-    BUTTON = "button"
-    LAST_EDITED_TIME = "last_edited_time"
-    EMAIL = "email"
-    PHONE_NUMBER = "phone_number"
-    FILES = "files"
-    CREATED_BY = "created_by"
-    CREATED_TIME = "created_time"
-    LAST_EDITED_BY = "last_edited_by"
-    UNIQUE_ID = "unique_id"
-    VERIFICATION = "verification"
-    # Newer property types
-    LOCATION = "location"
-    LAST_VISITED_TIME = "last_visited_time"
-    PLACE = "place"
-
-
-TPropertyType = TypeVar("TPropertyType", bound="NotionPropertyType")
+TPropertyType = TypeVar("TPropertyType", bound=NotionPropertyType)
 
 
 class BaseProperty(BaseModel, Generic[TPropertyType]):

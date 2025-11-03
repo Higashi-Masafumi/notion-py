@@ -2,14 +2,14 @@ from typing import Literal
 
 from pydantic import Field, StrictStr
 
-from ._base_property import BaseProperty, NotionPropertyType
+from ._base_property import BaseProperty
 
 
-class PhoneNumberProperty(BaseProperty[Literal[NotionPropertyType.PHONE_NUMBER]]):
+class PhoneNumberProperty(BaseProperty[Literal["phone_number"]]):
     """Notionのphone_numberプロパティ"""
 
-    type: Literal[NotionPropertyType.PHONE_NUMBER] = Field(
-        NotionPropertyType.PHONE_NUMBER, description="プロパティタイプ"
+    type: Literal["phone_number"] = Field(
+        "phone_number", description="プロパティタイプ"
     )
 
     phone_number: StrictStr | None = Field(

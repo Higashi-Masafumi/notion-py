@@ -3,7 +3,6 @@ from typing import Literal
 from pydantic import BaseModel, Field, StrictStr
 
 from ._base_config import BasePropertyConfig
-from ....properties.base_properties._base_property import NotionPropertyType
 
 
 class StatusOptionConfig(BaseModel):
@@ -36,11 +35,11 @@ class StatusConfig(BaseModel):
 
 
 class StatusPropertyConfig(
-    BasePropertyConfig[Literal[NotionPropertyType.STATUS]]
+    BasePropertyConfig[Literal["status"]]
 ):
     """Notionのstatusプロパティ設定"""
 
-    type: Literal[NotionPropertyType.STATUS] = Field(
-        NotionPropertyType.STATUS, description="プロパティタイプ"
+    type: Literal["status"] = Field(
+        "status", description="プロパティタイプ"
     )
     status: StatusConfig = Field(default_factory=StatusConfig, description="status設定")

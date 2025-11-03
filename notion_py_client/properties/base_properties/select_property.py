@@ -2,15 +2,13 @@ from typing import Literal
 from pydantic import Field
 
 from ...models import SelectOption
-from ._base_property import BaseProperty, NotionPropertyType
+from ._base_property import BaseProperty
 
 
-class SelectProperty(BaseProperty[Literal[NotionPropertyType.SELECT]]):
+class SelectProperty(BaseProperty[Literal["select"]]):
     """Notionのselectプロパティ"""
 
-    type: Literal[NotionPropertyType.SELECT] = Field(
-        NotionPropertyType.SELECT, description="プロパティタイプ"
-    )
+    type: Literal["select"] = Field("select", description="プロパティタイプ")
 
     select: SelectOption | None = Field(
         None, description="選択されたオプション（設定されていない場合はnull）"
