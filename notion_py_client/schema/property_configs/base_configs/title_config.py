@@ -4,14 +4,13 @@ from pydantic import Field
 
 from ._base_config import BasePropertyConfig
 from ....models.primitives import EmptyObject
-from ....properties.base_properties._base_property import NotionPropertyType
 
 
-class TitlePropertyConfig(BasePropertyConfig[Literal[NotionPropertyType.TITLE]]):
+class TitlePropertyConfig(BasePropertyConfig[Literal["title"]]):
     """Notionのtitleプロパティ設定"""
 
-    type: Literal[NotionPropertyType.TITLE] = Field(
-        NotionPropertyType.TITLE, description="プロパティタイプ"
+    type: Literal["title"] = Field(
+        "title", description="プロパティタイプ"
     )
     title: EmptyObject = Field(
         default_factory=EmptyObject, description="title設定"

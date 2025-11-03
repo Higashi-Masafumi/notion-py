@@ -4,14 +4,13 @@ from pydantic import Field
 
 from ._base_config import BasePropertyConfig
 from ....models.primitives import EmptyObject
-from ....properties.base_properties._base_property import NotionPropertyType
 
 
-class UrlPropertyConfig(BasePropertyConfig[Literal[NotionPropertyType.URL]]):
+class UrlPropertyConfig(BasePropertyConfig[Literal["url"]]):
     """Notionのurlプロパティ設定"""
 
-    type: Literal[NotionPropertyType.URL] = Field(
-        NotionPropertyType.URL, description="プロパティタイプ"
+    type: Literal["url"] = Field(
+        "url", description="プロパティタイプ"
     )
     url: EmptyObject = Field(
         default_factory=EmptyObject, description="url設定"

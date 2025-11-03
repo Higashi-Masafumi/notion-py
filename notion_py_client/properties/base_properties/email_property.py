@@ -2,15 +2,13 @@ from typing import Literal
 
 from pydantic import Field, StrictStr
 
-from ._base_property import BaseProperty, NotionPropertyType
+from ._base_property import BaseProperty
 
 
-class EmailProperty(BaseProperty[Literal[NotionPropertyType.EMAIL]]):
+class EmailProperty(BaseProperty[Literal["email"]]):
     """Notionのemailプロパティ"""
 
-    type: Literal[NotionPropertyType.EMAIL] = Field(
-        NotionPropertyType.EMAIL, description="プロパティタイプ"
-    )
+    type: Literal["email"] = Field("email", description="プロパティタイプ")
 
     email: StrictStr | None = Field(
         None, description="メールアドレス（未設定の場合はnull）"

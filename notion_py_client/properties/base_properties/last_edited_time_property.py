@@ -1,14 +1,14 @@
 from typing import Literal
 from pydantic import Field, StrictStr
 
-from ._base_property import BaseProperty, NotionPropertyType
+from ._base_property import BaseProperty
 
 
-class LastEditedTimeProperty(BaseProperty[Literal[NotionPropertyType.LAST_EDITED_TIME]]):
+class LastEditedTimeProperty(BaseProperty[Literal["last_edited_time"]]):
     """Notionのlast_edited_timeプロパティ"""
 
-    type: Literal[NotionPropertyType.LAST_EDITED_TIME] = Field(
-        NotionPropertyType.LAST_EDITED_TIME, description="プロパティタイプ"
+    type: Literal["last_edited_time"] = Field(
+        "last_edited_time", description="プロパティタイプ"
     )
 
     last_edited_time: StrictStr = Field(..., description="最終編集日時（ISO 8601形式）")

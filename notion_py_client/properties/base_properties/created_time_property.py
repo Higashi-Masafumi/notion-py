@@ -2,14 +2,14 @@ from typing import Literal
 
 from pydantic import Field, StrictStr
 
-from ._base_property import BaseProperty, NotionPropertyType
+from ._base_property import BaseProperty
 
 
-class CreatedTimeProperty(BaseProperty[Literal[NotionPropertyType.CREATED_TIME]]):
+class CreatedTimeProperty(BaseProperty[Literal["created_time"]]):
     """Notionのcreated_timeプロパティ"""
 
-    type: Literal[NotionPropertyType.CREATED_TIME] = Field(
-        NotionPropertyType.CREATED_TIME, description="プロパティタイプ"
+    type: Literal["created_time"] = Field(
+        "created_time", description="プロパティタイプ"
     )
 
     created_time: StrictStr = Field(..., description="作成日時（ISO 8601形式）")

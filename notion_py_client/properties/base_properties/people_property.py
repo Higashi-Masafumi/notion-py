@@ -2,15 +2,13 @@ from typing import Literal, Union
 from pydantic import Field
 
 from ...models import Group, PartialUser, User
-from ._base_property import BaseProperty, NotionPropertyType
+from ._base_property import BaseProperty
 
 
-class PeopleProperty(BaseProperty[Literal[NotionPropertyType.PEOPLE]]):
+class PeopleProperty(BaseProperty[Literal["people"]]):
     """Notionのpeopleプロパティ"""
 
-    type: Literal[NotionPropertyType.PEOPLE] = Field(
-        NotionPropertyType.PEOPLE, description="プロパティタイプ"
-    )
+    type: Literal["people"] = Field("people", description="プロパティタイプ")
 
     people: list[PartialUser | User | Group] = Field(
         default_factory=list, description="ユーザー/グループ配列"

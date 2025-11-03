@@ -4,7 +4,6 @@ from pydantic import BaseModel, Field, StrictStr
 
 from .base_configs import BasePropertyConfig
 from ...models.primitives import EmptyObject
-from ...properties.base_properties._base_property import NotionPropertyType
 
 
 class RelationSingleConfig(BaseModel):
@@ -46,10 +45,10 @@ class RelationDualConfig(BaseModel):
 RelationConfig = RelationSingleConfig | RelationDualConfig
 
 
-class RelationPropertyConfig(BasePropertyConfig[Literal[NotionPropertyType.RELATION]]):
+class RelationPropertyConfig(BasePropertyConfig[Literal["relation"]]):
     """Notionのrelationプロパティ設定"""
 
-    type: Literal[NotionPropertyType.RELATION] = Field(
-        NotionPropertyType.RELATION, description="プロパティタイプ"
+    type: Literal["relation"] = Field(
+        "relation", description="プロパティタイプ"
     )
     relation: RelationConfig

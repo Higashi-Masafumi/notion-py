@@ -2,15 +2,13 @@ from typing import Literal
 from pydantic import Field
 
 from ...models import RichTextItem
-from ._base_property import BaseProperty, NotionPropertyType
+from ._base_property import BaseProperty
 
 
-class TitleProperty(BaseProperty[Literal[NotionPropertyType.TITLE]]):
+class TitleProperty(BaseProperty[Literal["title"]]):
     """Notionのtitleプロパティ"""
 
-    type: Literal[NotionPropertyType.TITLE] = Field(
-        NotionPropertyType.TITLE, description="プロパティタイプ"
-    )
+    type: Literal["title"] = Field("title", description="プロパティタイプ")
 
     title: list[RichTextItem] = Field(..., description="タイトルのRichText配列")
 

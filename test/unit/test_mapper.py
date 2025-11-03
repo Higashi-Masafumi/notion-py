@@ -207,7 +207,7 @@ class TestNotionPropertyDescriptor:
         # Create mock TitleProperty
         mock_property = TitleProperty(
             id="test-id",
-            type=NotionPropertyType.TITLE,
+            type="title",
             title=[
                 RichTextItem(
                     type="text",
@@ -277,7 +277,7 @@ class TestNotionMapper:
         mock_properties = {
             "Name": TitleProperty(
                 id="title-id",
-                type=NotionPropertyType.TITLE,
+                type="title",
                 title=[
                     RichTextItem(
                         type="text",
@@ -299,7 +299,7 @@ class TestNotionMapper:
             ),
             "Status": StatusProperty(
                 id="status-id",
-                type=NotionPropertyType.STATUS,
+                type="status",
                 status=StatusOption(
                     id="status-opt-id",
                     name="In Progress",
@@ -308,7 +308,7 @@ class TestNotionMapper:
                 ),
             ),
             "Priority": NumberProperty(
-                id="number-id", type=NotionPropertyType.NUMBER, number=3
+                id="number-id", type="number", number=3
             ),
         }
 
@@ -388,7 +388,7 @@ class TestMapperEdgeCases:
         """Test parsing empty title property."""
         mapper = TaskMapper()
         empty_title = TitleProperty(
-            id="title-id", type=NotionPropertyType.TITLE, title=[]
+            id="title-id", type="title", title=[]
         )
 
         result = mapper.name_field.parse(empty_title)
@@ -398,7 +398,7 @@ class TestMapperEdgeCases:
         """Test parsing status property with None value."""
         mapper = TaskMapper()
         none_status = StatusProperty(
-            id="status-id", type=NotionPropertyType.STATUS, status=None
+            id="status-id", type="status", status=None
         )
 
         result = mapper.status_field.parse(none_status)
@@ -408,7 +408,7 @@ class TestMapperEdgeCases:
         """Test parsing number property with None value."""
         mapper = TaskMapper()
         none_number = NumberProperty(
-            id="number-id", type=NotionPropertyType.NUMBER, number=None
+            id="number-id", type="number", number=None
         )
 
         result = mapper.priority_field.parse(none_number)

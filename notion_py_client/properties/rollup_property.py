@@ -2,10 +2,6 @@ from typing import Any, Literal, Union
 
 from pydantic import BaseModel, Field, StrictFloat, StrictInt, StrictStr
 
-from .base_properties._base_property import (
-    NotionPropertyType,
-)
-
 from .base_properties import (
     BaseProperty,
     ButtonProperty,
@@ -93,12 +89,10 @@ class Rollup(BaseModel):
                 return None
 
 
-class RollupProperty(BaseProperty[Literal[NotionPropertyType.ROLLUP]]):
+class RollupProperty(BaseProperty[Literal["rollup"]]):
     """Notionのrollupプロパティ"""
 
-    type: Literal[NotionPropertyType.ROLLUP] = Field(
-        NotionPropertyType.ROLLUP, description="プロパティタイプ"
-    )
+    type: Literal["rollup"] = Field("rollup", description="プロパティタイプ")
 
     rollup: Rollup = Field(..., description="rollupデータ")
 

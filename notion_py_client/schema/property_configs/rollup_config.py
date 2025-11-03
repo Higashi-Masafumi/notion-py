@@ -5,7 +5,6 @@ from typing import Literal, Self
 from pydantic import BaseModel, Field, StrictStr, model_validator
 
 from .base_configs import BasePropertyConfig
-from ...properties.base_properties._base_property import NotionPropertyType
 
 
 class RollupSettings(BaseModel):
@@ -39,10 +38,10 @@ class RollupSettings(BaseModel):
         return self
 
 
-class RollupPropertyConfig(BasePropertyConfig[Literal[NotionPropertyType.ROLLUP]]):
+class RollupPropertyConfig(BasePropertyConfig[Literal["rollup"]]):
     """Notionのrollupプロパティ設定"""
 
-    type: Literal[NotionPropertyType.ROLLUP] = Field(
-        NotionPropertyType.ROLLUP, description="プロパティタイプ"
+    type: Literal["rollup"] = Field(
+        "rollup", description="プロパティタイプ"
     )
     rollup: RollupSettings

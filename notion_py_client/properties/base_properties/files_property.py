@@ -3,15 +3,13 @@ from typing import Literal
 from pydantic import Field
 
 from ...models import FileWithName
-from ._base_property import BaseProperty, NotionPropertyType
+from ._base_property import BaseProperty
 
 
-class FilesProperty(BaseProperty[Literal[NotionPropertyType.FILES]]):
+class FilesProperty(BaseProperty[Literal["files"]]):
     """Notionのfilesプロパティ"""
 
-    type: Literal[NotionPropertyType.FILES] = Field(
-        NotionPropertyType.FILES, description="プロパティタイプ"
-    )
+    type: Literal["files"] = Field("files", description="プロパティタイプ")
 
     files: list[FileWithName] = Field(
         default_factory=list, description="ファイル情報のリスト"

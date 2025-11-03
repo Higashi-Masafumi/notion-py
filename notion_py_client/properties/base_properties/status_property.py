@@ -2,15 +2,13 @@ from typing import Literal
 from pydantic import Field
 
 from ...models import StatusOption
-from ._base_property import BaseProperty, NotionPropertyType
+from ._base_property import BaseProperty
 
 
-class StatusProperty(BaseProperty[Literal[NotionPropertyType.STATUS]]):
+class StatusProperty(BaseProperty[Literal["status"]]):
     """Notionのstatusプロパティ"""
 
-    type: Literal[NotionPropertyType.STATUS] = Field(
-        NotionPropertyType.STATUS, description="プロパティタイプ"
-    )
+    type: Literal["status"] = Field("status", description="プロパティタイプ")
 
     status: StatusOption | None = Field(
         None, description="現在のステータス（設定されていない場合はnull）"

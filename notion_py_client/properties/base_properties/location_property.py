@@ -3,19 +3,17 @@ import json
 
 from pydantic import Field
 
-from ._base_property import BaseProperty, NotionPropertyType
+from ._base_property import BaseProperty
 
 
-class LocationProperty(BaseProperty[Literal[NotionPropertyType.LOCATION]]):
+class LocationProperty(BaseProperty[Literal["location"]]):
     """Notionのlocationプロパティ
 
     現在のNotion APIの更新に伴う新プロパティ。公式の返却形状は将来的に
     変更の可能性があるため、値は汎用の辞書として保持します。
     """
 
-    type: Literal[NotionPropertyType.LOCATION] = Field(
-        NotionPropertyType.LOCATION, description="プロパティタイプ"
-    )
+    type: Literal["location"] = Field("location", description="プロパティタイプ")
 
     location: dict[str, Any] | None = Field(
         default=None, description="ロケーション情報（API仕様未確定のため汎用辞書）"
