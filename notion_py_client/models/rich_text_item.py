@@ -28,10 +28,6 @@ class RichTextItem(BaseModel):
         """RichTextItemをMarkdown形式に変換"""
         text = self.plain_text
 
-        # Escape special markdown characters first
-        # Note: We escape before applying formatting to prevent double-escaping
-        special_chars = ["\\", "`", "*", "_", "{", "}", "[", "]", "(", ")", "#", "+", "-", ".", "!"]
-        
         # Apply code annotation exclusively (code blocks can't have other formatting)
         if self.annotations.code:
             # For code, we only need to escape backticks
