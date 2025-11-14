@@ -42,8 +42,12 @@ from .responses.list_response import (
     QueryDataSourceResponse,
     ListUsersResponse,
     SearchResponse,
+    ListBlockChildrenResponse,
+    ListCommentsResponse,
     ListFileUploadsResponse,
+    CommentObject,
 )
+from .blocks.base import BaseBlockObject, PartialBlock
 from .models.user import PartialUser, User
 
 
@@ -596,35 +600,71 @@ class _BlocksAPI:
 
     async def retrieve(
         self, *, block_id: str, auth: AuthParam | None = None
-    ) -> dict[str, Any]:
+    ) -> BaseBlockObject | PartialBlock:
         """Retrieve a block
 
         Returns:
             BlockObjectResponse | PartialBlockObjectResponse: ブロックオブジェクト
         """
-        return await self._c.request(path=f"blocks/{block_id}", method="get", auth=auth)
+        response = await self._c.request(
+            path=f"blocks/{block_id}", method="get", auth=auth
+        )
 
-    async def update(self, *, block_id: str, **body) -> dict[str, Any]:
+        # typeフィールドがあれば完全なブロック、なければPartialBlock
+        from .blocks.base import PartialBlock
+        from .blocks import BlockObject
+
+        if "type" in response and response.get("type") is not None:
+            from pydantic import TypeAdapter
+
+            block_adapter = TypeAdapter(BlockObject)
+            return block_adapter.validate_python(response)
+        else:
+            return PartialBlock(**response)
+
+    async def update(self, *, block_id: str, **body) -> BaseBlockObject | PartialBlock:
         """Update a block
 
         Returns:
             BlockObjectResponse | PartialBlockObjectResponse: 更新されたブロックオブジェクト
         """
-        return await self._c.request(
+        response = await self._c.request(
             path=f"blocks/{block_id}", method="patch", body=body
         )
 
+        # typeフィールドがあれば完全なブロック、なければPartialBlock
+        from .blocks import BlockObject
+
+        if "type" in response and response.get("type") is not None:
+            from pydantic import TypeAdapter
+
+            block_adapter = TypeAdapter(BlockObject)
+            return block_adapter.validate_python(response)
+        else:
+            return PartialBlock(**response)
+
     async def delete(
         self, *, block_id: str, auth: AuthParam | None = None
-    ) -> dict[str, Any]:
+    ) -> BaseBlockObject | PartialBlock:
         """Delete a block
 
         Returns:
             BlockObjectResponse | PartialBlockObjectResponse: 削除されたブロックオブジェクト（archived=True）
         """
-        return await self._c.request(
+        response = await self._c.request(
             path=f"blocks/{block_id}", method="delete", auth=auth
         )
+
+        # typeフィールドがあれば完全なブロック、なければPartialBlock
+        from .blocks import BlockObject
+
+        if "type" in response and response.get("type") is not None:
+            from pydantic import TypeAdapter
+
+            block_adapter = TypeAdapter(BlockObject)
+            return block_adapter.validate_python(response)
+        else:
+            return PartialBlock(**response)
 
 
 class _BlockChildrenAPI:
@@ -638,15 +678,38 @@ class _BlockChildrenAPI:
         children: list[dict[str, Any]],
         after: str | None = None,
         auth: AuthParam | None = None,
-    ) -> dict[str, Any]:
+    ) -> ListBlockChildrenResponse:
         """Append block children
 
         Returns:
             AppendBlockChildrenResponse: 追加された子ブロックを含むレスポンス
         """
         body = {"children": children, **({"after": after} if after else {})}
-        return await self._c.request(
+        response = await self._c.request(
             path=f"blocks/{block_id}/children", method="patch", body=body, auth=auth
+        )
+
+        # dictの結果をBlockObject/PartialBlockに変換
+        from .blocks import BlockObject
+
+        results = []
+        for item in response.get("results", []):
+            # typeフィールドがあれば完全なブロック、なければPartialBlock
+            if "type" in item and item.get("type") is not None:
+                # BlockObjectとしてパース
+                from pydantic import TypeAdapter
+
+                block_adapter = TypeAdapter(BlockObject)
+                results.append(block_adapter.validate_python(item))
+            else:
+                results.append(PartialBlock(**item))
+
+        return ListBlockChildrenResponse(
+            object="list",
+            results=results,
+            next_cursor=response.get("next_cursor"),
+            has_more=response.get("has_more", False),
+            type="block",
         )
 
     async def list(
@@ -656,7 +719,7 @@ class _BlockChildrenAPI:
         start_cursor: str | None = None,
         page_size: int | None = None,
         auth: AuthParam | None = None,
-    ) -> dict[str, Any]:
+    ) -> ListBlockChildrenResponse:
         """List block children
 
         Returns:
@@ -666,8 +729,32 @@ class _BlockChildrenAPI:
             {"start_cursor": start_cursor, "page_size": page_size},
             ["start_cursor", "page_size"],
         )
-        return await self._c.request(
+        response = await self._c.request(
             path=f"blocks/{block_id}/children", method="get", query=query, auth=auth
+        )
+
+        # dictの結果をBlockObject/PartialBlockに変換
+        from .blocks.base import PartialBlock
+        from .blocks import BlockObject
+
+        results = []
+        for item in response.get("results", []):
+            # typeフィールドがあれば完全なブロック、なければPartialBlock
+            if "type" in item and item.get("type") is not None:
+                # BlockObjectとしてパース（Pydanticが自動的に適切なサブクラスを選択）
+                from pydantic import TypeAdapter
+
+                block_adapter = TypeAdapter(BlockObject)
+                results.append(block_adapter.validate_python(item))
+            else:
+                results.append(PartialBlock(**item))
+
+        return ListBlockChildrenResponse(
+            object="list",
+            results=results,
+            next_cursor=response.get("next_cursor"),
+            has_more=response.get("has_more", False),
+            type="block",
         )
 
 
@@ -1312,7 +1399,7 @@ class _CommentsAPI:
         rich_text: list[dict[str, Any]],
         discussion_id: str | None = None,
         auth: AuthParam | None = None,
-    ) -> dict[str, Any]:
+    ) -> CommentObject:
         """Create a comment
 
         Returns:
@@ -1323,9 +1410,10 @@ class _CommentsAPI:
             "rich_text": rich_text,
             **pick({"discussion_id": discussion_id}, ["discussion_id"]),
         }
-        return await self._c.request(
+        response = await self._c.request(
             path="comments", method="post", body=body, auth=auth
         )
+        return CommentObject(**response)
 
     async def list(
         self,
@@ -1334,7 +1422,7 @@ class _CommentsAPI:
         start_cursor: str | None = None,
         page_size: int | None = None,
         auth: AuthParam | None = None,
-    ) -> dict[str, Any]:
+    ) -> ListCommentsResponse:
         """List comments
 
         Returns:
@@ -1348,21 +1436,33 @@ class _CommentsAPI:
             },
             ["block_id", "start_cursor", "page_size"],
         )
-        return await self._c.request(
+        response = await self._c.request(
             path="comments", method="get", query=query, auth=auth
+        )
+
+        # dictの結果をCommentObjectに変換
+        results = [CommentObject(**item) for item in response.get("results", [])]
+
+        return ListCommentsResponse(
+            object="list",
+            results=results,
+            next_cursor=response.get("next_cursor"),
+            has_more=response.get("has_more", False),
+            type="comment",
         )
 
     async def retrieve(
         self, *, comment_id: str, auth: AuthParam | None = None
-    ) -> dict[str, Any]:
+    ) -> CommentObject:
         """Retrieve a comment
 
         Returns:
             CommentObjectResponse: コメントオブジェクト
         """
-        return await self._c.request(
+        response = await self._c.request(
             path=f"comments/{comment_id}", method="get", auth=auth
         )
+        return CommentObject(**response)
 
 
 class _FileUploadsAPI:

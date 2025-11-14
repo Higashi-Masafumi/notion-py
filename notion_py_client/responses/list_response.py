@@ -4,7 +4,9 @@ Notionリストレスポンス型の定義
 TypeScript定義: ListUsersResponse, QueryDatabaseResponse, ListBlockChildrenResponse等
 """
 
-from typing import Generic, Literal, TypeVar
+from __future__ import annotations
+
+from typing import Any, Generic, Literal, TypeVar
 
 from pydantic import BaseModel, Field, StrictBool, StrictStr
 
@@ -13,8 +15,33 @@ from .database import NotionDatabase, PartialDatabase
 from .datasource import DataSource, PartialDataSource
 from .file_upload import FileUploadObject
 from ..models.user import PartialUser
+from ..models.parent import NotionParent
+from ..models.rich_text_item import RichTextItem
+from ..blocks.base import BaseBlockObject, PartialBlock
 
 T = TypeVar("T")
+
+
+# ============ Comment Type ============
+class CommentObject(BaseModel):
+    """Notionのコメントオブジェクト
+
+    TypeScript: CommentObjectResponse
+    """
+
+    object: Literal["comment"] = Field("comment", description="オブジェクトタイプ")
+    id: StrictStr = Field(..., description="コメントID")
+    parent: NotionParent = Field(
+        ..., description="親オブジェクト（ページまたはブロック）"
+    )
+    discussion_id: StrictStr = Field(..., description="ディスカッションID")
+    created_time: StrictStr = Field(..., description="作成日時（ISO 8601形式）")
+    last_edited_time: StrictStr = Field(..., description="最終編集日時（ISO 8601形式）")
+    created_by: PartialUser = Field(..., description="作成者")
+    rich_text: list[RichTextItem] = Field(..., description="コメントテキスト")
+
+
+# ============ List Response Types ============
 
 
 class ListResponse(BaseModel, Generic[T]):
@@ -66,6 +93,20 @@ class ListUsersResponse(ListResponse[PartialUser]):
     """users.list() のレスポンス型.
 
     備考: `type` は親クラスに準拠。
+    """
+
+
+class ListBlockChildrenResponse(ListResponse[BaseBlockObject | PartialBlock]):
+    """blocks.children.list() のレスポンス型.
+
+    備考: ブロックは完全なオブジェクト(BaseBlockObject)または部分的なオブジェクト(PartialBlock)が返される。
+    """
+
+
+class ListCommentsResponse(ListResponse[CommentObject]):
+    """comments.list() のレスポンス型.
+
+    備考: コメントのリストを返す。
     """
 
 
