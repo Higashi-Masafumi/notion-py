@@ -6,109 +6,108 @@ SyncedBlock, ChildPage, ChildDatabase, Equation, Code, Callout
 
 from __future__ import annotations
 
-from enum import Enum
 from typing import Literal
 
 from pydantic import BaseModel, Field, StrictStr
 
-from .base import ApiColor, BaseBlockObject, BlockType
+from .base import ApiColor, BaseBlockObject
 from ..models.rich_text_item import RichTextItem
 from ..models.icon import NotionIcon
 
 
-class CodeLanguage(str, Enum):
-    """コードブロックの言語"""
-
-    ABAP = "abap"
-    ABC = "abc"
-    AGDA = "agda"
-    ARDUINO = "arduino"
-    ASCII_ART = "ascii art"
-    ASSEMBLY = "assembly"
-    BASH = "bash"
-    BASIC = "basic"
-    BNF = "bnf"
-    C = "c"
-    C_SHARP = "c#"
-    C_PLUS_PLUS = "c++"
-    CLOJURE = "clojure"
-    COFFEESCRIPT = "coffeescript"
-    COQ = "coq"
-    CSS = "css"
-    DART = "dart"
-    DHALL = "dhall"
-    DIFF = "diff"
-    DOCKER = "docker"
-    EBNF = "ebnf"
-    ELIXIR = "elixir"
-    ELM = "elm"
-    ERLANG = "erlang"
-    F_SHARP = "f#"
-    FLOW = "flow"
-    FORTRAN = "fortran"
-    GHERKIN = "gherkin"
-    GLSL = "glsl"
-    GO = "go"
-    GRAPHQL = "graphql"
-    GROOVY = "groovy"
-    HASKELL = "haskell"
-    HCL = "hcl"
-    HTML = "html"
-    IDRIS = "idris"
-    JAVA = "java"
-    JAVASCRIPT = "javascript"
-    JSON = "json"
-    JULIA = "julia"
-    KOTLIN = "kotlin"
-    LATEX = "latex"
-    LESS = "less"
-    LISP = "lisp"
-    LIVESCRIPT = "livescript"
-    LLVM_IR = "llvm ir"
-    LUA = "lua"
-    MAKEFILE = "makefile"
-    MARKDOWN = "markdown"
-    MARKUP = "markup"
-    MATLAB = "matlab"
-    MATHEMATICA = "mathematica"
-    MERMAID = "mermaid"
-    NIX = "nix"
-    NOTION_FORMULA = "notion formula"
-    OBJECTIVE_C = "objective-c"
-    OCAML = "ocaml"
-    PASCAL = "pascal"
-    PERL = "perl"
-    PHP = "php"
-    PLAIN_TEXT = "plain text"
-    POWERSHELL = "powershell"
-    PROLOG = "prolog"
-    PROTOBUF = "protobuf"
-    PURESCRIPT = "purescript"
-    PYTHON = "python"
-    R = "r"
-    RACKET = "racket"
-    REASON = "reason"
-    RUBY = "ruby"
-    RUST = "rust"
-    SASS = "sass"
-    SCALA = "scala"
-    SCHEME = "scheme"
-    SCSS = "scss"
-    SHELL = "shell"
-    SMALLTALK = "smalltalk"
-    SOLIDITY = "solidity"
-    SQL = "sql"
-    SWIFT = "swift"
-    TOML = "toml"
-    TYPESCRIPT = "typescript"
-    VB_NET = "vb.net"
-    VERILOG = "verilog"
-    VHDL = "vhdl"
-    VISUAL_BASIC = "visual basic"
-    WEBASSEMBLY = "webassembly"
-    XML = "xml"
-    YAML = "yaml"
-    JAVA_C_CPP_CSHARP = "java/c/c++/c#"
+# CodeLanguage as Literal (TypeScript-style)
+CodeLanguage = Literal[
+    "abap",
+    "abc",
+    "agda",
+    "arduino",
+    "ascii art",
+    "assembly",
+    "bash",
+    "basic",
+    "bnf",
+    "c",
+    "c#",
+    "c++",
+    "clojure",
+    "coffeescript",
+    "coq",
+    "css",
+    "dart",
+    "dhall",
+    "diff",
+    "docker",
+    "ebnf",
+    "elixir",
+    "elm",
+    "erlang",
+    "f#",
+    "flow",
+    "fortran",
+    "gherkin",
+    "glsl",
+    "go",
+    "graphql",
+    "groovy",
+    "haskell",
+    "hcl",
+    "html",
+    "idris",
+    "java",
+    "javascript",
+    "json",
+    "julia",
+    "kotlin",
+    "latex",
+    "less",
+    "lisp",
+    "livescript",
+    "llvm ir",
+    "lua",
+    "makefile",
+    "markdown",
+    "markup",
+    "matlab",
+    "mathematica",
+    "mermaid",
+    "nix",
+    "notion formula",
+    "objective-c",
+    "ocaml",
+    "pascal",
+    "perl",
+    "php",
+    "plain text",
+    "powershell",
+    "prolog",
+    "protobuf",
+    "purescript",
+    "python",
+    "r",
+    "racket",
+    "reason",
+    "ruby",
+    "rust",
+    "sass",
+    "scala",
+    "scheme",
+    "scss",
+    "shell",
+    "smalltalk",
+    "solidity",
+    "sql",
+    "swift",
+    "toml",
+    "typescript",
+    "vb.net",
+    "verilog",
+    "vhdl",
+    "visual basic",
+    "webassembly",
+    "xml",
+    "yaml",
+    "java/c/c++/c#",
+]
 
 
 # ============================================
@@ -165,26 +164,22 @@ class CalloutContent(BaseModel):
 class SyncedBlockBlock(BaseBlockObject):
     """同期ブロック"""
 
-    type: Literal[BlockType.SYNCED_BLOCK] = Field(
-        BlockType.SYNCED_BLOCK, description="ブロックタイプ"
-    )
+    type: Literal["synced_block"] = Field("synced_block", description="ブロックタイプ")
     synced_block: SyncedBlockContent = Field(..., description="同期ブロックコンテンツ")
 
 
 class ChildPageBlock(BaseBlockObject):
     """子ページブロック"""
 
-    type: Literal[BlockType.CHILD_PAGE] = Field(
-        BlockType.CHILD_PAGE, description="ブロックタイプ"
-    )
+    type: Literal["child_page"] = Field("child_page", description="ブロックタイプ")
     child_page: TitleObject = Field(..., description="子ページ情報")
 
 
 class ChildDatabaseBlock(BaseBlockObject):
     """子データベースブロック"""
 
-    type: Literal[BlockType.CHILD_DATABASE] = Field(
-        BlockType.CHILD_DATABASE, description="ブロックタイプ"
+    type: Literal["child_database"] = Field(
+        "child_database", description="ブロックタイプ"
     )
     child_database: TitleObject = Field(..., description="子データベース情報")
 
@@ -192,23 +187,19 @@ class ChildDatabaseBlock(BaseBlockObject):
 class EquationBlock(BaseBlockObject):
     """数式ブロック"""
 
-    type: Literal[BlockType.EQUATION] = Field(
-        BlockType.EQUATION, description="ブロックタイプ"
-    )
+    type: Literal["equation"] = Field("equation", description="ブロックタイプ")
     equation: ExpressionObject = Field(..., description="数式")
 
 
 class CodeBlock(BaseBlockObject):
     """コードブロック"""
 
-    type: Literal[BlockType.CODE] = Field(BlockType.CODE, description="ブロックタイプ")
+    type: Literal["code"] = Field("code", description="ブロックタイプ")
     code: CodeContent = Field(..., description="コードコンテンツ")
 
 
 class CalloutBlock(BaseBlockObject):
     """コールアウトブロック"""
 
-    type: Literal[BlockType.CALLOUT] = Field(
-        BlockType.CALLOUT, description="ブロックタイプ"
-    )
+    type: Literal["callout"] = Field("callout", description="ブロックタイプ")
     callout: CalloutContent = Field(..., description="コールアウトコンテンツ")

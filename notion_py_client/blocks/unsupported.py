@@ -8,7 +8,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from .base import BaseBlockObject, BlockType
+from .base import BaseBlockObject
 
 
 class EmptyObject(BaseModel):
@@ -20,9 +20,7 @@ class EmptyObject(BaseModel):
 class UnsupportedBlock(BaseBlockObject):
     """サポートされていないブロック"""
 
-    type: Literal[BlockType.UNSUPPORTED] = Field(
-        BlockType.UNSUPPORTED, description="ブロックタイプ"
-    )
+    type: Literal["unsupported"] = Field("unsupported", description="ブロックタイプ")
     unsupported: EmptyObject = Field(
         default_factory=EmptyObject, description="空のコンテンツ"
     )

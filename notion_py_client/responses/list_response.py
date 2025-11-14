@@ -17,7 +17,8 @@ from .file_upload import FileUploadObject
 from ..models.user import PartialUser
 from ..models.parent import NotionParent
 from ..models.rich_text_item import RichTextItem
-from ..blocks.base import BaseBlockObject, PartialBlock
+from ..blocks.base import PartialBlock
+from ..blocks import BlockObject
 
 T = TypeVar("T")
 
@@ -96,7 +97,7 @@ class ListUsersResponse(ListResponse[PartialUser]):
     """
 
 
-class ListBlockChildrenResponse(ListResponse[BaseBlockObject | PartialBlock]):
+class ListBlockChildrenResponse(ListResponse[BlockObject | PartialBlock]):
     """blocks.children.list() のレスポンス型.
 
     備考: ブロックは完全なオブジェクト(BaseBlockObject)または部分的なオブジェクト(PartialBlock)が返される。

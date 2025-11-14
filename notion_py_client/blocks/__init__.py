@@ -4,6 +4,10 @@ Notionブロックモデル
 ブロックタイプごとにファイルを分割して実装
 """
 
+from typing import Annotated
+
+from pydantic import Field
+
 from .base import ApiColor, BlockType, BaseBlockObject, PartialBlock
 from .text_blocks import (
     ParagraphBlock,
@@ -47,8 +51,8 @@ from .media_blocks import (
 )
 from .unsupported import UnsupportedBlock
 
-# Union type for all block types
-BlockObject = (
+# Union type for all block types with discriminator
+BlockObject = Annotated[
     ParagraphBlock
     | Heading1Block
     | Heading2Block
@@ -81,8 +85,9 @@ BlockObject = (
     | FileBlock
     | AudioBlock
     | LinkPreviewBlock
-    | UnsupportedBlock
-)
+    | UnsupportedBlock,
+    Field(discriminator="type"),
+]
 
 __all__ = [
     # Base
