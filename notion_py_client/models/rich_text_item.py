@@ -23,3 +23,28 @@ class RichTextItem(BaseModel):
     def get_plain_text(self) -> str:
         """RichTextItemのプレーンテキストを取得"""
         return self.plain_text
+
+    def to_markdown(self) -> str:
+        """RichTextItemをMarkdown形式に変換"""
+        text = self.plain_text
+
+        # Apply annotations
+        if self.annotations.bold:
+            text = f"**{text}**"
+        if self.annotations.italic:
+            text = f"*{text}*"
+        if self.annotations.strikethrough:
+            text = f"~~{text}~~"
+        if self.annotations.code:
+            text = f"`{text}`"
+
+        # Apply link
+        if self.href:
+            text = f"[{text}]({self.href})"
+
+        return text
+
+
+def rich_text_to_markdown(rich_text: list[RichTextItem]) -> str:
+    """RichTextItemのリストをMarkdown文字列に変換"""
+    return "".join([item.to_markdown() for item in rich_text])

@@ -11,7 +11,7 @@ from typing import Literal
 from pydantic import BaseModel, Field, StrictStr
 
 from .base import ApiColor, BaseBlockObject
-from ..models.rich_text_item import RichTextItem
+from ..models.rich_text_item import RichTextItem, rich_text_to_markdown
 from ..models.icon import NotionIcon
 
 
@@ -167,12 +167,20 @@ class SyncedBlockBlock(BaseBlockObject):
     type: Literal["synced_block"] = Field("synced_block", description="ブロックタイプ")
     synced_block: SyncedBlockContent = Field(..., description="同期ブロックコンテンツ")
 
+    def to_markdown(self) -> str:
+        """同期ブロックをMarkdown形式に変換"""
+        return ""
+
 
 class ChildPageBlock(BaseBlockObject):
     """子ページブロック"""
 
     type: Literal["child_page"] = Field("child_page", description="ブロックタイプ")
     child_page: TitleObject = Field(..., description="子ページ情報")
+
+    def to_markdown(self) -> str:
+        """子ページブロックをMarkdown形式に変換"""
+        return f"[{self.child_page.title}]"
 
 
 class ChildDatabaseBlock(BaseBlockObject):
@@ -183,12 +191,20 @@ class ChildDatabaseBlock(BaseBlockObject):
     )
     child_database: TitleObject = Field(..., description="子データベース情報")
 
+    def to_markdown(self) -> str:
+        """子データベースブロックをMarkdown形式に変換"""
+        return f"[Database: {self.child_database.title}]"
+
 
 class EquationBlock(BaseBlockObject):
     """数式ブロック"""
 
     type: Literal["equation"] = Field("equation", description="ブロックタイプ")
     equation: ExpressionObject = Field(..., description="数式")
+
+    def to_markdown(self) -> str:
+        """数式ブロックをMarkdown形式に変換"""
+        return f"$${self.equation.expression}$$"
 
 
 class CodeBlock(BaseBlockObject):
@@ -197,9 +213,19 @@ class CodeBlock(BaseBlockObject):
     type: Literal["code"] = Field("code", description="ブロックタイプ")
     code: CodeContent = Field(..., description="コードコンテンツ")
 
+    def to_markdown(self) -> str:
+        """コードブロックをMarkdown形式に変換"""
+        code_text = rich_text_to_markdown(self.code.rich_text)
+        return f"```{self.code.language}\n{code_text}\n```"
+
 
 class CalloutBlock(BaseBlockObject):
     """コールアウトブロック"""
 
     type: Literal["callout"] = Field("callout", description="ブロックタイプ")
     callout: CalloutContent = Field(..., description="コールアウトコンテンツ")
+
+    def to_markdown(self) -> str:
+        """コールアウトブロックをMarkdown形式に変換"""
+        text = rich_text_to_markdown(self.callout.rich_text)
+        return f"> {text}"

@@ -24,3 +24,7 @@ class UnsupportedBlock(BaseBlockObject):
     unsupported: EmptyObject = Field(
         default_factory=EmptyObject, description="空のコンテンツ"
     )
+
+    def to_markdown(self) -> str:
+        """サポートされていないブロックをMarkdown形式に変換"""
+        return ""

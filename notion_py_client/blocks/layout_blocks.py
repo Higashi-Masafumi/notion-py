@@ -11,7 +11,7 @@ from typing import Literal
 from pydantic import BaseModel, Field, StrictBool, StrictInt, StrictStr
 
 from .base import ApiColor, BaseBlockObject
-from ..models.rich_text_item import RichTextItem
+from ..models.rich_text_item import RichTextItem, rich_text_to_markdown
 
 
 # ============================================
@@ -78,6 +78,10 @@ class DividerBlock(BaseBlockObject):
         default_factory=EmptyObject, description="空のコンテンツ"
     )
 
+    def to_markdown(self) -> str:
+        """区切り線ブロックをMarkdown形式に変換"""
+        return "---"
+
 
 class BreadcrumbBlock(BaseBlockObject):
     """パンくずリストブロック"""
@@ -86,6 +90,10 @@ class BreadcrumbBlock(BaseBlockObject):
     breadcrumb: EmptyObject = Field(
         default_factory=EmptyObject, description="空のコンテンツ"
     )
+
+    def to_markdown(self) -> str:
+        """パンくずリストブロックをMarkdown形式に変換"""
+        return ""
 
 
 class TableOfContentsBlock(BaseBlockObject):
@@ -96,6 +104,10 @@ class TableOfContentsBlock(BaseBlockObject):
     )
     table_of_contents: TableOfContentsContent = Field(..., description="目次コンテンツ")
 
+    def to_markdown(self) -> str:
+        """目次ブロックをMarkdown形式に変換"""
+        return "[TOC]"
+
 
 class ColumnListBlock(BaseBlockObject):
     """カラムリストブロック"""
@@ -105,12 +117,20 @@ class ColumnListBlock(BaseBlockObject):
         default_factory=EmptyObject, description="空のコンテンツ"
     )
 
+    def to_markdown(self) -> str:
+        """カラムリストブロックをMarkdown形式に変換"""
+        return ""
+
 
 class ColumnBlock(BaseBlockObject):
     """カラムブロック"""
 
     type: Literal["column"] = Field("column", description="ブロックタイプ")
     column: ColumnContent = Field(..., description="カラムコンテンツ")
+
+    def to_markdown(self) -> str:
+        """カラムブロックをMarkdown形式に変換"""
+        return ""
 
 
 class LinkToPageBlock(BaseBlockObject):
@@ -119,6 +139,14 @@ class LinkToPageBlock(BaseBlockObject):
     type: Literal["link_to_page"] = Field("link_to_page", description="ブロックタイプ")
     link_to_page: LinkToPageContent = Field(..., description="リンクコンテンツ")
 
+    def to_markdown(self) -> str:
+        """ページへのリンクブロックをMarkdown形式に変換"""
+        if self.link_to_page.page_id:
+            return f"[Page Link](https://notion.so/{self.link_to_page.page_id.replace('-', '')})"
+        elif self.link_to_page.database_id:
+            return f"[Database Link](https://notion.so/{self.link_to_page.database_id.replace('-', '')})"
+        return ""
+
 
 class TableBlock(BaseBlockObject):
     """テーブルブロック"""
@@ -126,9 +154,18 @@ class TableBlock(BaseBlockObject):
     type: Literal["table"] = Field("table", description="ブロックタイプ")
     table: TableContent = Field(..., description="テーブルコンテンツ")
 
+    def to_markdown(self) -> str:
+        """テーブルブロックをMarkdown形式に変換"""
+        return ""
+
 
 class TableRowBlock(BaseBlockObject):
     """テーブル行ブロック"""
 
     type: Literal["table_row"] = Field("table_row", description="ブロックタイプ")
     table_row: TableRowContent = Field(..., description="テーブル行コンテンツ")
+
+    def to_markdown(self) -> str:
+        """テーブル行ブロックをMarkdown形式に変換"""
+        cells = [rich_text_to_markdown(cell) for cell in self.table_row.cells]
+        return "| " + " | ".join(cells) + " |"
