@@ -145,6 +145,8 @@ class LinkToPageBlock(BaseBlockObject):
             return f"[Page Link](https://notion.so/{self.link_to_page.page_id.replace('-', '')})"
         elif self.link_to_page.database_id:
             return f"[Database Link](https://notion.so/{self.link_to_page.database_id.replace('-', '')})"
+        elif self.link_to_page.comment_id:
+            return f"[Comment Link](https://notion.so/comment/{self.link_to_page.comment_id.replace('-', '')})"
         return ""
 
 

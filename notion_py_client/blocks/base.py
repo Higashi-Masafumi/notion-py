@@ -4,10 +4,10 @@ Notionブロックの基底クラスと共通モデル
 
 from __future__ import annotations
 
+from abc import ABC, abstractmethod
 from typing import Literal
 
 from pydantic import BaseModel, Field, StrictBool, StrictStr
-from abc import abstractmethod
 
 from ..models.user import PartialUser
 from ..models.parent import NotionParent
@@ -74,7 +74,7 @@ ApiColor = Literal[
 ]
 
 
-class BaseBlockObject(BaseModel):
+class BaseBlockObject(BaseModel, ABC):
     """
     すべてのブロックタイプに共通のフィールド
 
@@ -85,9 +85,9 @@ class BaseBlockObject(BaseModel):
     object: Literal["block"] = Field("block", description="オブジェクトタイプ")
     id: StrictStr = Field(..., description="ブロックID")
     # type field is defined in each subclass with specific Literal
-    created_time: StrictStr = Field(..., description="作成日時(ISO 8601形式)")
+    created_time: StrictStr = Field(..., description="作成日時（ISO 8601形式）")
     created_by: PartialUser = Field(..., description="作成者")
-    last_edited_time: StrictStr = Field(..., description="最終編集日時(ISO 8601形式)")
+    last_edited_time: StrictStr = Field(..., description="最終編集日時（ISO 8601形式）")
     last_edited_by: PartialUser = Field(..., description="最終編集者")
     parent: NotionParent = Field(..., description="親オブジェクト")
     has_children: StrictBool = Field(False, description="子ブロックの有無")

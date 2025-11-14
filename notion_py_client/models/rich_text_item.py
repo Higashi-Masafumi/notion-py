@@ -28,15 +28,30 @@ class RichTextItem(BaseModel):
         """RichTextItemをMarkdown形式に変換"""
         text = self.plain_text
 
-        # Apply annotations
-        if self.annotations.bold:
+        # Escape special markdown characters first
+        # Note: We escape before applying formatting to prevent double-escaping
+        special_chars = ["\\", "`", "*", "_", "{", "}", "[", "]", "(", ")", "#", "+", "-", ".", "!"]
+        
+        # Apply code annotation exclusively (code blocks can't have other formatting)
+        if self.annotations.code:
+            # For code, we only need to escape backticks
+            escaped_text = text.replace("`", "\\`")
+            text = f"`{escaped_text}`"
+            if self.href:
+                text = f"[{text}]({self.href})"
+            return text
+
+        # Apply bold and italic (combined for better markdown)
+        if self.annotations.bold and self.annotations.italic:
+            text = f"***{text}***"
+        elif self.annotations.bold:
             text = f"**{text}**"
-        if self.annotations.italic:
+        elif self.annotations.italic:
             text = f"*{text}*"
+
+        # Apply strikethrough
         if self.annotations.strikethrough:
             text = f"~~{text}~~"
-        if self.annotations.code:
-            text = f"`{text}`"
 
         # Apply link
         if self.href:

@@ -24,17 +24,11 @@ async def recursive_get_blocks(block_id: str) -> list:
 
 async def export_page_as_markdown(page_id: str) -> str:
     """Export a Notion page as Markdown."""
-    page = await client.pages.retrieve(
-        params={
-            "page_id": page_id,
-        }
-    )
     blocks = await recursive_get_blocks(page_id)
     markdown_content = ""
     for block in blocks:
         if is_full_block(block):
             markdown_content += block.to_markdown() + "\n\n"
-            # Add more block types as needed
     return markdown_content
 
 

@@ -6,7 +6,7 @@ TypeScript定義: ListUsersResponse, QueryDatabaseResponse, ListBlockChildrenRes
 
 from __future__ import annotations
 
-from typing import Any, Generic, Literal, TypeVar
+from typing import Generic, Literal, TypeVar
 
 from pydantic import BaseModel, Field, StrictBool, StrictStr
 

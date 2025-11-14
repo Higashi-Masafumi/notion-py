@@ -48,6 +48,7 @@ from .responses.list_response import (
     CommentObject,
 )
 from .blocks.base import BaseBlockObject, PartialBlock
+from .blocks import BlockObject
 from .models.user import PartialUser, User
 
 
@@ -611,12 +612,7 @@ class _BlocksAPI:
         )
 
         # typeフィールドがあれば完全なブロック、なければPartialBlock
-        from .blocks.base import PartialBlock
-        from .blocks import BlockObject
-
         if "type" in response and response.get("type") is not None:
-            from pydantic import TypeAdapter
-
             block_adapter = TypeAdapter(BlockObject)
             return block_adapter.validate_python(response)
         else:
@@ -633,11 +629,7 @@ class _BlocksAPI:
         )
 
         # typeフィールドがあれば完全なブロック、なければPartialBlock
-        from .blocks import BlockObject
-
         if "type" in response and response.get("type") is not None:
-            from pydantic import TypeAdapter
-
             block_adapter = TypeAdapter(BlockObject)
             return block_adapter.validate_python(response)
         else:
@@ -656,11 +648,7 @@ class _BlocksAPI:
         )
 
         # typeフィールドがあれば完全なブロック、なければPartialBlock
-        from .blocks import BlockObject
-
         if "type" in response and response.get("type") is not None:
-            from pydantic import TypeAdapter
-
             block_adapter = TypeAdapter(BlockObject)
             return block_adapter.validate_python(response)
         else:
@@ -690,15 +678,11 @@ class _BlockChildrenAPI:
         )
 
         # dictの結果をBlockObject/PartialBlockに変換
-        from .blocks import BlockObject
-
         results = []
         for item in response.get("results", []):
             # typeフィールドがあれば完全なブロック、なければPartialBlock
             if "type" in item and item.get("type") is not None:
                 # BlockObjectとしてパース
-                from pydantic import TypeAdapter
-
                 block_adapter = TypeAdapter(BlockObject)
                 results.append(block_adapter.validate_python(item))
             else:
@@ -734,16 +718,11 @@ class _BlockChildrenAPI:
         )
 
         # dictの結果をBlockObject/PartialBlockに変換
-        from .blocks.base import PartialBlock
-        from .blocks import BlockObject
-
         results = []
         for item in response.get("results", []):
             # typeフィールドがあれば完全なブロック、なければPartialBlock
             if "type" in item and item.get("type") is not None:
                 # BlockObjectとしてパース（Pydanticが自動的に適切なサブクラスを選択）
-                from pydantic import TypeAdapter
-
                 block_adapter = TypeAdapter(BlockObject)
                 results.append(block_adapter.validate_python(item))
             else:
