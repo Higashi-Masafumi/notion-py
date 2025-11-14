@@ -10,8 +10,8 @@ from typing import Literal
 
 from pydantic import BaseModel, Field, StrictBool
 
-from .base import ApiColor, BaseBlockObject, BlockType
-from ..models.rich_text_item import RichTextItem
+from .base import ApiColor, BaseBlockObject
+from ..models.rich_text_item import RichTextItem, rich_text_to_markdown
 
 
 class ContentWithRichTextAndColor(BaseModel):
@@ -37,74 +37,98 @@ class HeaderContentWithRichTextAndColor(BaseModel):
 class ParagraphBlock(BaseBlockObject):
     """段落ブロック"""
 
-    type: Literal[BlockType.PARAGRAPH] = Field(
-        BlockType.PARAGRAPH, description="ブロックタイプ"
-    )
+    type: Literal["paragraph"] = Field("paragraph", description="ブロックタイプ")
     paragraph: ContentWithRichTextAndColor = Field(..., description="段落コンテンツ")
+
+    def to_markdown(self) -> str:
+        """段落ブロックをMarkdown形式に変換"""
+        return rich_text_to_markdown(self.paragraph.rich_text)
 
 
 class Heading1Block(BaseBlockObject):
     """見出し1ブロック"""
 
-    type: Literal[BlockType.HEADING_1] = Field(
-        BlockType.HEADING_1, description="ブロックタイプ"
-    )
+    type: Literal["heading_1"] = Field("heading_1", description="ブロックタイプ")
     heading_1: HeaderContentWithRichTextAndColor = Field(
         ..., description="見出し1コンテンツ"
     )
+
+    def to_markdown(self) -> str:
+        """見出し1ブロックをMarkdown形式に変換"""
+
+        return f"# {rich_text_to_markdown(self.heading_1.rich_text)}"
 
 
 class Heading2Block(BaseBlockObject):
     """見出し2ブロック"""
 
-    type: Literal[BlockType.HEADING_2] = Field(
-        BlockType.HEADING_2, description="ブロックタイプ"
-    )
+    type: Literal["heading_2"] = Field("heading_2", description="ブロックタイプ")
     heading_2: HeaderContentWithRichTextAndColor = Field(
         ..., description="見出し2コンテンツ"
     )
+
+    def to_markdown(self) -> str:
+        """見出し2ブロックをMarkdown形式に変換"""
+
+        return f"## {rich_text_to_markdown(self.heading_2.rich_text)}"
 
 
 class Heading3Block(BaseBlockObject):
     """見出し3ブロック"""
 
-    type: Literal[BlockType.HEADING_3] = Field(
-        BlockType.HEADING_3, description="ブロックタイプ"
-    )
+    type: Literal["heading_3"] = Field("heading_3", description="ブロックタイプ")
     heading_3: HeaderContentWithRichTextAndColor = Field(
         ..., description="見出し3コンテンツ"
     )
+
+    def to_markdown(self) -> str:
+        """見出し3ブロックをMarkdown形式に変換"""
+
+        return f"### {rich_text_to_markdown(self.heading_3.rich_text)}"
 
 
 class BulletedListItemBlock(BaseBlockObject):
     """箇条書きリストアイテムブロック"""
 
-    type: Literal[BlockType.BULLETED_LIST_ITEM] = Field(
-        BlockType.BULLETED_LIST_ITEM, description="ブロックタイプ"
+    type: Literal["bulleted_list_item"] = Field(
+        "bulleted_list_item", description="ブロックタイプ"
     )
     bulleted_list_item: ContentWithRichTextAndColor = Field(
         ..., description="箇条書きリストアイテムコンテンツ"
     )
 
+    def to_markdown(self) -> str:
+        """箇条書きリストアイテムブロックをMarkdown形式に変換"""
+
+        return f"- {rich_text_to_markdown(self.bulleted_list_item.rich_text)}"
+
 
 class NumberedListItemBlock(BaseBlockObject):
     """番号付きリストアイテムブロック"""
 
-    type: Literal[BlockType.NUMBERED_LIST_ITEM] = Field(
-        BlockType.NUMBERED_LIST_ITEM, description="ブロックタイプ"
+    type: Literal["numbered_list_item"] = Field(
+        "numbered_list_item", description="ブロックタイプ"
     )
     numbered_list_item: ContentWithRichTextAndColor = Field(
         ..., description="番号付きリストアイテムコンテンツ"
     )
 
+    def to_markdown(self) -> str:
+        """番号付きリストアイテムブロックをMarkdown形式に変換"""
+
+        return f"1. {rich_text_to_markdown(self.numbered_list_item.rich_text)}"
+
 
 class QuoteBlock(BaseBlockObject):
     """引用ブロック"""
 
-    type: Literal[BlockType.QUOTE] = Field(
-        BlockType.QUOTE, description="ブロックタイプ"
-    )
+    type: Literal["quote"] = Field("quote", description="ブロックタイプ")
     quote: ContentWithRichTextAndColor = Field(..., description="引用コンテンツ")
+
+    def to_markdown(self) -> str:
+        """引用ブロックをMarkdown形式に変換"""
+
+        return f"> {rich_text_to_markdown(self.quote.rich_text)}"
 
 
 class ToDoContent(BaseModel):
@@ -118,27 +142,37 @@ class ToDoContent(BaseModel):
 class ToDoBlock(BaseBlockObject):
     """ToDoブロック"""
 
-    type: Literal[BlockType.TO_DO] = Field(
-        BlockType.TO_DO, description="ブロックタイプ"
-    )
+    type: Literal["to_do"] = Field("to_do", description="ブロックタイプ")
     to_do: ToDoContent = Field(..., description="ToDoコンテンツ")
+
+    def to_markdown(self) -> str:
+        """ToDoブロックをMarkdown形式に変換"""
+
+        checkbox = "[x]" if self.to_do.checked else "[ ]"
+        return f"- {checkbox} {rich_text_to_markdown(self.to_do.rich_text)}"
 
 
 class ToggleBlock(BaseBlockObject):
     """トグルブロック"""
 
-    type: Literal[BlockType.TOGGLE] = Field(
-        BlockType.TOGGLE, description="ブロックタイプ"
-    )
+    type: Literal["toggle"] = Field("toggle", description="ブロックタイプ")
     toggle: ContentWithRichTextAndColor = Field(..., description="トグルコンテンツ")
+
+    def to_markdown(self) -> str:
+        """トグルブロックをMarkdown形式に変換"""
+
+        return f"<details><summary>{rich_text_to_markdown(self.toggle.rich_text)}</summary></details>"
 
 
 class TemplateBlock(BaseBlockObject):
     """テンプレートブロック"""
 
-    type: Literal[BlockType.TEMPLATE] = Field(
-        BlockType.TEMPLATE, description="ブロックタイプ"
-    )
+    type: Literal["template"] = Field("template", description="ブロックタイプ")
     template: ContentWithRichTextAndColor = Field(
         ..., description="テンプレートコンテンツ"
     )
+
+    def to_markdown(self) -> str:
+        """テンプレートブロックをMarkdown形式に変換"""
+
+        return rich_text_to_markdown(self.template.rich_text)

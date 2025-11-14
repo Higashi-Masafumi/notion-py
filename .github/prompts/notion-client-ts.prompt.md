@@ -1,6 +1,6 @@
 ---
 mode: agent
-model: Claude Sonnet 4.5 (Preview) (copilot)
+model: Claude Sonnet 4.5 (copilot)
 tools: ['codebase', 'editFiles', 'fetch']
 ---
 以下はNotionの公式のTypescriptSDKのクライアントの実装です。これを参考にして、Pythonで同様のクライアントを提供するライブラリを作成したいと考えています。Pythonの型システムに合わせて、PydanticやTypedDictを活用した実装を提案してください
