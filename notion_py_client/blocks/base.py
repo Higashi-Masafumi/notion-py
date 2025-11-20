@@ -4,13 +4,12 @@ Notionブロックの基底クラスと共通モデル
 
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
 from typing import Literal
 
 from pydantic import BaseModel, Field, StrictBool, StrictStr
 
-from ..models.user import PartialUser
 from ..models.parent import NotionParent
+from ..models.user import PartialUser
 
 # BlockType as Literal (TypeScript-style)
 BlockType = Literal[
@@ -74,7 +73,7 @@ ApiColor = Literal[
 ]
 
 
-class BaseBlockObject(BaseModel, ABC):
+class BaseBlockObject(BaseModel):
     """
     すべてのブロックタイプに共通のフィールド
 
@@ -93,11 +92,6 @@ class BaseBlockObject(BaseModel, ABC):
     has_children: StrictBool = Field(False, description="子ブロックの有無")
     archived: StrictBool = Field(False, description="アーカイブフラグ")
     in_trash: StrictBool = Field(False, description="ゴミ箱フラグ")
-
-    @abstractmethod
-    def to_markdown(self) -> str:
-        """ブロックをMarkdown形式に変換する抽象メソッド"""
-        pass
 
 
 class PartialBlock(BaseModel):

@@ -11,7 +11,7 @@ from typing import Literal
 from pydantic import BaseModel, Field, StrictStr
 
 from .base import BaseBlockObject
-from ..models.rich_text_item import RichTextItem, rich_text_to_markdown
+from ..models.rich_text_item import RichTextItem
 from ..models.file import InternalFile
 
 
@@ -98,15 +98,6 @@ class EmbedBlock(BaseBlockObject):
     type: Literal["embed"] = Field("embed", description="ブロックタイプ")
     embed: MediaContentWithUrlAndCaption = Field(..., description="埋め込みコンテンツ")
 
-    def to_markdown(self) -> str:
-        """埋め込みブロックをMarkdown形式に変換"""
-        caption = (
-            rich_text_to_markdown(self.embed.caption) if self.embed.caption else ""
-        )
-        if caption:
-            return f"[{caption}]({self.embed.url})"
-        return f"[Embed]({self.embed.url})"
-
 
 class BookmarkBlock(BaseBlockObject):
     """ブックマークブロック"""
@@ -116,35 +107,11 @@ class BookmarkBlock(BaseBlockObject):
         ..., description="ブックマークコンテンツ"
     )
 
-    def to_markdown(self) -> str:
-        """ブックマークブロックをMarkdown形式に変換"""
-        caption = (
-            rich_text_to_markdown(self.bookmark.caption)
-            if self.bookmark.caption
-            else ""
-        )
-        if caption:
-            return f"[{caption}]({self.bookmark.url})"
-        return f"[Bookmark]({self.bookmark.url})"
-
-
 class ImageBlock(BaseBlockObject):
     """画像ブロック"""
 
     type: Literal["image"] = Field("image", description="ブロックタイプ")
     image: MediaContentWithFileAndCaption = Field(..., description="画像コンテンツ")
-
-    def to_markdown(self) -> str:
-        """画像ブロックをMarkdown形式に変換"""
-        caption = (
-            rich_text_to_markdown(self.image.caption) if self.image.caption else ""
-        )
-        if self.image.type == "external":
-            url = self.image.external.url
-        else:
-            url = self.image.file.url
-        return f"![{caption}]({url})"
-
 
 class VideoBlock(BaseBlockObject):
     """動画ブロック"""
@@ -152,37 +119,12 @@ class VideoBlock(BaseBlockObject):
     type: Literal["video"] = Field("video", description="ブロックタイプ")
     video: MediaContentWithFileAndCaption = Field(..., description="動画コンテンツ")
 
-    def to_markdown(self) -> str:
-        """動画ブロックをMarkdown形式に変換"""
-        caption = (
-            rich_text_to_markdown(self.video.caption) if self.video.caption else ""
-        )
-        if self.video.type == "external":
-            url = self.video.external.url
-        else:
-            url = self.video.file.url
-        if caption:
-            return f"[{caption}]({url})"
-        return f"[Video]({url})"
-
 
 class PdfBlock(BaseBlockObject):
     """PDFブロック"""
 
     type: Literal["pdf"] = Field("pdf", description="ブロックタイプ")
     pdf: MediaContentWithFileAndCaption = Field(..., description="PDFコンテンツ")
-
-    def to_markdown(self) -> str:
-        """PDFブロックをMarkdown形式に変換"""
-        caption = rich_text_to_markdown(self.pdf.caption) if self.pdf.caption else ""
-        if self.pdf.type == "external":
-            url = self.pdf.external.url
-        else:
-            url = self.pdf.file.url
-        if caption:
-            return f"[{caption}]({url})"
-        return f"[PDF]({url})"
-
 
 class FileBlock(BaseBlockObject):
     """ファイルブロック"""
@@ -192,38 +134,12 @@ class FileBlock(BaseBlockObject):
         ..., description="ファイルコンテンツ"
     )
 
-    def to_markdown(self) -> str:
-        """ファイルブロックをMarkdown形式に変換"""
-        caption = (
-            rich_text_to_markdown(self.file.caption)
-            if self.file.caption
-            else self.file.name
-        )
-        if self.file.type == "external":
-            url = self.file.external.url
-        else:
-            url = self.file.file.url
-        return f"[{caption}]({url})"
-
 
 class AudioBlock(BaseBlockObject):
     """音声ブロック"""
 
     type: Literal["audio"] = Field("audio", description="ブロックタイプ")
     audio: MediaContentWithFileAndCaption = Field(..., description="音声コンテンツ")
-
-    def to_markdown(self) -> str:
-        """音声ブロックをMarkdown形式に変換"""
-        caption = (
-            rich_text_to_markdown(self.audio.caption) if self.audio.caption else ""
-        )
-        if self.audio.type == "external":
-            url = self.audio.external.url
-        else:
-            url = self.audio.file.url
-        if caption:
-            return f"[{caption}]({url})"
-        return f"[Audio]({url})"
 
 
 class LinkPreviewBlock(BaseBlockObject):
@@ -233,7 +149,3 @@ class LinkPreviewBlock(BaseBlockObject):
     link_preview: MediaContentWithUrl = Field(
         ..., description="リンクプレビューコンテンツ"
     )
-
-    def to_markdown(self) -> str:
-        """リンクプレビューブロックをMarkdown形式に変換"""
-        return f"[Link Preview]({self.link_preview.url})"
