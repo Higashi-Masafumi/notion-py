@@ -21,8 +21,8 @@ NotionページをMarkdown形式にエクスポートするツール。
     NOTION_API_TOKEN: NotionインテグレーションのAPIトークン
 """
 
-import asyncio
 import argparse
+import asyncio
 import os
 
 from dotenv import load_dotenv
@@ -87,7 +87,7 @@ async def convert_block_to_markdown(
         text = rich_text_to_markdown(block.heading_1.rich_text)
         # トグル可能な見出しの場合
         if block.heading_1.is_toggleable and children_markdown:
-            result = f"{indent}<details>\n{indent}<summary>\n\n{indent}# {text}\n\n{indent}</summary>\n\n"
+            result = f"{indent}<details>\n{indent}<summary># {text}</summary>\n\n"
             result += children_markdown
             result += f"{indent}</details>\n\n"
         else:
@@ -99,7 +99,7 @@ async def convert_block_to_markdown(
         text = rich_text_to_markdown(block.heading_2.rich_text)
         # トグル可能な見出しの場合
         if block.heading_2.is_toggleable and children_markdown:
-            result = f"{indent}<details>\n{indent}<summary>\n\n{indent}## {text}\n\n{indent}</summary>\n\n"
+            result = f"{indent}<details>\n{indent}<summary>## {text}</summary>\n\n"
             result += children_markdown
             result += f"{indent}</details>\n\n"
         else:
@@ -111,7 +111,7 @@ async def convert_block_to_markdown(
         text = rich_text_to_markdown(block.heading_3.rich_text)
         # トグル可能な見出しの場合
         if block.heading_3.is_toggleable and children_markdown:
-            result = f"{indent}<details>\n{indent}<summary>\n\n{indent}### {text}\n\n{indent}</summary>\n\n"
+            result = f"{indent}<details>\n{indent}<summary>### {text}</summary>\n\n"
             result += children_markdown
             result += f"{indent}</details>\n\n"
         else:
@@ -338,7 +338,6 @@ async def convert_block_to_markdown(
             result += children_markdown
 
     elif block.type == "synced_block":
-        print(f"synced_block: {block}")
         # 同期ブロックの処理
         if block.synced_block.synced_from:
             synced_block_id = block.synced_block.synced_from.block_id
@@ -387,7 +386,6 @@ async def export_page_as_markdown(
     """
     # ページ情報を取得
     page = await client.pages.retrieve({"page_id": page_id})
-    print(f"created: {page.created_by}")
 
     # ページタイトルを取得
     for property in page.properties.values():
@@ -415,6 +413,7 @@ async def export_page_as_markdown(
         print(f"マークダウンファイルを出力しました: {output_file}")
 
     return markdown
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

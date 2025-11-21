@@ -37,23 +37,39 @@ class RichTextItem(BaseModel):
                 text = f"[{text}]({self.href})"
             return text
 
-        # Apply bold and italic (combined for better markdown)
-        if self.annotations.bold and self.annotations.italic:
-            text = f"***{text}***"
-        elif self.annotations.bold:
-            text = f"**{text}**"
-        elif self.annotations.italic:
-            text = f"*{text}*"
+        # Preserve leading and trailing spaces while applying formatting
+        leading_space = ""
+        trailing_space = ""
 
-        # Apply strikethrough
-        if self.annotations.strikethrough:
-            text = f"~~{text}~~"
+        # Extract leading spaces
+        if text and text[0].isspace():
+            leading_space = text[0]
+            text = text[1:]
+
+        # Extract trailing spaces
+        if text and text[-1].isspace():
+            trailing_space = text[-1]
+            text = text[:-1]
+
+        # Apply bold and italic (combined for better markdown)
+        if text:  # Only apply formatting if there's non-space content
+            if self.annotations.bold and self.annotations.italic:
+                text = f"***{text}***"
+            elif self.annotations.bold:
+                text = f"**{text}**"
+            elif self.annotations.italic:
+                text = f"*{text}*"
+
+            # Apply strikethrough
+            if self.annotations.strikethrough:
+                text = f"~~{text}~~"
 
         # Apply link
-        if self.href:
+        if self.href and text:
             text = f"[{text}]({self.href})"
 
-        return text
+        # Restore leading and trailing spaces
+        return leading_space + text + trailing_space
 
 
 def rich_text_to_markdown(rich_text: list[RichTextItem]) -> str:
