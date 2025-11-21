@@ -164,7 +164,10 @@ from .responses.list_response import (
     QueryDatabaseResponse,
     QueryDataSourceResponse,
     SearchResponse,
+    ListBlockChildrenResponse,
+    ListCommentsResponse,
     ListFileUploadsResponse,
+    CommentObject,
 )
 from .helper import Field, NotionMapper, NotionPropertyDescriptor
 
@@ -186,7 +189,11 @@ __all__ = [
     "QueryDatabaseResponse",
     "QueryDataSourceResponse",
     "SearchResponse",
+    "ListBlockChildrenResponse",
+    "ListCommentsResponse",
     "ListFileUploadsResponse",
+    # Comment
+    "CommentObject",
     # Block base
     "BlockObject",
     "PartialBlock",

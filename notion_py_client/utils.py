@@ -105,7 +105,7 @@ async def collect_paginated_api(
 from .responses.page import NotionPage, PartialPage
 from .responses.datasource import DataSource, PartialDataSource
 from .responses.database import NotionDatabase, PartialDatabase
-from .blocks.base import BaseBlockObject, PartialBlock
+from .blocks import PartialBlock, BlockObject
 from .models.rich_text_item import RichTextItem
 from .models.primitives import Text, Mention, Equation
 
@@ -115,8 +115,8 @@ def _get_object_type(obj: Any) -> str | None:
 
 
 def is_full_block(
-    response: BaseBlockObject | PartialBlock | Mapping[str, Any] | Any,
-) -> TypeGuard[BaseBlockObject]:
+    response: BlockObject | PartialBlock | Mapping[str, Any] | Any,
+) -> TypeGuard[BlockObject]:
     """Type guard: block object with full fields (`type` present)."""
     return (
         _get_object_type(response) == "block"

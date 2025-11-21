@@ -4,7 +4,7 @@ from .parent import NotionParent
 from .date_info import DateInfo
 from .file import ExternalFile, FileObject, FileWithName, InternalFile
 from .formula import FormulaResult
-from .rich_text_item import RichTextItem
+from .rich_text_item import RichTextItem, rich_text_to_markdown
 from .select_option import SelectOption
 from .status_option import StatusOption
 from .unique_id import UniqueId
@@ -21,6 +21,7 @@ __all__ = [
     # Other models
     "FormulaResult",
     "RichTextItem",
+    "rich_text_to_markdown",
     "StatusOption",
     "DateInfo",
     "User",

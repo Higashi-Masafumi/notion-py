@@ -1,0 +1,7 @@
+{
+  "setup-worktree": [
+    "uv sync",
+    "cp $ROOT_WORKTREE_PATH/.env .env",
+    "echo $NOTION_API_TOKEN"
+  ]
+}

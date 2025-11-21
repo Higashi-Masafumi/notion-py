@@ -258,3 +258,4 @@ do not let deprecated code remain in the codebase. Remove any code that is no lo
 do not let temporary test code remain. Remove any temporary code used for debugging or testing.
 do not use emoji decorations in the documentation. Maintain a clean, professional style.
 do not write new documentation files without prior approval. Ensure all new docs are reviewed for quality and consistency.
+do not use inline imports unless absolutely necessary. Keep imports at the top of the file for clarity.
