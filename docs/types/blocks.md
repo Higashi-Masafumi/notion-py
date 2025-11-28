@@ -12,7 +12,7 @@ from notion_py_client.blocks.base import BaseBlockObject, BlockType
 class BaseBlockObject(BaseModel):
     object: Literal["block"] = "block"
     id: str
-    type: BlockType
+    type: BlockType  # BlockType is a Literal type (e.g., "paragraph", "heading_1", etc.)
     created_time: str
     created_by: PartialUser
     last_edited_time: str
@@ -20,7 +20,10 @@ class BaseBlockObject(BaseModel):
     parent: NotionParent
     has_children: bool = False
     archived: bool = False
+    in_trash: bool = False
 ```
+
+> **Note**: `BlockType` and `ApiColor` are `Literal` types, not enums. Use string literals directly (e.g., `"paragraph"`, `"default"`) rather than attribute access (e.g., `BlockType.PARAGRAPH`, `ApiColor.DEFAULT`).
 
 ## Text Blocks
 
@@ -135,7 +138,41 @@ toggle = ToggleBlock(
 )
 ```
 
+### TemplateBlock
+
+```python
+from notion_py_client import TemplateBlock
+
+template = TemplateBlock(
+    id="block_id",
+    type="template",
+    template={
+        "rich_text": [
+            {"type": "text", "text": {"content": "Template content"}}
+        ],
+        "color": "default"
+    },
+    # ... base fields
+)
+```
+
 ## Special Blocks
+
+### SyncedBlockBlock
+
+```python
+from notion_py_client import SyncedBlockBlock
+
+synced = SyncedBlockBlock(
+    id="block_id",
+    type="synced_block",
+    synced_block={
+        "synced_from": None  # or {"type": "block_id", "block_id": "source_block_id"}
+    },
+    has_children=True,
+    # ... base fields
+)
+```
 
 ### CodeBlock
 
@@ -149,14 +186,14 @@ code = CodeBlock(
         "rich_text": [
             {"type": "text", "text": {"content": "print('hello')"}}
         ],
-        "language": "python",
+        "language": "python",  # CodeLanguage is a Literal type, use string literals
         "caption": []
     },
     # ... base fields
 )
 ```
 
-**Supported languages**: `python`, `javascript`, `typescript`, `java`, `c`, `cpp`, `csharp`, `go`, `rust`, `ruby`, `php`, `sql`, `shell`, `yaml`, `json`, `xml`, `html`, `css`, `markdown`, etc.
+**Supported languages** (use as string literals): `"python"`, `"javascript"`, `"typescript"`, `"java"`, `"c"`, `"c++"`, `"c#"`, `"go"`, `"rust"`, `"ruby"`, `"php"`, `"sql"`, `"shell"`, `"yaml"`, `"json"`, `"xml"`, `"html"`, `"css"`, `"markdown"`, `"bash"`, `"docker"`, `"graphql"`, `"latex"`, `"mermaid"`, `"plain text"`, and many more.
 
 ### CalloutBlock
 
@@ -269,7 +306,8 @@ file = FileBlock(
     file={
         "type": "external",
         "external": {"url": "https://example.com/document.pdf"},
-        "caption": []
+        "caption": [],
+        "name": "document.pdf"
     },
     # ... base fields
 )
@@ -300,7 +338,57 @@ embed = EmbedBlock(
     id="block_id",
     type="embed",
     embed={
-        "url": "https://example.com/embed"
+        "url": "https://example.com/embed",
+        "caption": []
+    },
+    # ... base fields
+)
+```
+
+### PdfBlock
+
+```python
+from notion_py_client import PdfBlock
+
+pdf = PdfBlock(
+    id="block_id",
+    type="pdf",
+    pdf={
+        "type": "external",
+        "external": {"url": "https://example.com/document.pdf"},
+        "caption": []
+    },
+    # ... base fields
+)
+```
+
+### AudioBlock
+
+```python
+from notion_py_client import AudioBlock
+
+audio = AudioBlock(
+    id="block_id",
+    type="audio",
+    audio={
+        "type": "external",
+        "external": {"url": "https://example.com/audio.mp3"},
+        "caption": []
+    },
+    # ... base fields
+)
+```
+
+### LinkPreviewBlock
+
+```python
+from notion_py_client import LinkPreviewBlock
+
+link_preview = LinkPreviewBlock(
+    id="block_id",
+    type="link_preview",
+    link_preview={
+        "url": "https://example.com"
     },
     # ... base fields
 )
@@ -365,8 +453,26 @@ column_list = ColumnListBlock(
 column = ColumnBlock(
     id="block_id",
     type="column",
-    column={},
+    column={
+        "width_ratio": 0.5  # Optional: width ratio (0-1)
+    },
     parent={"type": "block_id", "block_id": "column_list_id"},
+    # ... base fields
+)
+```
+
+### LinkToPageBlock
+
+```python
+from notion_py_client import LinkToPageBlock
+
+link_to_page = LinkToPageBlock(
+    id="block_id",
+    type="link_to_page",
+    link_to_page={
+        "type": "page_id",  # or "database_id", "comment_id"
+        "page_id": "page_abc123"
+    },
     # ... base fields
 )
 ```
@@ -404,34 +510,47 @@ table_row = TableRowBlock(
 
 ## Block Colors
 
-Available colors for text blocks:
+Available colors for text blocks. `ApiColor` is a `Literal` type, so use string literals directly:
 
 ```python
 from notion_py_client.blocks.base import ApiColor
 
-# Text colors
-ApiColor.DEFAULT
-ApiColor.GRAY
-ApiColor.BROWN
-ApiColor.ORANGE
-ApiColor.YELLOW
-ApiColor.GREEN
-ApiColor.BLUE
-ApiColor.PURPLE
-ApiColor.PINK
-ApiColor.RED
+# Text colors (use as string literals)
+"default"
+"gray"
+"brown"
+"orange"
+"yellow"
+"green"
+"blue"
+"purple"
+"pink"
+"red"
 
-# Background colors
-ApiColor.DEFAULT_BACKGROUND
-ApiColor.GRAY_BACKGROUND
-ApiColor.BROWN_BACKGROUND
-ApiColor.ORANGE_BACKGROUND
-ApiColor.YELLOW_BACKGROUND
-ApiColor.GREEN_BACKGROUND
-ApiColor.BLUE_BACKGROUND
-ApiColor.PURPLE_BACKGROUND
-ApiColor.PINK_BACKGROUND
-ApiColor.RED_BACKGROUND
+# Background colors (use as string literals)
+"default_background"
+"gray_background"
+"brown_background"
+"orange_background"
+"yellow_background"
+"green_background"
+"blue_background"
+"purple_background"
+"pink_background"
+"red_background"
+
+# Example usage
+from notion_py_client import ParagraphBlock
+
+block = ParagraphBlock(
+    id="block_id",
+    type="paragraph",
+    paragraph={
+        "rich_text": [{"type": "text", "text": {"content": "Text"}}],
+        "color": "blue"  # Use string literal, not ApiColor.BLUE
+    },
+    # ... base fields
+)
 ```
 
 ## Union Types
