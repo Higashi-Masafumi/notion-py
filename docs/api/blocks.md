@@ -241,6 +241,17 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
     }
 }
 
+# Template
+{
+    "type": "template",
+    "template": {
+        "rich_text": [
+            {"type": "text", "text": {"content": "Template content"}}
+        ],
+        "color": "default"
+    }
+}
+
 # Code
 {
     "type": "code",
@@ -274,7 +285,8 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
     "type": "image",
     "image": {
         "type": "external",
-        "external": {"url": "https://example.com/image.png"}
+        "external": {"url": "https://example.com/image.png"},
+        "caption": []
     }
 }
 
@@ -283,7 +295,8 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
     "type": "video",
     "video": {
         "type": "external",
-        "external": {"url": "https://youtube.com/watch?v=..."}
+        "external": {"url": "https://youtube.com/watch?v=..."},
+        "caption": []
     }
 }
 
@@ -293,7 +306,8 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
     "file": {
         "type": "external",
         "external": {"url": "https://example.com/file.pdf"},
-        "caption": []
+        "caption": [],
+        "name": "document.pdf"
     }
 }
 
@@ -310,7 +324,36 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
 {
     "type": "embed",
     "embed": {
-        "url": "https://example.com/embed"
+        "url": "https://example.com/embed",
+        "caption": []
+    }
+}
+
+# PDF
+{
+    "type": "pdf",
+    "pdf": {
+        "type": "external",
+        "external": {"url": "https://example.com/document.pdf"},
+        "caption": []
+    }
+}
+
+# Audio
+{
+    "type": "audio",
+    "audio": {
+        "type": "external",
+        "external": {"url": "https://example.com/audio.mp3"},
+        "caption": []
+    }
+}
+
+# Link Preview
+{
+    "type": "link_preview",
+    "link_preview": {
+        "url": "https://example.com"
     }
 }
 ```
@@ -347,13 +390,32 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
 # Column (child of column_list)
 {
     "type": "column",
-    "column": {}
+    "column": {
+        "width_ratio": 0.5  # Optional: width ratio (0-1)
+    }
+}
+
+# Link to Page
+{
+    "type": "link_to_page",
+    "link_to_page": {
+        "type": "page_id",  # or "database_id", "comment_id"
+        "page_id": "page_abc123"
+    }
 }
 ```
 
 ### Special Blocks
 
 ```python
+# Synced Block
+{
+    "type": "synced_block",
+    "synced_block": {
+        "synced_from": null  # or {"type": "block_id", "block_id": "source_block_id"}
+    }
+}
+
 # Equation
 {
     "type": "equation",
