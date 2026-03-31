@@ -26,6 +26,7 @@ from .base_properties import (
     UrlProperty,
     VerificationProperty,
 )
+from .relation_property import RelationProperty
 
 
 class Rollup(BaseModel):
@@ -61,6 +62,7 @@ class Rollup(BaseModel):
                 FormulaProperty,
                 LastEditedByProperty,
                 LastEditedTimeProperty,
+                RelationProperty,
                 UniqueIdProperty,
                 VerificationProperty,
             ]
