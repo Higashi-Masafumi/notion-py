@@ -665,6 +665,7 @@ class _BlockChildrenAPI:
         block_id: str,
         children: list[dict[str, Any]],
         after: str | None = None,
+        position: dict[str, Any] | None = None,
         auth: AuthParam | None = None,
     ) -> ListBlockChildrenResponse:
         """Append block children
@@ -672,7 +673,17 @@ class _BlockChildrenAPI:
         Returns:
             AppendBlockChildrenResponse: 追加された子ブロックを含むレスポンス
         """
-        body = {"children": children, **({"after": after} if after else {})}
+        normalized_position = position
+        if normalized_position is None and after is not None:
+            normalized_position = {
+                "type": "after_block",
+                "after_block": {"id": after},
+            }
+
+        body = {
+            "children": children,
+            **({"position": normalized_position} if normalized_position else {}),
+        }
         response = await self._c.request(
             path=f"blocks/{block_id}/children", method="patch", body=body, auth=auth
         )

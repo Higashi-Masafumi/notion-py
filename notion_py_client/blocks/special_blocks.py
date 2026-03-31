@@ -156,6 +156,43 @@ class CalloutContent(BaseModel):
     icon: NotionIcon | None = Field(None, description="アイコン")
 
 
+class MeetingNotesChildren(BaseModel):
+    """会議メモの関連ブロックID"""
+
+    summary_block_id: StrictStr | None = Field(None, description="要約ブロックID")
+    notes_block_id: StrictStr | None = Field(None, description="ノートブロックID")
+    transcript_block_id: StrictStr | None = Field(
+        None, description="トランスクリプトブロックID"
+    )
+
+
+class MeetingNotesCalendarEvent(BaseModel):
+    """会議メモのカレンダー情報"""
+
+    start_time: StrictStr | None = Field(None, description="開始時刻")
+    end_time: StrictStr | None = Field(None, description="終了時刻")
+    attendees: list[StrictStr] | None = Field(None, description="参加者のユーザーID")
+
+
+class MeetingNotesRecording(BaseModel):
+    """会議メモの録音情報"""
+
+    start_time: StrictStr | None = Field(None, description="録音開始時刻")
+    end_time: StrictStr | None = Field(None, description="録音終了時刻")
+
+
+class MeetingNotesContent(BaseModel):
+    """会議メモコンテンツ"""
+
+    title: list[RichTextItem] | None = Field(None, description="会議タイトル")
+    status: StrictStr | None = Field(None, description="会議メモの状態")
+    children: MeetingNotesChildren | None = Field(None, description="子ブロック参照")
+    calendar_event: MeetingNotesCalendarEvent | None = Field(
+        None, description="カレンダー情報"
+    )
+    recording: MeetingNotesRecording | None = Field(None, description="録音情報")
+
+
 # ============================================
 # Special Blocks
 # ============================================
@@ -199,3 +236,20 @@ class CalloutBlock(BaseBlockObject):
     type: Literal["callout"] = Field("callout", description="ブロックタイプ")
     callout: CalloutContent = Field(..., description="コールアウトコンテンツ")
 
+
+class MeetingNotesBlock(BaseBlockObject):
+    """会議メモブロック"""
+
+    type: Literal["meeting_notes"] = Field(
+        "meeting_notes", description="ブロックタイプ"
+    )
+    meeting_notes: MeetingNotesContent = Field(..., description="会議メモコンテンツ")
+
+
+class TranscriptionBlock(BaseBlockObject):
+    """旧transcriptionブロック"""
+
+    type: Literal["transcription"] = Field(
+        "transcription", description="旧ブロックタイプ"
+    )
+    transcription: MeetingNotesContent = Field(..., description="会議メモコンテンツ")

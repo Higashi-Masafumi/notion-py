@@ -149,6 +149,7 @@ class UpdateBlockParameters(TypedDict, total=False):
 
     block_id: str
     archived: NotRequired[bool]
+    in_trash: NotRequired[bool]
 
 
 class DeleteBlockParameters(TypedDict):
@@ -171,6 +172,7 @@ class AppendBlockChildrenParameters(TypedDict, total=False):
     block_id: str
     children: list[dict[str, Any]]
     after: NotRequired[str]
+    position: NotRequired[dict[str, Any]]
 
 
 # ========== User API Types ==========

@@ -144,11 +144,22 @@ class CustomEmojiPageIconRequest(BaseModel):
     custom_emoji: CustomEmojiRef
 
 
+class NativeIconRef(BaseModel):
+    name: StrictStr
+    color: StrictStr | None = None
+
+
+class NativePageIconRequest(BaseModel):
+    type: Literal["icon"] | None = None
+    icon: NativeIconRef
+
+
 PageIconRequest = (
     FileUploadPageIconRequest
     | EmojiPageIconRequest
     | ExternalPageIconRequest
     | CustomEmojiPageIconRequest
+    | NativePageIconRequest
 )
 
 

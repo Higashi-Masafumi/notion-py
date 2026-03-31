@@ -27,6 +27,8 @@ from .blocks import (
     EquationBlock,
     CodeBlock,
     CalloutBlock,
+    MeetingNotesBlock,
+    TranscriptionBlock,
     # Layout blocks
     DividerBlock,
     BreadcrumbBlock,
@@ -218,6 +220,8 @@ __all__ = [
     "EquationBlock",
     "CodeBlock",
     "CalloutBlock",
+    "MeetingNotesBlock",
+    "TranscriptionBlock",
     # Layout blocks
     "DividerBlock",
     "BreadcrumbBlock",

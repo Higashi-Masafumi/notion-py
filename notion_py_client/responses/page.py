@@ -10,7 +10,7 @@ TypeScript定義: PageObjectResponse
 
 from typing import Literal
 
-from pydantic import BaseModel, Field, StrictBool, StrictStr
+from pydantic import BaseModel, Field, StrictBool, StrictStr, model_validator
 
 from ..models.user import PartialUser
 from ..models.icon import NotionIcon
@@ -74,6 +74,19 @@ class NotionPage(BaseModel):
 
     # ページ固有のプロパティ（オプション）
     request_id: StrictStr | None = Field(None, description="リクエストID")
+
+    @model_validator(mode="before")
+    @classmethod
+    def normalize_trash_fields(cls, value: object) -> object:
+        if not isinstance(value, dict):
+            return value
+
+        normalized = dict(value)
+        if "in_trash" in normalized and "archived" not in normalized:
+            normalized["archived"] = normalized["in_trash"]
+        if "archived" in normalized and "in_trash" not in normalized:
+            normalized["in_trash"] = normalized["archived"]
+        return normalized
 
 
 class PartialPage(BaseModel):
