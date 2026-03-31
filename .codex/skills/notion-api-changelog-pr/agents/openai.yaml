@@ -1,0 +1,4 @@
+interface:
+  display_name: "Notion API Changelog PR"
+  short_description: "Check Notion API changes and prepare bounded PRs"
+  default_prompt: "Use $notion-api-changelog-pr to check the latest Notion changelog for notion-py, align the library with the current Notion API spec, run tests, and open a draft PR if safe."

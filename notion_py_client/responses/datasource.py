@@ -60,7 +60,6 @@ class DataSource(BaseModel):
         ..., description="データベースの親オブジェクト"
     )
     is_inline: StrictBool = Field(False, description="インラインフラグ")
-    archived: StrictBool = Field(False, description="アーカイブフラグ")
     in_trash: StrictBool = Field(False, description="ゴミ箱フラグ")
     created_time: StrictStr = Field(..., description="作成日時（ISO 8601形式）")
     last_edited_time: StrictStr = Field(..., description="最終編集日時（ISO 8601形式）")

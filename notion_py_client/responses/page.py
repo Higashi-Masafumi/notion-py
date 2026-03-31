@@ -63,7 +63,6 @@ class NotionPage(BaseModel):
     created_by: PartialUser = Field(..., description="作成者")
     last_edited_by: PartialUser = Field(..., description="最終編集者")
     parent: NotionParent = Field(..., description="親オブジェクト")
-    archived: StrictBool = Field(False, description="アーカイブフラグ")
     in_trash: StrictBool = Field(False, description="ゴミ箱フラグ")
     is_locked: StrictBool = Field(False, description="ロックフラグ")
     properties: dict[str, PropertyType] = Field(..., description="プロパティ一覧")

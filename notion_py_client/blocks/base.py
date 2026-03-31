@@ -45,6 +45,7 @@ BlockType = Literal[
     "file",
     "audio",
     "link_preview",
+    "meeting_notes",
     "unsupported",
 ]
 
@@ -90,7 +91,6 @@ class BaseBlockObject(BaseModel):
     last_edited_by: PartialUser = Field(..., description="最終編集者")
     parent: NotionParent = Field(..., description="親オブジェクト")
     has_children: StrictBool = Field(False, description="子ブロックの有無")
-    archived: StrictBool = Field(False, description="アーカイブフラグ")
     in_trash: StrictBool = Field(False, description="ゴミ箱フラグ")
 
 

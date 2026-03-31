@@ -1,6 +1,7 @@
 """Unit tests for page response models."""
 
 from notion_py_client.properties import RelationProperty, RollupProperty
+from notion_py_client.models.icon import IconType
 from notion_py_client.responses.page import NotionPage
 
 
@@ -17,7 +18,6 @@ class TestNotionPage:
             "created_by": {"object": "user", "id": "user_123"},
             "last_edited_by": {"object": "user", "id": "user_123"},
             "parent": {"type": "database_id", "database_id": "db_123"},
-            "archived": False,
             "in_trash": False,
             "is_locked": False,
             "properties": {
@@ -59,3 +59,35 @@ class TestNotionPage:
             "page-id-2",
         ]
         assert relation_property.get_display_value() == "page-id-1, page-id-2"
+
+    def test_parse_native_icon(self):
+        """Page responses should accept native icons."""
+        data = {
+            "object": "page",
+            "id": "page_icon",
+            "created_time": "2025-01-01T00:00:00.000Z",
+            "last_edited_time": "2025-01-02T00:00:00.000Z",
+            "created_by": {"object": "user", "id": "user_123"},
+            "last_edited_by": {"object": "user", "id": "user_123"},
+            "parent": {"type": "page_id", "page_id": "parent_123"},
+            "in_trash": True,
+            "is_locked": False,
+            "properties": {},
+            "icon": {
+                "type": "icon",
+                "icon": {
+                    "name": "bullseye",
+                    "color": "blue",
+                },
+            },
+            "url": "https://www.notion.so/page_icon",
+        }
+
+        result = NotionPage.model_validate(data)
+
+        assert result.in_trash is True
+        assert result.icon is not None
+        assert result.icon.type == IconType.ICON
+        assert result.icon.icon is not None
+        assert result.icon.icon.name == "bullseye"
+        assert result.icon.icon.color == "blue"

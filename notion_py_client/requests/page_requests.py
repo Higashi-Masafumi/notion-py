@@ -51,5 +51,4 @@ class UpdatePageParameters(BaseModel):
     icon: PageIconRequest | None = None
     cover: PageCoverRequest | None = None
     is_locked: StrictBool | None = None
-    archived: StrictBool | None = None
     in_trash: StrictBool | None = None

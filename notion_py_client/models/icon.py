@@ -17,10 +17,18 @@ from .primitives import CustomEmoji
 class IconType(str, Enum):
     """アイコンタイプ"""
 
+    ICON = "icon"
     EMOJI = "emoji"
     EXTERNAL = "external"
     FILE = "file"
     CUSTOM_EMOJI = "custom_emoji"
+
+
+class NativeIcon(BaseModel):
+    """Notionのネイティブアイコン"""
+
+    name: StrictStr = Field(..., description="アイコン名")
+    color: StrictStr | None = Field(None, description="アイコン色")
 
 
 class NotionIcon(BaseModel):
@@ -49,6 +57,9 @@ class NotionIcon(BaseModel):
     """
 
     type: IconType = Field(..., description="アイコンタイプ")
+    icon: NativeIcon | None = Field(
+        None, description="ネイティブアイコン（typeがiconの場合のみ）"
+    )
     emoji: StrictStr | None = Field(None, description="絵文字アイコン")
     external: ExternalFile | None = Field(None, description="外部ファイル")
     file: InternalFile | None = Field(None, description="内部ファイル")
