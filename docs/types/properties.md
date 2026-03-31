@@ -370,6 +370,24 @@ property: RollupProperty = {
     }
 }
 
+# Array rollup returning relation values via show_original
+property: RollupProperty = {
+    "id": "abc123",
+    "type": "rollup",
+    "rollup": {
+        "type": "array",
+        "array": [
+            {
+                "id": "relation_prop",
+                "type": "relation",
+                "relation": [{"id": "page-id-1"}, {"id": "page-id-2"}],
+                "has_more": False
+            }
+        ],
+        "function": "show_original"
+    }
+}
+
 # Access value (type guard required)
 if property.rollup.type == "number":
     total = property.rollup.number or 0
