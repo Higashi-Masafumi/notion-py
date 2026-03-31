@@ -226,7 +226,7 @@ wheels = [
 
 [[package]]
 name = "notion-py-client"
-version = "0.1.7"
+version = "0.1.18"
 source = { editable = "." }
 dependencies = [
     { name = "httpx" },
