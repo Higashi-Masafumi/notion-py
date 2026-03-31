@@ -320,7 +320,6 @@ class TestNotionMapper:
             created_by=PartialUser(object="user", id="user-123"),
             last_edited_time="2024-01-01T00:00:00.000Z",
             last_edited_by=PartialUser(object="user", id="user-123"),
-            archived=False,
             in_trash=False,
             is_locked=False,
             icon=None,

@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, Field, StrictBool, StrictStr, model_validator
+from pydantic import BaseModel, Field, StrictBool, StrictStr
 
 from ..models.parent import NotionParent
 from ..models.user import PartialUser
@@ -46,7 +46,6 @@ BlockType = Literal[
     "audio",
     "link_preview",
     "meeting_notes",
-    "transcription",
     "unsupported",
 ]
 
@@ -92,21 +91,7 @@ class BaseBlockObject(BaseModel):
     last_edited_by: PartialUser = Field(..., description="最終編集者")
     parent: NotionParent = Field(..., description="親オブジェクト")
     has_children: StrictBool = Field(False, description="子ブロックの有無")
-    archived: StrictBool = Field(False, description="アーカイブフラグ")
     in_trash: StrictBool = Field(False, description="ゴミ箱フラグ")
-
-    @model_validator(mode="before")
-    @classmethod
-    def normalize_trash_fields(cls, value: object) -> object:
-        if not isinstance(value, dict):
-            return value
-
-        normalized = dict(value)
-        if "in_trash" in normalized and "archived" not in normalized:
-            normalized["archived"] = normalized["in_trash"]
-        if "archived" in normalized and "in_trash" not in normalized:
-            normalized["in_trash"] = normalized["archived"]
-        return normalized
 
 
 class PartialBlock(BaseModel):

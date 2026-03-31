@@ -18,7 +18,6 @@ class TestNotionPage:
             "created_by": {"object": "user", "id": "user_123"},
             "last_edited_by": {"object": "user", "id": "user_123"},
             "parent": {"type": "database_id", "database_id": "db_123"},
-            "archived": False,
             "in_trash": False,
             "is_locked": False,
             "properties": {
@@ -61,8 +60,8 @@ class TestNotionPage:
         ]
         assert relation_property.get_display_value() == "page-id-1, page-id-2"
 
-    def test_parse_native_icon_and_in_trash_alias(self):
-        """Page responses should accept native icons and archived aliases."""
+    def test_parse_native_icon(self):
+        """Page responses should accept native icons."""
         data = {
             "object": "page",
             "id": "page_icon",
@@ -87,7 +86,6 @@ class TestNotionPage:
         result = NotionPage.model_validate(data)
 
         assert result.in_trash is True
-        assert result.archived is True
         assert result.icon is not None
         assert result.icon.type == IconType.ICON
         assert result.icon.icon is not None

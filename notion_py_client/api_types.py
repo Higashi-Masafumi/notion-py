@@ -51,7 +51,6 @@ class QueryDatabaseParameters(_QueryDatabaseRequired, total=False):
     start_cursor: str
     page_size: int
     filter_properties: list[str]
-    archived: bool
 
 
 class RetrieveDatabaseParameters(TypedDict):
@@ -148,7 +147,6 @@ class UpdateBlockParameters(TypedDict, total=False):
     """ブロック更新のパラメータ."""
 
     block_id: str
-    archived: NotRequired[bool]
     in_trash: NotRequired[bool]
 
 
@@ -171,7 +169,6 @@ class AppendBlockChildrenParameters(TypedDict, total=False):
 
     block_id: str
     children: list[dict[str, Any]]
-    after: NotRequired[str]
     position: NotRequired[dict[str, Any]]
 
 

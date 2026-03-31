@@ -641,7 +641,7 @@ class _BlocksAPI:
         """Delete a block
 
         Returns:
-            BlockObjectResponse | PartialBlockObjectResponse: 削除されたブロックオブジェクト（archived=True）
+            BlockObjectResponse | PartialBlockObjectResponse: 削除されたブロックオブジェクト（in_trash=True）
         """
         response = await self._c.request(
             path=f"blocks/{block_id}", method="delete", auth=auth
@@ -664,7 +664,6 @@ class _BlockChildrenAPI:
         *,
         block_id: str,
         children: list[dict[str, Any]],
-        after: str | None = None,
         position: dict[str, Any] | None = None,
         auth: AuthParam | None = None,
     ) -> ListBlockChildrenResponse:
@@ -673,16 +672,9 @@ class _BlockChildrenAPI:
         Returns:
             AppendBlockChildrenResponse: 追加された子ブロックを含むレスポンス
         """
-        normalized_position = position
-        if normalized_position is None and after is not None:
-            normalized_position = {
-                "type": "after_block",
-                "after_block": {"id": after},
-            }
-
         body = {
             "children": children,
-            **({"position": normalized_position} if normalized_position else {}),
+            **({"position": position} if position else {}),
         }
         response = await self._c.request(
             path=f"blocks/{block_id}/children", method="patch", body=body, auth=auth
@@ -868,7 +860,6 @@ class _DatabasesAPI:
                 "start_cursor",
                 "page_size",
                 "filter_properties",
-                "archived",
             ],
         )
         response = await self._c.request(
@@ -1118,7 +1109,6 @@ class _DataSourcesAPI:
                 "start_cursor",
                 "page_size",
                 "filter_properties",
-                "archived",
             ],
         )
         response = await self._c.request(

@@ -244,12 +244,3 @@ class MeetingNotesBlock(BaseBlockObject):
         "meeting_notes", description="ブロックタイプ"
     )
     meeting_notes: MeetingNotesContent = Field(..., description="会議メモコンテンツ")
-
-
-class TranscriptionBlock(BaseBlockObject):
-    """旧transcriptionブロック"""
-
-    type: Literal["transcription"] = Field(
-        "transcription", description="旧ブロックタイプ"
-    )
-    transcription: MeetingNotesContent = Field(..., description="会議メモコンテンツ")

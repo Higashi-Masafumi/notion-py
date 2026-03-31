@@ -29,7 +29,6 @@ from .special_blocks import (
     CodeBlock,
     CalloutBlock,
     MeetingNotesBlock,
-    TranscriptionBlock,
 )
 from .layout_blocks import (
     DividerBlock,
@@ -72,7 +71,6 @@ BlockObject = Annotated[
     | CodeBlock
     | CalloutBlock
     | MeetingNotesBlock
-    | TranscriptionBlock
     | DividerBlock
     | BreadcrumbBlock
     | TableOfContentsBlock
@@ -119,7 +117,6 @@ __all__ = [
     "CodeBlock",
     "CalloutBlock",
     "MeetingNotesBlock",
-    "TranscriptionBlock",
     # Layout blocks
     "DividerBlock",
     "BreadcrumbBlock",
