@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Scan notion-py for high-signal Notion API compatibility gaps."""
+"""Scan notion-py for high-signal gaps against the latest Notion API spec."""
 
 from __future__ import annotations
 
@@ -95,7 +95,7 @@ def classify_version_support(repo_root: Path) -> CheckResult:
         summary = "Repo still defaults to or documents 2025-09-03 without any visible 2026-03-11 support."
     elif new_matches:
         classification = "no-op"
-        summary = "Repo already mentions 2026-03-11 support somewhere; verify whether it is opt-in or complete."
+        summary = "Repo already mentions 2026-03-11 support somewhere; verify whether the latest spec is implemented consistently."
     else:
         classification = "auto-fix"
         summary = "No visible 2026-03-11 support markers were found."
@@ -104,7 +104,7 @@ def classify_version_support(repo_root: Path) -> CheckResult:
         title="2026-03-11 version support",
         classification=classification,
         summary=summary,
-        rationale="Breaking API versions should be added as opt-in support before changing defaults.",
+        rationale="The latest breaking API version should become the implementation target for current-spec PRs.",
         old_matches=old_matches,
         new_matches=new_matches,
     )

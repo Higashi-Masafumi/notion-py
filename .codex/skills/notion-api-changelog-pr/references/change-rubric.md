@@ -2,6 +2,8 @@
 
 Use this rubric to decide whether a Notion changelog item should be patched automatically in `notion-py`.
 
+Current policy: treat the latest official Notion API spec as the source of truth for generated PRs. Do not optimize for backward compatibility unless the user explicitly asks for it.
+
 ## Decision buckets
 
 ### `auto-fix`
@@ -10,7 +12,7 @@ Use `auto-fix` when the work is bounded, local, and matches existing repo patter
 
 Typical examples:
 
-- add opt-in support for a new Notion API version string
+- update the repo to the latest official API version and current field names
 - rename or remap existing request and response fields
 - rename block types that already fit the existing model layout
 - add small enum, literal, union, or model fields
@@ -34,7 +36,8 @@ Use `no-op` when the repo already supports the capability well enough or the cha
 
 ## Fixed policy for this skill
 
-- Keep new breaking API versions opt-in unless the user explicitly asks to flip defaults.
+- Implement against the latest official Notion API spec first.
+- Prefer replacing legacy fields and behaviors over adding backward compatibility shims.
 - Do not bump `project.version` automatically.
 - Do not treat docs-only changes as sufficient when code is still missing.
 - Do not create a PR when validation fails or GitHub auth is invalid.
@@ -43,7 +46,7 @@ Use `no-op` when the repo already supports the capability well enough or the cha
 
 The latest breaking upgrade guide verified for this skill is `2026-03-11`.
 
-Its required compatibility actions are:
+Its required current-spec actions are:
 
 - replace `after` with `position`
 - replace `archived` with `in_trash`
