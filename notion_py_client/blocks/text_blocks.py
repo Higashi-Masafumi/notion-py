@@ -11,6 +11,7 @@ from typing import Literal
 from pydantic import BaseModel, Field, StrictBool
 
 from .base import ApiColor, BaseBlockObject
+from ..models.icon import NotionIcon
 from ..models.rich_text_item import RichTextItem
 
 
@@ -19,6 +20,14 @@ class ContentWithRichTextAndColor(BaseModel):
 
     rich_text: list[RichTextItem] = Field(..., description="リッチテキスト配列")
     color: ApiColor = Field(..., description="カラー設定")
+
+
+class ParagraphContent(ContentWithRichTextAndColor):
+    """段落ブロック用コンテンツ."""
+
+    icon: NotionIcon | None = Field(
+        None, description="tab 直下の paragraph で使える任意のアイコン"
+    )
 
 
 class HeaderContentWithRichTextAndColor(BaseModel):
@@ -38,7 +47,7 @@ class ParagraphBlock(BaseBlockObject):
     """段落ブロック"""
 
     type: Literal["paragraph"] = Field("paragraph", description="ブロックタイプ")
-    paragraph: ContentWithRichTextAndColor = Field(..., description="段落コンテンツ")
+    paragraph: ParagraphContent = Field(..., description="段落コンテンツ")
 
 
 class Heading1Block(BaseBlockObject):
@@ -65,6 +74,15 @@ class Heading3Block(BaseBlockObject):
     type: Literal["heading_3"] = Field("heading_3", description="ブロックタイプ")
     heading_3: HeaderContentWithRichTextAndColor = Field(
         ..., description="見出し3コンテンツ"
+    )
+
+
+class Heading4Block(BaseBlockObject):
+    """見出し4ブロック"""
+
+    type: Literal["heading_4"] = Field("heading_4", description="ブロックタイプ")
+    heading_4: HeaderContentWithRichTextAndColor = Field(
+        ..., description="見出し4コンテンツ"
     )
 
 

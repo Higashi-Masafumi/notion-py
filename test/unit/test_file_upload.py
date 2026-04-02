@@ -135,7 +135,7 @@ class TestFileUploadObject:
                 "type": "person",
             },
             "last_edited_time": "2025-01-01T00:00:00.000Z",
-            "archived": False,
+            "in_trash": False,
             "expiry_time": "2025-01-02T00:00:00.000Z",
             "status": "pending",
             "filename": "document.pdf",
@@ -153,7 +153,7 @@ class TestFileUploadObject:
         assert result.content_type == "application/pdf"
         assert result.content_length == 1024
         assert result.upload_url == "https://example.com/upload"
-        assert result.archived is False
+        assert result.in_trash is False
 
     def test_parse_file_upload_uploaded(self):
         """Test parsing a file upload object with uploaded status."""
@@ -166,7 +166,7 @@ class TestFileUploadObject:
                 "type": "bot",
             },
             "last_edited_time": "2025-01-01T00:10:00.000Z",
-            "archived": False,
+            "in_trash": False,
             "expiry_time": None,
             "status": "uploaded",
             "filename": "image.png",
@@ -192,7 +192,7 @@ class TestFileUploadObject:
                 "type": "person",
             },
             "last_edited_time": "2025-01-01T00:15:00.000Z",
-            "archived": False,
+            "in_trash": False,
             "expiry_time": None,
             "status": "uploaded",
             "file_import_result": {
@@ -219,7 +219,7 @@ class TestFileUploadObject:
                 "type": "person",
             },
             "last_edited_time": "2025-01-01T00:05:00.000Z",
-            "archived": False,
+            "in_trash": False,
             "expiry_time": None,
             "status": "failed",
         }
@@ -240,7 +240,7 @@ class TestFileUploadObject:
                 "type": "person",
             },
             "last_edited_time": "2025-01-01T00:00:00.000Z",
-            "archived": False,
+            "in_trash": False,
             "expiry_time": "2025-01-02T00:00:00.000Z",
             "status": "pending",
             "number_of_parts": {"total": 10, "sent": 5},
@@ -267,7 +267,7 @@ class TestListFileUploadsResponse:
                     "created_time": "2025-01-01T00:00:00.000Z",
                     "created_by": {"id": "user_123", "type": "person"},
                     "last_edited_time": "2025-01-01T00:00:00.000Z",
-                    "archived": False,
+                    "in_trash": False,
                     "expiry_time": None,
                     "status": "uploaded",
                     "filename": "file1.pdf",
@@ -280,7 +280,7 @@ class TestListFileUploadsResponse:
                     "created_time": "2025-01-01T00:05:00.000Z",
                     "created_by": {"id": "user_456", "type": "person"},
                     "last_edited_time": "2025-01-01T00:05:00.000Z",
-                    "archived": False,
+                    "in_trash": False,
                     "expiry_time": "2025-01-02T00:00:00.000Z",
                     "status": "pending",
                 },

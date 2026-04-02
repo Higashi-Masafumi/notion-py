@@ -1,6 +1,6 @@
 # Databases API
 
-Databases are containers that hold multiple data sources in Notion API 2025-09-03.
+Databases are containers that hold multiple data sources in the current Notion API.
 
 ## Overview
 
@@ -243,7 +243,7 @@ database: NotionDatabase = {
     "last_edited_time": "2025-01-02T00:00:00.000Z",
     "last_edited_by": {...},
     "parent": {...},
-    "archived": false,
+    "in_trash": false,
     "is_inline": false,
     "public_url": "https://...",
     "data_sources": [
