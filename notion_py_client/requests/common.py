@@ -56,6 +56,12 @@ class RelationItemRequest(BaseModel):
     id: IdRequest
 
 
+class BlockIdReferenceRequest(BaseModel):
+    """ブロックID参照."""
+
+    id: IdRequest
+
+
 # Select/MultiSelect/Status用の選択肢リクエスト
 class SelectPropertyItemRequest(BaseModel):
     """Select/MultiSelect/Status用の選択肢.
@@ -174,3 +180,48 @@ class ExternalPageCoverRequest(BaseModel):
 
 
 PageCoverRequest = FileUploadPageCoverRequest | ExternalPageCoverRequest
+
+
+# ===== Page template / position helpers =====
+
+
+class DefaultPageTemplateRequest(BaseModel):
+    """データソースのデフォルトテンプレートを適用."""
+
+    type: Literal["default"] = "default"
+    timezone: TimeZoneRequest | None = None
+
+
+class TemplateIdPageTemplateRequest(BaseModel):
+    """特定のテンプレートページを適用."""
+
+    type: Literal["template_id"] = "template_id"
+    template_id: IdRequest
+    timezone: TimeZoneRequest | None = None
+
+
+PageTemplateRequest = DefaultPageTemplateRequest | TemplateIdPageTemplateRequest
+
+
+class PageStartPositionRequest(BaseModel):
+    """親ページの先頭に新規ページを挿入."""
+
+    type: Literal["page_start"] = "page_start"
+
+
+class PageEndPositionRequest(BaseModel):
+    """親ページの末尾に新規ページを挿入."""
+
+    type: Literal["page_end"] = "page_end"
+
+
+class AfterBlockPositionRequest(BaseModel):
+    """特定ブロックの直後に新規ページを挿入."""
+
+    type: Literal["after_block"] = "after_block"
+    after_block: BlockIdReferenceRequest
+
+
+PagePositionRequest = (
+    PageStartPositionRequest | PageEndPositionRequest | AfterBlockPositionRequest
+)

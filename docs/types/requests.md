@@ -86,13 +86,13 @@ params = UpdatePageParameters(
         "emoji": "✅"
     },
     cover=None,  # Remove cover
-    archived=False
+    in_trash=False
 )
 
-# Archive page
+# Move page to trash
 params = UpdatePageParameters(
     page_id="page_abc123",
-    archived=True
+    in_trash=True
 )
 ```
 

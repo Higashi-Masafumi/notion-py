@@ -14,6 +14,7 @@ from .text_blocks import (
     Heading1Block,
     Heading2Block,
     Heading3Block,
+    Heading4Block,
     BulletedListItemBlock,
     NumberedListItemBlock,
     QuoteBlock,
@@ -36,6 +37,7 @@ from .layout_blocks import (
     TableOfContentsBlock,
     ColumnListBlock,
     ColumnBlock,
+    TabBlock,
     LinkToPageBlock,
     TableBlock,
     TableRowBlock,
@@ -58,6 +60,7 @@ BlockObject = Annotated[
     | Heading1Block
     | Heading2Block
     | Heading3Block
+    | Heading4Block
     | BulletedListItemBlock
     | NumberedListItemBlock
     | QuoteBlock
@@ -76,6 +79,7 @@ BlockObject = Annotated[
     | TableOfContentsBlock
     | ColumnListBlock
     | ColumnBlock
+    | TabBlock
     | LinkToPageBlock
     | TableBlock
     | TableRowBlock
@@ -103,6 +107,7 @@ __all__ = [
     "Heading1Block",
     "Heading2Block",
     "Heading3Block",
+    "Heading4Block",
     "BulletedListItemBlock",
     "NumberedListItemBlock",
     "QuoteBlock",
@@ -123,6 +128,7 @@ __all__ = [
     "TableOfContentsBlock",
     "ColumnListBlock",
     "ColumnBlock",
+    "TabBlock",
     "LinkToPageBlock",
     "TableBlock",
     "TableRowBlock",

@@ -31,11 +31,16 @@ from .api_types import (
     UpdateDatabaseParameters,
 )
 from .filters import FilterCondition
-from .requests.page_requests import CreatePageParameters, UpdatePageParameters
+from .requests.page_requests import (
+    CreatePageParameters,
+    PageMarkdownCommand,
+    UpdatePageParameters,
+)
 from .responses.database import NotionDatabase
 from .responses.datasource import DataSource
 from .responses.page import NotionPage
 from .responses.file_upload import FileUploadObject
+from .responses.page_markdown import PageMarkdownResponse
 from .responses.property_item import PropertyItemListResponse, PropertyItemObject
 from .responses.list_response import (
     QueryDatabaseResponse,
@@ -45,10 +50,12 @@ from .responses.list_response import (
     ListBlockChildrenResponse,
     ListCommentsResponse,
     ListFileUploadsResponse,
+    ListCustomEmojisResponse,
     CommentObject,
 )
 from .blocks.base import BaseBlockObject, PartialBlock
 from .blocks import BlockObject
+from .models.primitives import CustomEmoji
 from .models.user import PartialUser, User
 
 
@@ -234,7 +241,7 @@ def _normalize_query(
 Method = Literal["get", "post", "patch", "delete"]
 
 # QueryParams type (公式SDKと同じ)
-QueryParams = dict[str, str | int | list[str]]
+QueryParams = dict[str, str | int | bool | list[str]]
 
 
 class FileParam(TypedDict, total=False):
@@ -259,7 +266,7 @@ class ClientOptions(TypedDict, total=False):
             options={
                 "timeout_ms": 30000,
                 "log_level": LogLevel.DEBUG,
-                "notion_version": "2025-09-03"
+                "notion_version": "2026-03-11"
             }
         )
         ```
@@ -286,14 +293,19 @@ class NotionAsyncClient:
     """
     公式JSクライアントの構成を踏襲した async Python クライアント。
 
-    Notion API 2025-09-03に対応:
+    Notion API 2026-03-11 を既定値として使用:
+    - `position` による block/page の配置指定
+    - `in_trash` への統一
+    - `meeting_notes` ブロック名
     - databases: データベース（複数のデータソースを持つコンテナ）の管理
     - dataSources: データソース（実際のデータとスキーマを持つ）の管理・クエリ
     - pages: ページの作成・取得・更新
+    - pages markdown: Markdown でのページ読み書き
     - blocks: ブロックの操作
     - users: ユーザー情報の取得
     - comments: コメントの管理
     - fileUploads: ファイルアップロード
+    - customEmojis: ワークスペース絵文字一覧
     - search: 検索
 
     重要な概念変更:
@@ -307,7 +319,7 @@ class NotionAsyncClient:
     3. dataSources.retrieve()でスキーマを取得（旧databases.retrieve()のproperties部分）
     """
 
-    default_notion_version = "2025-09-03"
+    default_notion_version = "2026-03-11"
 
     def __init__(self, auth: str, options: ClientOptions | None = None):
         """
@@ -346,6 +358,7 @@ class NotionAsyncClient:
 
         # ------- public API groups（JSに合わせた名前/階層）-------
         self.blocks = _BlocksAPI(self)
+        self.customEmojis = _CustomEmojisAPI(self)
         self.databases = _DatabasesAPI(self)
         self.dataSources = _DataSourcesAPI(self)
         self.pages = _PagesAPI(self)
@@ -1274,6 +1287,45 @@ class _PagesAPI:
         )
         return NotionPage(**response)
 
+    async def retrieve_markdown(
+        self,
+        *,
+        page_id: str,
+        include_transcript: bool | None = None,
+        auth: AuthParam | None = None,
+    ) -> PageMarkdownResponse:
+        """Retrieve a page as Notion-flavored Markdown."""
+
+        query = pick(
+            {"include_transcript": include_transcript},
+            ["include_transcript"],
+        )
+        response = await self._c.request(
+            path=f"pages/{page_id}/markdown",
+            method="get",
+            query=query,
+            auth=auth,
+        )
+        return PageMarkdownResponse.model_validate(response)
+
+    async def update_markdown(
+        self,
+        *,
+        page_id: str,
+        command: PageMarkdownCommand,
+        auth: AuthParam | None = None,
+    ) -> PageMarkdownResponse:
+        """Update page content through the markdown API."""
+
+        body = command.model_dump(exclude_none=True, by_alias=True)
+        response = await self._c.request(
+            path=f"pages/{page_id}/markdown",
+            method="patch",
+            body=body,
+            auth=auth,
+        )
+        return PageMarkdownResponse.model_validate(response)
+
 
 class _PagePropertiesAPI:
     def __init__(self, client: NotionAsyncClient):
@@ -1366,6 +1418,40 @@ class _UsersAPI:
             UserObjectResponse: ボットユーザーの詳細
         """
         return await self._c.request(path="users/me", method="get", auth=auth)
+
+
+class _CustomEmojisAPI:
+    def __init__(self, client: NotionAsyncClient):
+        self._c = client
+
+    async def list(
+        self,
+        *,
+        start_cursor: str | None = None,
+        page_size: int | None = None,
+        name: str | None = None,
+        auth: AuthParam | None = None,
+    ) -> ListCustomEmojisResponse:
+        """List workspace custom emojis."""
+
+        query = pick(
+            {
+                "start_cursor": start_cursor,
+                "page_size": page_size,
+                "name": name,
+            },
+            ["start_cursor", "page_size", "name"],
+        )
+        response = await self._c.request(
+            path="custom_emojis", method="get", query=query, auth=auth
+        )
+        return ListCustomEmojisResponse(
+            object="list",
+            results=[CustomEmoji(**item) for item in response.get("results", [])],
+            next_cursor=response.get("next_cursor"),
+            has_more=response.get("has_more", False),
+            type="custom_emoji",
+        )
 
 
 class _CommentsAPI:

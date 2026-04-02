@@ -6,11 +6,18 @@
 
 from .common import (
     AnnotationRequest,
+    AfterBlockPositionRequest,
+    BlockIdReferenceRequest,
     DateRequest,
+    DefaultPageTemplateRequest,
     GroupObjectRequest,
     IdRequest,
     PageIconRequest,
     PageCoverRequest,
+    PageEndPositionRequest,
+    PagePositionRequest,
+    PageStartPositionRequest,
+    PageTemplateRequest,
     InternalFileRequest,
     ExternalFileRequest,
     InternalOrExternalFileWithNameRequest,
@@ -19,8 +26,22 @@ from .common import (
     PartialUserObjectRequest,
     RelationItemRequest,
     SelectPropertyItemRequest,
+    TemplateIdPageTemplateRequest,
 )
-from .page_requests import CreatePageParameters, UpdatePageParameters
+from .page_requests import (
+    CreatePageParameters,
+    InsertContentMarkdownCommand,
+    InsertContentMarkdownRequest,
+    MarkdownContentUpdateRequest,
+    PageMarkdownCommand,
+    ReplaceContentMarkdownCommand,
+    ReplaceContentMarkdownRequest,
+    ReplaceContentRangeMarkdownCommand,
+    ReplaceContentRangeMarkdownRequest,
+    UpdateContentMarkdownCommand,
+    UpdateContentMarkdownRequest,
+    UpdatePageParameters,
+)
 from .property_requests import (
     CheckboxPropertyRequest,
     DatePropertyRequest,
@@ -37,12 +58,25 @@ from .property_requests import (
     StatusPropertyRequest,
     TitlePropertyRequest,
     UrlPropertyRequest,
+    VerificationPropertyRequest,
+    VerificationStateDateRequest,
+    VerificationValueRequest,
 )
 
 __all__ = [
     # Page requests
     "CreatePageParameters",
     "UpdatePageParameters",
+    "PageMarkdownCommand",
+    "MarkdownContentUpdateRequest",
+    "UpdateContentMarkdownRequest",
+    "UpdateContentMarkdownCommand",
+    "ReplaceContentMarkdownRequest",
+    "ReplaceContentMarkdownCommand",
+    "InsertContentMarkdownRequest",
+    "InsertContentMarkdownCommand",
+    "ReplaceContentRangeMarkdownRequest",
+    "ReplaceContentRangeMarkdownCommand",
     # Property requests
     "PropertyRequest",
     "TitlePropertyRequest",
@@ -59,6 +93,9 @@ __all__ = [
     "RelationPropertyRequest",
     "FilesPropertyRequest",
     "StatusPropertyRequest",
+    "VerificationPropertyRequest",
+    "VerificationValueRequest",
+    "VerificationStateDateRequest",
     # Common types
     "IdRequest",
     "DateRequest",
@@ -67,6 +104,7 @@ __all__ = [
     "GroupObjectRequest",
     "RelationItemRequest",
     "SelectPropertyItemRequest",
+    "BlockIdReferenceRequest",
     # Files and icon/cover request helpers
     "InternalFileRequest",
     "ExternalFileRequest",
@@ -75,4 +113,11 @@ __all__ = [
     "FileUploadWithOptionalNameRequest",
     "PageIconRequest",
     "PageCoverRequest",
+    "PageTemplateRequest",
+    "DefaultPageTemplateRequest",
+    "TemplateIdPageTemplateRequest",
+    "PagePositionRequest",
+    "PageStartPositionRequest",
+    "PageEndPositionRequest",
+    "AfterBlockPositionRequest",
 ]

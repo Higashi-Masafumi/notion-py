@@ -133,6 +133,17 @@ class ColumnBlock(BaseBlockObject):
         return ""
 
 
+class TabBlock(BaseBlockObject):
+    """タブコンテナブロック"""
+
+    type: Literal["tab"] = Field("tab", description="ブロックタイプ")
+    tab: EmptyObject = Field(default_factory=EmptyObject, description="空のコンテンツ")
+
+    def to_markdown(self) -> str:
+        """タブブロックをMarkdown形式に変換"""
+        return ""
+
+
 class LinkToPageBlock(BaseBlockObject):
     """ページへのリンクブロック"""
 

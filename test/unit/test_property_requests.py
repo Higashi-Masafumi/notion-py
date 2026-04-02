@@ -16,6 +16,7 @@ from notion_py_client.requests.property_requests import (
     PeoplePropertyRequest,
     FilesPropertyRequest,
     RelationPropertyRequest,
+    VerificationPropertyRequest,
 )
 from notion_py_client.requests.common import (
     SelectPropertyItemRequest,
@@ -353,6 +354,36 @@ class TestRelationPropertyRequest:
         assert len(result["relation"]) == 2
 
 
+class TestVerificationPropertyRequest:
+    """Test VerificationPropertyRequest."""
+
+    def test_create_verified_request(self):
+        """Test creating a verified verification request."""
+        request = VerificationPropertyRequest(
+            verification={
+                "state": "verified",
+                "date": {
+                    "start": "2026-03-25T00:00:00.000Z",
+                    "end": "2026-06-23T00:00:00.000Z",
+                },
+            }
+        )
+
+        result = request.model_dump(by_alias=True, exclude_none=True)
+
+        assert result["verification"]["state"] == "verified"
+        assert result["verification"]["date"]["start"] == "2026-03-25T00:00:00.000Z"
+
+    def test_create_unverified_request(self):
+        """Test clearing verification state."""
+        request = VerificationPropertyRequest(verification={"state": "unverified"})
+
+        result = request.model_dump(by_alias=True, exclude_none=True)
+
+        assert result["verification"]["state"] == "unverified"
+        assert "date" not in result["verification"]
+
+
 class TestPropertyRequestSerialization:
     """Test property request serialization for API compatibility."""
 
@@ -364,6 +395,7 @@ class TestPropertyRequestSerialization:
             NumberPropertyRequest(number=100),
             DatePropertyRequest(date=DateRequest(start="2025-01-01")),
             CheckboxPropertyRequest(checkbox=True),
+            VerificationPropertyRequest(verification={"state": "unverified"}),
         ]
 
         for req in requests:
