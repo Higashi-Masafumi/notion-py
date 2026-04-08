@@ -41,7 +41,7 @@ class FileUploadObject(BaseModel):
     created_time: StrictStr
     created_by: FileUploadCreatedBy
     last_edited_time: StrictStr
-    archived: StrictBool
+    in_trash: StrictBool
     expiry_time: StrictStr | None
     status: Literal["pending", "uploaded", "expired", "failed"]
     filename: StrictStr | None = None

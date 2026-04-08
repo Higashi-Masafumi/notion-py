@@ -16,6 +16,7 @@ from notion_py_client.requests.property_requests import (
     PeoplePropertyRequest,
     FilesPropertyRequest,
     RelationPropertyRequest,
+    VerificationPropertyRequest,
 )
 from notion_py_client.requests.common import (
     SelectPropertyItemRequest,
@@ -252,6 +253,34 @@ class TestUrlPropertyRequest:
         result = request.model_dump(by_alias=True, exclude_none=True)
 
         assert "url" not in result or result.get("url") is None
+
+
+class TestVerificationPropertyRequest:
+    """Test VerificationPropertyRequest."""
+
+    def test_create_verified_request(self):
+        request = VerificationPropertyRequest(
+            verification={
+                "state": "verified",
+                "date": {"start": "2026-03-25"},
+            }
+        )
+
+        result = request.model_dump(by_alias=True, exclude_none=True)
+
+        assert result["verification"]["state"] == "verified"
+        assert result["verification"]["date"]["start"] == "2026-03-25"
+
+    def test_create_unverified_request(self):
+        request = VerificationPropertyRequest(
+            verification={
+                "state": "unverified",
+            }
+        )
+
+        result = request.model_dump(by_alias=True, exclude_none=True)
+
+        assert result["verification"]["state"] == "unverified"
 
 
 class TestEmailPropertyRequest:

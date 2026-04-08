@@ -18,7 +18,7 @@ from ..schema.property_configs import DatabasePropertyConfigResponse
 
 
 class DataSourceReference(TypedDict):
-    """データソース参照情報 (2025-09-03で追加)"""
+    """データソース参照情報."""
 
     id: str
     name: str
@@ -78,7 +78,7 @@ class NotionDatabase(BaseModel):
     created_time: StrictStr = Field(..., description="作成日時（ISO 8601形式）")
     last_edited_time: StrictStr = Field(..., description="最終編集日時（ISO 8601形式）")
     data_sources: list[DataSourceReference] = Field(
-        default_factory=list, description="データソース一覧（2025-09-03以降）"
+        default_factory=list, description="データソース一覧"
     )
     icon: NotionIcon | None = Field(None, description="アイコン")
     cover: NotionCover | None = Field(None, description="カバー画像")
@@ -86,9 +86,8 @@ class NotionDatabase(BaseModel):
     public_url: StrictStr | None = Field(None, description="パブリックURL")
     properties: dict[str, DatabasePropertyConfigResponse] | None = Field(
         None,
-        description="プロパティ設定の辞書 (2025-09-03以降はdataSources.retrieve()で取得)",
+        description="プロパティ設定の辞書（詳細取得はdataSources.retrieve()を使用）",
     )
-    # archived フィールドは TypeScript 定義にない（削除）
 
 
 class PartialDatabase(BaseModel):

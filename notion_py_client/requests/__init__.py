@@ -20,7 +20,17 @@ from .common import (
     RelationItemRequest,
     SelectPropertyItemRequest,
 )
-from .page_requests import CreatePageParameters, UpdatePageParameters
+from .page_requests import (
+    CreatePageParameters,
+    InsertContentMarkdownRequest,
+    MarkdownContentUpdateOperation,
+    PageTemplateRequest,
+    ReplaceContentMarkdownRequest,
+    ReplaceContentRangeMarkdownRequest,
+    UpdateContentMarkdownRequest,
+    UpdatePageMarkdownParameters,
+    UpdatePageParameters,
+)
 from .property_requests import (
     CheckboxPropertyRequest,
     DatePropertyRequest,
@@ -37,12 +47,21 @@ from .property_requests import (
     StatusPropertyRequest,
     TitlePropertyRequest,
     UrlPropertyRequest,
+    VerificationPropertyRequest,
+    VerificationValueRequest,
 )
 
 __all__ = [
     # Page requests
     "CreatePageParameters",
     "UpdatePageParameters",
+    "PageTemplateRequest",
+    "UpdatePageMarkdownParameters",
+    "InsertContentMarkdownRequest",
+    "ReplaceContentRangeMarkdownRequest",
+    "MarkdownContentUpdateOperation",
+    "UpdateContentMarkdownRequest",
+    "ReplaceContentMarkdownRequest",
     # Property requests
     "PropertyRequest",
     "TitlePropertyRequest",
@@ -59,6 +78,8 @@ __all__ = [
     "RelationPropertyRequest",
     "FilesPropertyRequest",
     "StatusPropertyRequest",
+    "VerificationPropertyRequest",
+    "VerificationValueRequest",
     # Common types
     "IdRequest",
     "DateRequest",

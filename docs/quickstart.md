@@ -25,7 +25,7 @@ client = NotionAsyncClient(
     auth="secret_xxx",
     options={
         "timeout_ms": 30000,
-        "notion_version": "2025-09-03"
+        "notion_version": "2026-03-11"
     }
 )
 ```
@@ -34,7 +34,7 @@ client = NotionAsyncClient(
 
 ### Query a Data Source
 
-In Notion API 2025-09-03, databases are containers for data sources. To query data:
+In Notion API 2026-03-11, databases are containers for data sources. To query data:
 
 ```python
 async with NotionAsyncClient(auth="secret_xxx") as client:
@@ -115,15 +115,15 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
             print(f"{name}: {config.type}")
 ```
 
-## Understanding 2025-09-03 API Changes
+## Understanding 2026-03-11 API Changes
 
-The key concept change in API 2025-09-03:
+The key concept changes in API 2026-03-11:
 
-**Old API (before 2025-09-03)**:
+**Old API (before 2026-03-11)**:
 
 - Database = data + schema
 
-**New API (2025-09-03+)**:
+**Current API (2026-03-11+)**:
 
 - Database = container with multiple data sources
 - Data Source = data + schema (equivalent to old database)

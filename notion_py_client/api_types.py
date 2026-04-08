@@ -192,6 +192,7 @@ class CreateCommentParameters(TypedDict, total=False):
 
     parent: dict[str, str]
     rich_text: list[dict[str, Any]]
+    markdown: NotRequired[str]
     discussion_id: NotRequired[str]
 
 
@@ -199,5 +200,13 @@ class ListCommentsParameters(TypedDict, total=False):
     """コメントリスト取得のパラメータ."""
 
     block_id: NotRequired[str]
+    start_cursor: NotRequired[str]
+    page_size: NotRequired[int]
+
+
+class ListCustomEmojisParameters(TypedDict, total=False):
+    """カスタム絵文字一覧取得のパラメータ."""
+
+    name: NotRequired[str]
     start_cursor: NotRequired[str]
     page_size: NotRequired[int]

@@ -12,7 +12,7 @@ A type-safe Python client library for the Notion API, built with Pydantic v2.
 
 - **Type-Safe**: Complete type definitions using Pydantic v2
 - **Async-First**: Built on httpx for async/await support
-- **API 2025-09-03**: Latest Notion API with DataSources support
+- **API 2026-03-11**: Latest Notion API with current block and trash semantics
 - **Comprehensive**: All blocks, properties, filters, and request types
 - **Domain Mapping**: Built-in mapper for converting to domain models
 
@@ -31,7 +31,7 @@ from notion_py_client import NotionAsyncClient
 async def main():
     client = NotionAsyncClient(auth="your_NOTION_API_TOKEN")
 
-    # Query a database (API 2025-09-03)
+    # Query a database (API 2026-03-11)
     response = await client.dataSources.query(
         data_source_id="your_database_id"
     )
@@ -42,9 +42,9 @@ async def main():
 asyncio.run(main())
 ```
 
-## Notion API 2025-09-03
+## Notion API 2026-03-11
 
-This library supports the latest Notion API version `2025-09-03`, which introduces:
+This library supports the latest Notion API version `2026-03-11`, which includes:
 
 - **DataSources**: New paradigm replacing the legacy databases endpoint
 - **Backward Compatibility**: Legacy `databases` endpoint still supported

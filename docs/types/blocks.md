@@ -1,6 +1,6 @@
 # Block Types
 
-Complete reference for all 33 block types supported by notion-py-client.
+Complete reference for all 35 block types supported by notion-py-client.
 
 ## Base Block
 
@@ -19,7 +19,6 @@ class BaseBlockObject(BaseModel):
     last_edited_by: PartialUser
     parent: NotionParent
     has_children: bool = False
-    archived: bool = False
     in_trash: bool = False
 ```
 

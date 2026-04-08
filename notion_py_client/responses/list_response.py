@@ -17,6 +17,7 @@ from .file_upload import FileUploadObject
 from ..models.user import PartialUser
 from ..models.parent import NotionParent
 from ..models.rich_text_item import RichTextItem
+from ..models.primitives.custom_emoji import CustomEmoji
 from ..blocks.base import PartialBlock
 from ..blocks import BlockObject
 
@@ -125,3 +126,7 @@ class ListFileUploadsResponse(ListResponse[FileUploadObject]):
 
     備考: `type` は親クラスに準拠（省略される場合あり）。
     """
+
+
+class ListCustomEmojisResponse(ListResponse[CustomEmoji]):
+    """custom_emojis.list() のレスポンス型."""

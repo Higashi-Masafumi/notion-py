@@ -14,6 +14,7 @@ from .text_blocks import (
     Heading1Block,
     Heading2Block,
     Heading3Block,
+    Heading4Block,
     BulletedListItemBlock,
     NumberedListItemBlock,
     QuoteBlock,
@@ -39,6 +40,7 @@ from .layout_blocks import (
     LinkToPageBlock,
     TableBlock,
     TableRowBlock,
+    TabBlock,
 )
 from .media_blocks import (
     EmbedBlock,
@@ -58,6 +60,7 @@ BlockObject = Annotated[
     | Heading1Block
     | Heading2Block
     | Heading3Block
+    | Heading4Block
     | BulletedListItemBlock
     | NumberedListItemBlock
     | QuoteBlock
@@ -79,6 +82,7 @@ BlockObject = Annotated[
     | LinkToPageBlock
     | TableBlock
     | TableRowBlock
+    | TabBlock
     | EmbedBlock
     | BookmarkBlock
     | ImageBlock
@@ -103,6 +107,7 @@ __all__ = [
     "Heading1Block",
     "Heading2Block",
     "Heading3Block",
+    "Heading4Block",
     "BulletedListItemBlock",
     "NumberedListItemBlock",
     "QuoteBlock",
@@ -126,6 +131,7 @@ __all__ = [
     "LinkToPageBlock",
     "TableBlock",
     "TableRowBlock",
+    "TabBlock",
     # Media blocks
     "EmbedBlock",
     "BookmarkBlock",

@@ -1,6 +1,6 @@
 # Databases API
 
-Databases are containers that hold multiple data sources in Notion API 2025-09-03.
+Databases are containers that hold multiple data sources in Notion API 2026-03-11.
 
 ## Overview
 
@@ -14,7 +14,7 @@ For querying data or managing schema, use the [Data Sources API](datasources.md)
 
 ### Legacy Note: databases.query
 
-As of Notion-Version 2025-09-03, `databases.query` is considered legacy and is not
+As of Notion-Version 2026-03-11, `databases.query` is considered legacy and is not
 available when the client uses the latest version header. Attempting to call it
 will emit a warning and raise an error. Please use `dataSources.query` instead.
 
@@ -243,7 +243,7 @@ database: NotionDatabase = {
     "last_edited_time": "2025-01-02T00:00:00.000Z",
     "last_edited_by": {...},
     "parent": {...},
-    "archived": false,
+    "in_trash": false,
     "is_inline": false,
     "public_url": "https://...",
     "data_sources": [

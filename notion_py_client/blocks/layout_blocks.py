@@ -1,7 +1,8 @@
 """
 レイアウト系ブロックの定義
 
-Divider, Breadcrumb, TableOfContents, ColumnList, Column, LinkToPage, Table, TableRow
+Divider, Breadcrumb, TableOfContents, ColumnList, Column, LinkToPage, Table,
+TableRow, Tab
 """
 
 from __future__ import annotations
@@ -171,3 +172,14 @@ class TableRowBlock(BaseBlockObject):
         """テーブル行ブロックをMarkdown形式に変換"""
         cells = [rich_text_to_markdown(cell) for cell in self.table_row.cells]
         return "| " + " | ".join(cells) + " |"
+
+
+class TabBlock(BaseBlockObject):
+    """タブブロック"""
+
+    type: Literal["tab"] = Field("tab", description="ブロックタイプ")
+    tab: EmptyObject = Field(default_factory=EmptyObject, description="空のコンテンツ")
+
+    def to_markdown(self) -> str:
+        """タブブロックをMarkdown形式に変換"""
+        return ""

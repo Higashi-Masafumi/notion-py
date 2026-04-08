@@ -4,6 +4,7 @@ from .parent import NotionParent
 from .date_info import DateInfo
 from .file import ExternalFile, FileObject, FileWithName, InternalFile
 from .formula import FormulaResult
+from .primitives.custom_emoji import CustomEmoji
 from .rich_text_item import RichTextItem, rich_text_to_markdown
 from .select_option import SelectOption
 from .status_option import StatusOption
@@ -20,6 +21,7 @@ __all__ = [
     "CoverType",
     # Other models
     "FormulaResult",
+    "CustomEmoji",
     "RichTextItem",
     "rich_text_to_markdown",
     "StatusOption",

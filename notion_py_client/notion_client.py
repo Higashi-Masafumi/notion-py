@@ -32,10 +32,12 @@ from .api_types import (
 )
 from .filters import FilterCondition
 from .requests.page_requests import CreatePageParameters, UpdatePageParameters
+from .requests.page_requests import UpdatePageMarkdownParameters
 from .responses.database import NotionDatabase
 from .responses.datasource import DataSource
 from .responses.page import NotionPage
 from .responses.file_upload import FileUploadObject
+from .responses.page_markdown import PageMarkdownResponse
 from .responses.property_item import PropertyItemListResponse, PropertyItemObject
 from .responses.list_response import (
     QueryDatabaseResponse,
@@ -46,9 +48,11 @@ from .responses.list_response import (
     ListCommentsResponse,
     ListFileUploadsResponse,
     CommentObject,
+    ListCustomEmojisResponse,
 )
 from .blocks.base import BaseBlockObject, PartialBlock
 from .blocks import BlockObject
+from .models.primitives.custom_emoji import CustomEmoji
 from .models.user import PartialUser, User
 
 
@@ -259,7 +263,7 @@ class ClientOptions(TypedDict, total=False):
             options={
                 "timeout_ms": 30000,
                 "log_level": LogLevel.DEBUG,
-                "notion_version": "2025-09-03"
+                "notion_version": "2026-03-11"
             }
         )
         ```
@@ -286,7 +290,7 @@ class NotionAsyncClient:
     """
     公式JSクライアントの構成を踏襲した async Python クライアント。
 
-    Notion API 2025-09-03に対応:
+    Notion API 2026-03-11 を既定で利用:
     - databases: データベース（複数のデータソースを持つコンテナ）の管理
     - dataSources: データソース（実際のデータとスキーマを持つ）の管理・クエリ
     - pages: ページの作成・取得・更新
@@ -294,6 +298,7 @@ class NotionAsyncClient:
     - users: ユーザー情報の取得
     - comments: コメントの管理
     - fileUploads: ファイルアップロード
+    - customEmojis: ワークスペースのカスタム絵文字一覧
     - search: 検索
 
     重要な概念変更:
@@ -307,7 +312,7 @@ class NotionAsyncClient:
     3. dataSources.retrieve()でスキーマを取得（旧databases.retrieve()のproperties部分）
     """
 
-    default_notion_version = "2025-09-03"
+    default_notion_version = "2026-03-11"
 
     def __init__(self, auth: str, options: ClientOptions | None = None):
         """
@@ -352,6 +357,7 @@ class NotionAsyncClient:
         self.users = _UsersAPI(self)
         self.comments = _CommentsAPI(self)
         self.fileUploads = _FileUploadsAPI(self)
+        self.customEmojis = _CustomEmojisAPI(self)
 
     # ---------- lifecycle ----------
     async def aclose(self) -> None:
@@ -742,7 +748,7 @@ class _BlockChildrenAPI:
 
 class _DatabasesAPI:
     """
-    Databases API - 2025-09-03対応
+    Databases API - 2026-03-11既定
 
     データベースは複数のデータソースを持つコンテナです。
     - databases.retrieve(): データベースのメタ情報とdata_sources一覧を取得
@@ -759,7 +765,7 @@ class _DatabasesAPI:
         self, params: RetrieveDatabaseParameters, *, auth: AuthParam | None = None
     ) -> NotionDatabase:
         """
-        Retrieve a database (API version 2025-09-03)
+        Retrieve a database (API version 2026-03-11)
 
         データベースのメタ情報とdata_sources一覧を取得します。
         propertiesは含まれません。スキーマ情報が必要な場合は
@@ -800,7 +806,7 @@ class _DatabasesAPI:
         self, params: CreateDatabaseParameters, *, auth: AuthParam | None = None
     ) -> NotionDatabase:
         """
-        Create a database (API version 2025-09-03)
+        Create a database (API version 2026-03-11)
 
         新しいデータベースと初期データソースを作成します。
         initial_data_sourceにpropertiesを指定してください。
@@ -832,7 +838,7 @@ class _DatabasesAPI:
     ) -> QueryDatabaseResponse:
         """Legacy databases.query endpoint.
 
-        If the client's Notion-Version is the latest (>= 2025-09-03), this
+        If the client's Notion-Version is the latest (>= 2026-03-11), this
         method is considered legacy and will warn then raise, guiding callers
         to use dataSources.query instead. If an older Notion-Version is set,
         the request is forwarded to the legacy endpoint.
@@ -846,7 +852,7 @@ class _DatabasesAPI:
                 {"notion_version": nv, "required": f"< {latest}"},
             )
             raise RuntimeError(
-                "databases.query is not available for Notion-Version >= 2025-09-03."
+                "databases.query is not available for Notion-Version >= 2026-03-11."
                 " Use dataSources.query or set an older Notion-Version explicitly."
             )
 
@@ -881,7 +887,7 @@ class _DatabasesAPI:
         self, params: UpdateDatabaseParameters, *, auth: AuthParam | None = None
     ) -> NotionDatabase:
         """
-        Update a database (API version 2025-09-03)
+        Update a database (API version 2026-03-11)
 
         データベースレベルの属性を更新します。
         更新可能: title, icon, cover, is_inline, parent
@@ -914,7 +920,7 @@ class _DatabasesAPI:
 
 class _DataSourcesAPI:
     """
-    Data Sources API - 2025-09-03対応
+    Data Sources API - 2026-03-11既定
 
     データソースは旧APIでの「データベース」の概念に相当します。
     - 実際のデータ（ページ）を持つ
@@ -931,7 +937,7 @@ class _DataSourcesAPI:
         self, *, data_source_id: str, auth: AuthParam | None = None
     ) -> DataSource:
         """
-        Retrieve a data source (API version 2025-09-03)
+        Retrieve a data source (API version 2026-03-11)
 
         データソースのスキーマ情報（properties）を取得します。
         これは旧APIのdatabases.retrieve()に相当します。
@@ -971,7 +977,7 @@ class _DataSourcesAPI:
         auth: AuthParam | None = None,
     ) -> QueryDataSourceResponse:
         """
-        Query a data source (API version 2025-09-03)
+        Query a data source (API version 2026-03-11)
 
         データソース内のページ（データ行）を取得します。
         これは旧APIのdatabases.query()に相当します。
@@ -1140,7 +1146,7 @@ class _DataSourcesAPI:
         **kwargs,
     ) -> DataSource:
         """
-        Create a data source (API version 2025-09-03)
+        Create a data source (API version 2026-03-11)
 
         既存のデータベースに新しいデータソースを追加します。
 
@@ -1185,7 +1191,7 @@ class _DataSourcesAPI:
         **kwargs,
     ) -> DataSource:
         """
-        Update a data source (API version 2025-09-03)
+        Update a data source (API version 2026-03-11)
 
         データソースのスキーマ（properties）やタイトルを更新します。
 
@@ -1273,6 +1279,50 @@ class _PagesAPI:
             path=f"pages/{page_id}", method="patch", body=payload, auth=auth
         )
         return NotionPage(**response)
+
+    async def retrieve_markdown(
+        self,
+        *,
+        page_id: str,
+        include_transcript: bool | None = None,
+        auth: AuthParam | None = None,
+    ) -> PageMarkdownResponse:
+        """Retrieve a page's content as markdown."""
+
+        query: QueryParams | None = None
+        if include_transcript is not None:
+            query = {
+                "include_transcript": "true" if include_transcript else "false"
+            }
+        response = await self._c.request(
+            path=f"pages/{page_id}/markdown",
+            method="get",
+            query=query,
+            auth=auth,
+        )
+        return PageMarkdownResponse(**response)
+
+    async def update_markdown(
+        self,
+        *,
+        page_id: str,
+        params: UpdatePageMarkdownParameters | dict[str, Any],
+        auth: AuthParam | None = None,
+    ) -> PageMarkdownResponse:
+        """Update a page's content as markdown."""
+
+        body = (
+            params.model_dump(exclude_none=True, by_alias=True)
+            if isinstance(params, UpdatePageMarkdownParameters)
+            else dict(params)
+        )
+        response = await self._c.request(
+            path=f"pages/{page_id}/markdown",
+            method="patch",
+            body=body,
+            auth=auth,
+        )
+        return PageMarkdownResponse(**response)
 
 
 class _PagePropertiesAPI:
@@ -1376,7 +1426,8 @@ class _CommentsAPI:
         self,
         *,
         parent: dict[str, Any],
-        rich_text: list[dict[str, Any]],
+        rich_text: list[dict[str, Any]] | None = None,
+        markdown: str | None = None,
         discussion_id: str | None = None,
         auth: AuthParam | None = None,
     ) -> CommentObject:
@@ -1385,10 +1436,18 @@ class _CommentsAPI:
         Returns:
             CommentObjectResponse: 作成されたコメントオブジェクト
         """
+        if (rich_text is None) == (markdown is None):
+            raise ValueError("Exactly one of rich_text or markdown must be provided.")
         body = {
             "parent": parent,
-            "rich_text": rich_text,
-            **pick({"discussion_id": discussion_id}, ["discussion_id"]),
+            **pick(
+                {
+                    "rich_text": rich_text,
+                    "markdown": markdown,
+                    "discussion_id": discussion_id,
+                },
+                ["rich_text", "markdown", "discussion_id"],
+            ),
         }
         response = await self._c.request(
             path="comments", method="post", body=body, auth=auth
@@ -1563,3 +1622,40 @@ class _FileUploadsAPI:
             auth=auth,
         )
         return FileUploadObject(**res)
+
+
+class _CustomEmojisAPI:
+    def __init__(self, client: NotionAsyncClient):
+        self._c = client
+
+    async def list(
+        self,
+        *,
+        name: str | None = None,
+        start_cursor: str | None = None,
+        page_size: int | None = None,
+        auth: AuthParam | None = None,
+    ) -> ListCustomEmojisResponse:
+        """List workspace custom emojis."""
+
+        query = pick(
+            {
+                "name": name,
+                "start_cursor": start_cursor,
+                "page_size": page_size,
+            },
+            ["name", "start_cursor", "page_size"],
+        )
+        response = await self._c.request(
+            path="custom_emojis",
+            method="get",
+            query=query,
+            auth=auth,
+        )
+        return ListCustomEmojisResponse(
+            object="list",
+            results=[CustomEmoji(**it) for it in response.get("results", [])],
+            next_cursor=response.get("next_cursor"),
+            has_more=response.get("has_more", False),
+            type="custom_emoji",
+        )

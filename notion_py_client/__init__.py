@@ -14,6 +14,7 @@ from .blocks import (
     Heading1Block,
     Heading2Block,
     Heading3Block,
+    Heading4Block,
     BulletedListItemBlock,
     NumberedListItemBlock,
     QuoteBlock,
@@ -37,6 +38,7 @@ from .blocks import (
     LinkToPageBlock,
     TableBlock,
     TableRowBlock,
+    TabBlock,
     # Media blocks
     EmbedBlock,
     BookmarkBlock,
@@ -119,6 +121,13 @@ from .requests import (
     PhoneNumberPropertyRequest,
     RelationPropertyRequest,
     UpdatePageParameters,
+    PageTemplateRequest,
+    UpdatePageMarkdownParameters,
+    InsertContentMarkdownRequest,
+    ReplaceContentRangeMarkdownRequest,
+    MarkdownContentUpdateOperation,
+    UpdateContentMarkdownRequest,
+    ReplaceContentMarkdownRequest,
     CreatePageParameters,
     RelationItemRequest,
     DateRequest,
@@ -128,6 +137,8 @@ from .requests import (
     GroupObjectRequest,
     AnnotationRequest,
     PropertyRequest,
+    VerificationPropertyRequest,
+    VerificationValueRequest,
 )
 from .schema import (
     PeoplePropertyConfig,
@@ -168,8 +179,11 @@ from .responses.list_response import (
     ListBlockChildrenResponse,
     ListCommentsResponse,
     ListFileUploadsResponse,
+    ListCustomEmojisResponse,
     CommentObject,
 )
+from .responses.page_markdown import PageMarkdownResponse
+from .models import CustomEmoji
 from .helper import Field, NotionMapper, NotionPropertyDescriptor
 
 __all__ = [
@@ -193,8 +207,11 @@ __all__ = [
     "ListBlockChildrenResponse",
     "ListCommentsResponse",
     "ListFileUploadsResponse",
+    "ListCustomEmojisResponse",
+    "PageMarkdownResponse",
     # Comment
     "CommentObject",
+    "CustomEmoji",
     # Block base
     "BlockObject",
     "PartialBlock",
@@ -206,6 +223,7 @@ __all__ = [
     "Heading1Block",
     "Heading2Block",
     "Heading3Block",
+    "Heading4Block",
     "BulletedListItemBlock",
     "NumberedListItemBlock",
     "QuoteBlock",
@@ -229,6 +247,7 @@ __all__ = [
     "LinkToPageBlock",
     "TableBlock",
     "TableRowBlock",
+    "TabBlock",
     # Media blocks
     "EmbedBlock",
     "BookmarkBlock",
@@ -256,6 +275,13 @@ __all__ = [
     "PhoneNumberPropertyRequest",
     "RelationPropertyRequest",
     "UpdatePageParameters",
+    "PageTemplateRequest",
+    "UpdatePageMarkdownParameters",
+    "InsertContentMarkdownRequest",
+    "ReplaceContentRangeMarkdownRequest",
+    "MarkdownContentUpdateOperation",
+    "UpdateContentMarkdownRequest",
+    "ReplaceContentMarkdownRequest",
     "CreatePageParameters",
     "RelationItemRequest",
     "DateRequest",
@@ -265,6 +291,8 @@ __all__ = [
     "GroupObjectRequest",
     "AnnotationRequest",
     "PropertyRequest",
+    "VerificationPropertyRequest",
+    "VerificationValueRequest",
     # Filters
     # フィルター基底型
     "PropertyFilter",

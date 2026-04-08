@@ -176,10 +176,10 @@ class TestPropertyFilterMultiSelect:
         """Test multi_select does_not_contain filter."""
         filter_dict: PropertyFilterMultiSelect = {
             "property": "Labels",
-            "multi_select": {"does_not_contain": "archived"},
+            "multi_select": {"does_not_contain": "retired"},
         }
 
-        assert filter_dict["multi_select"]["does_not_contain"] == "archived"  # type: ignore
+        assert filter_dict["multi_select"]["does_not_contain"] == "retired"  # type: ignore
 
 
 class TestPropertyFilterStatus:

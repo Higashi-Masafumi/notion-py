@@ -17,7 +17,7 @@ pip install notion-py-client
 ## Key Features
 
 - **Type Safety**: Built on Pydantic v2 with strict type validation
-- **Complete API Coverage**: All Notion API 2025-09-03 endpoints supported
+- **Complete API Coverage**: Current Notion API endpoints supported
 - **TypeScript Compatibility**: Mirrors official TypeScript type definitions
 - **Async First**: Built with `httpx` for async HTTP operations
 - **Developer Friendly**: Intuitive API design with comprehensive type hints
@@ -36,7 +36,7 @@ pip install notion-py-client
 from notion_py_client import NotionAsyncClient
 
 async with NotionAsyncClient(auth="secret_xxx") as client:
-    # Query a data source (2025-09-03 API)
+    # Query a data source (2026-03-11 API)
     response = await client.dataSources.query(
         data_source_id="ds_abc123",
         filter={
@@ -51,7 +51,7 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
 
 ## API Version
 
-This library supports **Notion API version 2025-09-03**, which introduces:
+This library supports **Notion API version 2026-03-11**, which includes:
 
 - **Databases**: Containers holding multiple data sources
 - **Data Sources**: Entities containing actual data and schema (equivalent to old databases)

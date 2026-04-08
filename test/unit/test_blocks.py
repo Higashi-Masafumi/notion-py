@@ -4,7 +4,9 @@ import pytest
 from pydantic import TypeAdapter
 
 from notion_py_client.blocks import BlockObject
+from notion_py_client.blocks.layout_blocks import TabBlock
 from notion_py_client.blocks.special_blocks import MeetingNotesBlock
+from notion_py_client.blocks.text_blocks import Heading4Block, ParagraphBlock
 from notion_py_client.notion_client import NotionAsyncClient
 
 
@@ -55,6 +57,113 @@ class TestMeetingNotesBlocks:
         assert result.meeting_notes.status == "notes_ready"
         assert result.meeting_notes.children is not None
         assert result.meeting_notes.children.transcript_block_id == "c3"
+
+
+class TestNewBlockTypes:
+    """Test parsing newly supported block types."""
+
+    def test_parse_heading_4_block(self):
+        data = {
+            "object": "block",
+            "id": "block_heading_4",
+            "type": "heading_4",
+            "created_time": "2026-03-30T10:00:00.000Z",
+            "last_edited_time": "2026-03-30T10:00:00.000Z",
+            "created_by": {"object": "user", "id": "user_123"},
+            "last_edited_by": {"object": "user", "id": "user_123"},
+            "parent": {"type": "page_id", "page_id": "page_123"},
+            "has_children": False,
+            "in_trash": False,
+            "heading_4": {
+                "rich_text": [
+                    {
+                        "type": "text",
+                        "text": {"content": "Heading 4", "link": None},
+                        "annotations": {
+                            "bold": False,
+                            "italic": False,
+                            "strikethrough": False,
+                            "underline": False,
+                            "code": False,
+                            "color": "default",
+                        },
+                        "plain_text": "Heading 4",
+                        "href": None,
+                    }
+                ],
+                "color": "default",
+                "is_toggleable": False,
+            },
+        }
+
+        result = TypeAdapter(BlockObject).validate_python(data)
+
+        assert isinstance(result, Heading4Block)
+        assert result.heading_4.rich_text[0].plain_text == "Heading 4"
+
+    def test_parse_tab_block(self):
+        data = {
+            "object": "block",
+            "id": "block_tab",
+            "type": "tab",
+            "created_time": "2026-03-25T10:00:00.000Z",
+            "last_edited_time": "2026-03-25T10:00:00.000Z",
+            "created_by": {"object": "user", "id": "user_123"},
+            "last_edited_by": {"object": "user", "id": "user_123"},
+            "parent": {"type": "page_id", "page_id": "page_123"},
+            "has_children": True,
+            "in_trash": False,
+            "tab": {},
+        }
+
+        result = TypeAdapter(BlockObject).validate_python(data)
+
+        assert isinstance(result, TabBlock)
+        assert result.has_children is True
+
+    def test_parse_paragraph_tab_icon(self):
+        data = {
+            "object": "block",
+            "id": "block_paragraph",
+            "type": "paragraph",
+            "created_time": "2026-03-30T10:00:00.000Z",
+            "last_edited_time": "2026-03-30T10:00:00.000Z",
+            "created_by": {"object": "user", "id": "user_123"},
+            "last_edited_by": {"object": "user", "id": "user_123"},
+            "parent": {"type": "block_id", "block_id": "tab_123"},
+            "has_children": True,
+            "in_trash": False,
+            "paragraph": {
+                "rich_text": [
+                    {
+                        "type": "text",
+                        "text": {"content": "Tab A", "link": None},
+                        "annotations": {
+                            "bold": False,
+                            "italic": False,
+                            "strikethrough": False,
+                            "underline": False,
+                            "code": False,
+                            "color": "default",
+                        },
+                        "plain_text": "Tab A",
+                        "href": None,
+                    }
+                ],
+                "color": "default",
+                "icon": {
+                    "type": "icon",
+                    "icon": {"name": "target", "color": "green"},
+                },
+            },
+        }
+
+        result = TypeAdapter(BlockObject).validate_python(data)
+
+        assert isinstance(result, ParagraphBlock)
+        assert result.paragraph.icon is not None
+        assert result.paragraph.icon.icon is not None
+        assert result.paragraph.icon.icon.name == "target"
 
 class TestBlockChildrenAPI:
     """Test append block children request shaping."""

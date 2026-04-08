@@ -143,7 +143,7 @@ async def update(
 - `params.properties` (optional): Properties to update
 - `params.icon` (optional): New icon
 - `params.cover` (optional): New cover
-- `params.archived` (optional): Archive status
+- `params.in_trash` (optional): Trash status
 
 **Returns**: Updated `NotionPage`
 
@@ -373,18 +373,18 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
     page = await client.pages.create(params)
 ```
 
-## Archiving Pages
+## Trashing Pages
 
 ```python
 async with NotionAsyncClient(auth="secret_xxx") as client:
-    # Archive a page
+    # Move a page to trash
     params = UpdatePageParameters(
         page_id="page_abc123",
-        archived=True
+        in_trash=True
     )
 
     page = await client.pages.update(params)
-    print(f"Archived: {page.archived}")
+    print(f"In trash: {page.in_trash}")
 ```
 
 ## Common Patterns
@@ -445,7 +445,7 @@ page: NotionPage = {
     "created_by": {...},
     "last_edited_by": {...},
     "parent": {...},
-    "archived": false,
+    "in_trash": false,
     "icon": {...},
     "cover": {...},
     "properties": {

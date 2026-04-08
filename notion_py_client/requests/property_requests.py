@@ -11,7 +11,6 @@ Note:
     - LastEditedBy, LastEditedTime (更新情報)
     - UniqueId (自動生成ID)
     - Button (アクション用)
-    - Verification (検証用)
 """
 
 from typing import Any, Literal, Union
@@ -149,6 +148,20 @@ class FilesPropertyRequest(BaseModel):
     type: Literal["files"] | None = None
 
 
+class VerificationValueRequest(BaseModel):
+    """Verificationプロパティの値."""
+
+    state: Literal["verified", "unverified"]
+    date: DateRequest | None = None
+
+
+class VerificationPropertyRequest(BaseModel):
+    """Verificationプロパティのリクエスト."""
+
+    verification: VerificationValueRequest
+    type: Literal["verification"] | None = None
+
+
 # すべてのプロパティリクエストのUnion型
 PropertyRequest = Union[
     TitlePropertyRequest,
@@ -165,4 +178,5 @@ PropertyRequest = Union[
     CheckboxPropertyRequest,
     RelationPropertyRequest,
     FilesPropertyRequest,
+    VerificationPropertyRequest,
 ]
