@@ -1,6 +1,7 @@
 """Unit tests for client facade additions and defaults."""
 
 import pytest
+from pydantic import ValidationError
 
 from notion_py_client.notion_client import NotionAsyncClient
 from notion_py_client.requests.page_requests import ReplaceContentMarkdownCommand
@@ -125,3 +126,20 @@ class TestCustomEmojisAPI:
         assert captured["query"] == {"page_size": 10, "name": "ship-it"}
         assert result.type == "custom_emoji"
         assert result.results[0].name == "ship-it"
+
+    @pytest.mark.asyncio
+    async def test_list_custom_emojis_validates_required_response_type(self):
+        client = NotionAsyncClient(auth="test-token")
+
+        async def fake_request(*, path, method, query=None, auth=None, **kwargs):
+            return {
+                "object": "list",
+                "results": [],
+                "has_more": False,
+                "next_cursor": None,
+            }
+
+        client.request = fake_request  # type: ignore[method-assign]
+
+        with pytest.raises(ValidationError):
+            await client.customEmojis.list()

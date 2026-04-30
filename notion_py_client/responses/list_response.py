@@ -130,3 +130,6 @@ class ListFileUploadsResponse(ListResponse[FileUploadObject]):
 
 class ListCustomEmojisResponse(ListResponse[CustomEmoji]):
     """custom_emojis.list() のレスポンス型."""
+
+    type: Literal["custom_emoji"] = Field(..., description="結果の型")
+    next_cursor: StrictStr | None = Field(..., description="次ページのカーソル")

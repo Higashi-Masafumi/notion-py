@@ -55,7 +55,6 @@ from .responses.list_response import (
 )
 from .blocks.base import BaseBlockObject, PartialBlock
 from .blocks import BlockObject
-from .models.primitives import CustomEmoji
 from .models.user import PartialUser, User
 
 
@@ -1445,13 +1444,7 @@ class _CustomEmojisAPI:
         response = await self._c.request(
             path="custom_emojis", method="get", query=query, auth=auth
         )
-        return ListCustomEmojisResponse(
-            object="list",
-            results=[CustomEmoji(**item) for item in response.get("results", [])],
-            next_cursor=response.get("next_cursor"),
-            has_more=response.get("has_more", False),
-            type="custom_emoji",
-        )
+        return ListCustomEmojisResponse.model_validate(response)
 
 
 class _CommentsAPI:
