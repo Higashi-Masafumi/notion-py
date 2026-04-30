@@ -140,6 +140,7 @@ Located in `notion_py.requests.property_requests`:
 - `PhoneNumberPropertyRequest`
 - `RelationPropertyRequest`
 - `StatusPropertyRequest`
+- `VerificationPropertyRequest`
 
 ### Block Types
 
@@ -148,7 +149,7 @@ Located in `notion_py.blocks`:
 #### Text Blocks
 
 - `ParagraphBlock`
-- `Heading1Block`, `Heading2Block`, `Heading3Block`
+- `Heading1Block`, `Heading2Block`, `Heading3Block`, `Heading4Block`
 - `BulletedListItemBlock`, `NumberedListItemBlock`
 - `QuoteBlock`
 - `ToDoBlock`
@@ -168,7 +169,7 @@ Located in `notion_py.blocks`:
 - `DividerBlock`
 - `BreadcrumbBlock`
 - `TableOfContentsBlock`
-- `ColumnListBlock`, `ColumnBlock`
+- `ColumnListBlock`, `ColumnBlock`, `TabBlock`
 - `LinkToPageBlock`
 - `TableBlock`, `TableRowBlock`
 

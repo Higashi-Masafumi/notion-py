@@ -1,6 +1,6 @@
 # Block Types
 
-Complete reference for all 33 block types supported by notion-py-client.
+Complete reference for all 35 block types supported by notion-py-client.
 
 ## Base Block
 
@@ -19,7 +19,6 @@ class BaseBlockObject(BaseModel):
     last_edited_by: PartialUser
     parent: NotionParent
     has_children: bool = False
-    archived: bool = False
     in_trash: bool = False
 ```
 
@@ -39,7 +38,8 @@ block = ParagraphBlock(
         "rich_text": [
             {"type": "text", "text": {"content": "Paragraph text"}}
         ],
-        "color": "default"
+        "color": "default",
+        "icon": None
     },
     # ... base fields
 )
@@ -48,7 +48,7 @@ block = ParagraphBlock(
 ### Heading Blocks
 
 ```python
-from notion_py_client import Heading1Block, Heading2Block, Heading3Block
+from notion_py_client import Heading1Block, Heading2Block, Heading3Block, Heading4Block
 
 heading = Heading1Block(
     id="block_id",

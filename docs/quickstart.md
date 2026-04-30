@@ -25,7 +25,7 @@ client = NotionAsyncClient(
     auth="secret_xxx",
     options={
         "timeout_ms": 30000,
-        "notion_version": "2025-09-03"
+        "notion_version": "2026-03-11"
     }
 )
 ```
@@ -34,7 +34,7 @@ client = NotionAsyncClient(
 
 ### Query a Data Source
 
-In Notion API 2025-09-03, databases are containers for data sources. To query data:
+In the latest Notion API, databases are containers for data sources. To query data:
 
 ```python
 async with NotionAsyncClient(auth="secret_xxx") as client:
@@ -59,7 +59,7 @@ from notion_py_client.requests.property_requests import (
 
 async with NotionAsyncClient(auth="secret_xxx") as client:
     params = CreatePageParameters(
-        parent={"type": "database_id", "database_id": "db_abc123"},
+        parent={"type": "data_source_id", "data_source_id": "ds_abc123"},
         properties={
             "Name": TitlePropertyRequest(
                 title=[{"type": "text", "text": {"content": "New Page"}}]
@@ -93,6 +93,24 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
     print(f"Updated page: {page.id}")
 ```
 
+### Read and Update Markdown Content
+
+```python
+from notion_py_client.requests import ReplaceContentMarkdownCommand
+
+async with NotionAsyncClient(auth="secret_xxx") as client:
+    markdown_page = await client.pages.retrieve_markdown(page_id="page_abc123")
+    print(markdown_page.markdown)
+
+    updated = await client.pages.update_markdown(
+        page_id="page_abc123",
+        command=ReplaceContentMarkdownCommand(
+            replace_content={"new_str": "# Fresh Start\n\nUpdated from markdown"}
+        ),
+    )
+    print(updated.markdown)
+```
+
 ### Retrieve a Database
 
 ```python
@@ -115,9 +133,9 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
             print(f"{name}: {config.type}")
 ```
 
-## Understanding 2025-09-03 API Changes
+## Understanding the 2025-09-03 Data Model Changes
 
-The key concept change in API 2025-09-03:
+The key concept change introduced in API 2025-09-03 remains relevant in 2026-03-11:
 
 **Old API (before 2025-09-03)**:
 

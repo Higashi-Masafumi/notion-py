@@ -12,7 +12,7 @@ A type-safe Python client library for the Notion API, built with Pydantic v2.
 
 - **Type-Safe**: Complete type definitions using Pydantic v2
 - **Async-First**: Built on httpx for async/await support
-- **API 2025-09-03**: Latest Notion API with DataSources support
+- **API 2026-03-11**: Latest Notion API with `position`, `in_trash`, and `meeting_notes`
 - **Comprehensive**: All blocks, properties, filters, and request types
 - **Domain Mapping**: Built-in mapper for converting to domain models
 
@@ -31,9 +31,9 @@ from notion_py_client import NotionAsyncClient
 async def main():
     client = NotionAsyncClient(auth="your_NOTION_API_TOKEN")
 
-    # Query a database (API 2025-09-03)
+    # Query a data source (API 2026-03-11)
     response = await client.dataSources.query(
-        data_source_id="your_database_id"
+        data_source_id="your_data_source_id"
     )
 
     for page in response.results:
@@ -42,13 +42,14 @@ async def main():
 asyncio.run(main())
 ```
 
-## Notion API 2025-09-03
+## Notion API 2026-03-11
 
-This library supports the latest Notion API version `2025-09-03`, which introduces:
+This library supports the latest Notion API version `2026-03-11`, including:
 
-- **DataSources**: New paradigm replacing the legacy databases endpoint
-- **Backward Compatibility**: Legacy `databases` endpoint still supported
-- **Migration Path**: Seamless transition from databases to dataSources
+- **Current breaking changes**: `position`, `in_trash`, and `meeting_notes`
+- **Markdown APIs**: create, read, and update page content as markdown
+- **Custom emojis**: `customEmojis.list()` support
+- **DataSources**: Continued support for the 2025-09-03 data model split
 
 ### DataSources vs Databases
 
@@ -56,7 +57,7 @@ This library supports the latest Notion API version `2025-09-03`, which introduc
 # New DataSources API (recommended)
 await client.dataSources.query(data_source_id="...")
 
-# Legacy Databases API (still supported)
+# Legacy Databases API (only for older Notion-Version headers)
 await client.databases.query(database_id="...")
 ```
 
@@ -80,8 +81,8 @@ Full documentation is available at: [https://higashi-masafumi.github.io/notion-p
 from notion_py_client.requests import CreatePageParameters, TitlePropertyRequest
 
 await client.pages.create(
-    parameters=CreatePageParameters(
-        parent={"database_id": "your_database_id"},
+    params=CreatePageParameters(
+        parent={"type": "data_source_id", "data_source_id": "your_data_source_id"},
         properties={
             "Name": TitlePropertyRequest(
                 title=[{"type": "text", "text": {"content": "New Page"}}]
@@ -101,7 +102,7 @@ client = NotionAsyncClient(auth="your_NOTION_API_TOKEN")
 
 # Simple filter (直接辞書 - IDE補完が効く)
 response = await client.dataSources.query(
-    data_source_id="your_database_id",
+    data_source_id="your_data_source_id",
     filter={"property": "Status", "status": {"equals": "Active"}}
 )
 
@@ -127,7 +128,7 @@ filter = create_and_filter(
 )
 
 await client.dataSources.query(
-    data_source_id="your_database_id",
+    data_source_id="your_data_source_id",
     filter=filter
 )
 ```

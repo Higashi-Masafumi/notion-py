@@ -2,6 +2,7 @@ from .responses.datasource import DataSource, PartialDataSource
 from .responses.database import NotionDatabase, PartialDatabase
 from .responses.page import NotionPage, PartialPage
 from .responses.file_upload import FileUploadObject
+from .responses.page_markdown import PageMarkdownResponse
 from .responses.property_item import PropertyItemObject, PropertyItemListResponse
 from .blocks import (
     BlockObject,
@@ -14,6 +15,7 @@ from .blocks import (
     Heading1Block,
     Heading2Block,
     Heading3Block,
+    Heading4Block,
     BulletedListItemBlock,
     NumberedListItemBlock,
     QuoteBlock,
@@ -34,6 +36,7 @@ from .blocks import (
     TableOfContentsBlock,
     ColumnListBlock,
     ColumnBlock,
+    TabBlock,
     LinkToPageBlock,
     TableBlock,
     TableRowBlock,
@@ -118,8 +121,21 @@ from .requests import (
     EmailPropertyRequest,
     PhoneNumberPropertyRequest,
     RelationPropertyRequest,
+    VerificationPropertyRequest,
     UpdatePageParameters,
     CreatePageParameters,
+    PageMarkdownCommand,
+    UpdateContentMarkdownCommand,
+    ReplaceContentMarkdownCommand,
+    InsertContentMarkdownCommand,
+    ReplaceContentRangeMarkdownCommand,
+    PageTemplateRequest,
+    DefaultPageTemplateRequest,
+    TemplateIdPageTemplateRequest,
+    PagePositionRequest,
+    PageStartPositionRequest,
+    PageEndPositionRequest,
+    AfterBlockPositionRequest,
     RelationItemRequest,
     DateRequest,
     IdRequest,
@@ -168,6 +184,7 @@ from .responses.list_response import (
     ListBlockChildrenResponse,
     ListCommentsResponse,
     ListFileUploadsResponse,
+    ListCustomEmojisResponse,
     CommentObject,
 )
 from .helper import Field, NotionMapper, NotionPropertyDescriptor
@@ -183,6 +200,7 @@ __all__ = [
     "NotionPage",
     "PartialPage",
     "FileUploadObject",
+    "PageMarkdownResponse",
     "PropertyItemObject",
     "PropertyItemListResponse",
     # List responses
@@ -193,6 +211,7 @@ __all__ = [
     "ListBlockChildrenResponse",
     "ListCommentsResponse",
     "ListFileUploadsResponse",
+    "ListCustomEmojisResponse",
     # Comment
     "CommentObject",
     # Block base
@@ -206,6 +225,7 @@ __all__ = [
     "Heading1Block",
     "Heading2Block",
     "Heading3Block",
+    "Heading4Block",
     "BulletedListItemBlock",
     "NumberedListItemBlock",
     "QuoteBlock",
@@ -226,6 +246,7 @@ __all__ = [
     "TableOfContentsBlock",
     "ColumnListBlock",
     "ColumnBlock",
+    "TabBlock",
     "LinkToPageBlock",
     "TableBlock",
     "TableRowBlock",
@@ -255,8 +276,21 @@ __all__ = [
     "EmailPropertyRequest",
     "PhoneNumberPropertyRequest",
     "RelationPropertyRequest",
+    "VerificationPropertyRequest",
     "UpdatePageParameters",
     "CreatePageParameters",
+    "PageMarkdownCommand",
+    "UpdateContentMarkdownCommand",
+    "ReplaceContentMarkdownCommand",
+    "InsertContentMarkdownCommand",
+    "ReplaceContentRangeMarkdownCommand",
+    "PageTemplateRequest",
+    "DefaultPageTemplateRequest",
+    "TemplateIdPageTemplateRequest",
+    "PagePositionRequest",
+    "PageStartPositionRequest",
+    "PageEndPositionRequest",
+    "AfterBlockPositionRequest",
     "RelationItemRequest",
     "DateRequest",
     "IdRequest",

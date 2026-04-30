@@ -6,18 +6,18 @@ Install using pip:
 pip install notion-py-client
 ```
 
-## Quick Examplehon client library for the Notion API, built with Pydantic v2.
+## Quick Example
 
 ---
 
 ## Overview
 
-**notion-py-client** provides a complete type system mirroring Notion's TypeScript API definitions. It offers full coverage of Databases, Data Sources, Pages, Blocks (33 types), Filters, and Request types with strict runtime validation.
+**notion-py-client** provides a complete type system mirroring Notion's TypeScript API definitions. It offers full coverage of Databases, Data Sources, Pages, Blocks (35 types), Filters, and Request types with strict runtime validation.
 
 ## Key Features
 
 - **Type Safety**: Built on Pydantic v2 with strict type validation
-- **Complete API Coverage**: All Notion API 2025-09-03 endpoints supported
+- **Complete API Coverage**: Latest Notion API 2026-03-11 compatibility
 - **TypeScript Compatibility**: Mirrors official TypeScript type definitions
 - **Async First**: Built with `httpx` for async HTTP operations
 - **Developer Friendly**: Intuitive API design with comprehensive type hints
@@ -36,7 +36,7 @@ pip install notion-py-client
 from notion_py_client import NotionAsyncClient
 
 async with NotionAsyncClient(auth="secret_xxx") as client:
-    # Query a data source (2025-09-03 API)
+    # Query a data source (2026-03-11 API)
     response = await client.dataSources.query(
         data_source_id="ds_abc123",
         filter={
@@ -51,12 +51,12 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
 
 ## API Version
 
-This library supports **Notion API version 2025-09-03**, which introduces:
+This library supports **Notion API version 2026-03-11**, including:
 
-- **Databases**: Containers holding multiple data sources
-- **Data Sources**: Entities containing actual data and schema (equivalent to old databases)
-- Enhanced file upload capabilities
-- Improved type safety
+- **Current breaking changes**: `position`, `in_trash`, and `meeting_notes`
+- **Markdown page APIs**: create, retrieve, and update page markdown
+- **Custom emoji listing**: workspace custom emoji pagination
+- **Data source model**: continued support for the 2025-09-03 split
 
 ## Next Steps
 

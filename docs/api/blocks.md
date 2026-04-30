@@ -81,7 +81,7 @@ async def delete(
 ```python
 async with NotionAsyncClient(auth="secret_xxx") as client:
     block = await client.blocks.delete(block_id="block_abc123")
-    print(f"Archived: {block['archived']}")
+    print(f"In trash: {block['in_trash']}")
 ```
 
 ### children.list
@@ -134,7 +134,7 @@ async def children.append(
     *,
     block_id: str,
     children: list[dict[str, Any]],
-    after: str | None = None,
+    position: dict[str, Any] | None = None,
     auth: AuthParam | None = None
 ) -> dict[str, Any]
 ```
@@ -145,6 +145,10 @@ async def children.append(
 async with NotionAsyncClient(auth="secret_xxx") as client:
     response = await client.blocks.children.append(
         block_id="page_abc123",
+        position={
+            "type": "after_block",
+            "after_block": {"id": "block_def456"}
+        },
         children=[
             {
                 "object": "block",

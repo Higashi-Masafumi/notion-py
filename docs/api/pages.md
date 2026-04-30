@@ -143,7 +143,9 @@ async def update(
 - `params.properties` (optional): Properties to update
 - `params.icon` (optional): New icon
 - `params.cover` (optional): New cover
-- `params.archived` (optional): Archive status
+- `params.template` (optional): Apply a default or specific template
+- `params.erase_content` (optional): Clear existing block children before applying updates
+- `params.in_trash` (optional): Trash status
 
 **Returns**: Updated `NotionPage`
 
@@ -164,6 +166,58 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
 
     page = await client.pages.update(params)
     print(f"Updated: {page.id}")
+```
+
+### retrieve_markdown
+
+Retrieve page content as Notion-flavored Markdown.
+
+```python
+async def retrieve_markdown(
+    *,
+    page_id: str,
+    include_transcript: bool | None = None,
+    auth: AuthParam | None = None
+) -> PageMarkdownResponse
+```
+
+**Example**:
+
+```python
+async with NotionAsyncClient(auth="secret_xxx") as client:
+    markdown_page = await client.pages.retrieve_markdown(
+        page_id="page_abc123",
+        include_transcript=True,
+    )
+    print(markdown_page.markdown)
+```
+
+### update_markdown
+
+Update page content through the markdown API.
+
+```python
+async def update_markdown(
+    *,
+    page_id: str,
+    command: PageMarkdownCommand,
+    auth: AuthParam | None = None
+) -> PageMarkdownResponse
+```
+
+**Example**:
+
+```python
+from notion_py_client.requests import ReplaceContentMarkdownCommand
+
+async with NotionAsyncClient(auth="secret_xxx") as client:
+    markdown_page = await client.pages.update_markdown(
+        page_id="page_abc123",
+        command=ReplaceContentMarkdownCommand(
+            replace_content={"new_str": "# Fresh Start\n\nUpdated from markdown"}
+        ),
+    )
+    print(markdown_page.markdown)
 ```
 
 ### properties.retrieve
@@ -377,14 +431,14 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
 
 ```python
 async with NotionAsyncClient(auth="secret_xxx") as client:
-    # Archive a page
+    # Move a page to trash
     params = UpdatePageParameters(
         page_id="page_abc123",
-        archived=True
+        in_trash=True
     )
 
     page = await client.pages.update(params)
-    print(f"Archived: {page.archived}")
+    print(f"In trash: {page.in_trash}")
 ```
 
 ## Common Patterns
@@ -445,7 +499,7 @@ page: NotionPage = {
     "created_by": {...},
     "last_edited_by": {...},
     "parent": {...},
-    "archived": false,
+    "in_trash": false,
     "icon": {...},
     "cover": {...},
     "properties": {
