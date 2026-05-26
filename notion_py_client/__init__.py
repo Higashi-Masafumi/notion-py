@@ -189,6 +189,7 @@ from .responses.list_response import (
     QueryMeetingNotesResponse,
     RequestStatusResponse,
     CommentObject,
+    PartialCommentObject,
 )
 from .helper import Field, NotionMapper, NotionPropertyDescriptor
 
@@ -219,6 +220,7 @@ __all__ = [
     "RequestStatusResponse",
     # Comment
     "CommentObject",
+    "PartialCommentObject",
     # Block base
     "BlockObject",
     "PartialBlock",

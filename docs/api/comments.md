@@ -112,6 +112,10 @@ async def update(
 ) -> dict[str, Any]
 ```
 
+Depending on the integration's comment read capability, Notion may return either
+a full comment object or a partial comment object containing only `object` and
+`id`.
+
 **Example**:
 
 ```python
@@ -124,7 +128,9 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
 
 ### delete
 
-Delete a comment by ID. Notion returns the deleted comment object.
+Delete a comment by ID. Depending on the integration's comment read capability,
+Notion may return either the deleted comment object or a partial comment object
+containing only `object` and `id`.
 
 ```python
 async def delete(

@@ -52,6 +52,13 @@ class CommentObject(BaseModel):
     rich_text: list[RichTextItem] = Field(..., description="コメントテキスト")
 
 
+class PartialCommentObject(BaseModel):
+    """権限設定により本文なしで返るコメントオブジェクト."""
+
+    object: Literal["comment"] = Field("comment", description="オブジェクトタイプ")
+    id: StrictStr = Field(..., description="コメントID")
+
+
 # ============ List Response Types ============
 
 
