@@ -113,12 +113,24 @@ class ReplaceContentMarkdownCommand(BaseModel):
     replace_content: ReplaceContentMarkdownRequest
 
 
+class MarkdownInsertPositionRequest(BaseModel):
+    """Explicit insertion target for markdown insert_content."""
+
+    type: Literal["start", "end"]
+
+
 class InsertContentMarkdownRequest(BaseModel):
     """Insert markdown content into a page."""
 
     content: str
-    position: dict[str, Any] | None = None
+    position: MarkdownInsertPositionRequest | None = None
     after: str | None = None
+
+    @model_validator(mode="after")
+    def validate_insert_target(self) -> "InsertContentMarkdownRequest":
+        if self.after is not None and self.position is not None:
+            raise ValueError("insert_content.after cannot be used with position")
+        return self
 
 
 class InsertContentMarkdownCommand(BaseModel):

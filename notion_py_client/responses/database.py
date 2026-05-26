@@ -88,7 +88,7 @@ class NotionDatabase(BaseModel):
         None,
         description="プロパティ設定の辞書 (2025-09-03以降はdataSources.retrieve()で取得)",
     )
-    # archived フィールドは TypeScript 定義にない（削除）
+    # 旧ごみ箱フィールドは最新の TypeScript 定義にないため保持しない
 
 
 class PartialDatabase(BaseModel):

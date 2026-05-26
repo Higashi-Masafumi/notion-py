@@ -21,7 +21,7 @@ the helper functions for AND/OR combinations.
 filter = {"property": "Name", "rich_text": {"contains": "urgent"}}
 
 # Does not contain
-filter = {"property": "Description", "rich_text": {"does_not_contain": "archived"}}
+filter = {"property": "Description", "rich_text": {"does_not_contain": "stale"}}
 
 # Equals
 filter = {"property": "Title", "rich_text": {"equals": "Exact Match"}}
