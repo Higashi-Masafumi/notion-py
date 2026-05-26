@@ -42,6 +42,7 @@ async def query(
 - `results`: List of `NotionPage` or `PartialPage`
 - `has_more`: Whether more results exist
 - `next_cursor`: Cursor for next page
+- `request_status`: Present when Notion reports an incomplete result set, such as `query_result_limit_reached`
 
 **Example**:
 

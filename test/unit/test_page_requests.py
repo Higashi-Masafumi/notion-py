@@ -4,6 +4,7 @@ import pytest
 
 from notion_py_client.requests.page_requests import (
     CreatePageParameters,
+    InsertContentMarkdownCommand,
     UpdatePageParameters,
 )
 
@@ -72,6 +73,28 @@ class TestCreatePageParameters:
                 markdown="# Heading",
                 children=[{"object": "block", "type": "paragraph", "paragraph": {}}],
             )
+
+
+class TestPageMarkdownCommands:
+    """Test page markdown command payloads."""
+
+    def test_insert_content_serializes_position(self):
+        command = InsertContentMarkdownCommand(
+            insert_content={
+                "content": "## Prepended section",
+                "position": {"type": "start"},
+            }
+        )
+
+        payload = command.model_dump(exclude_none=True, by_alias=True)
+
+        assert payload == {
+            "type": "insert_content",
+            "insert_content": {
+                "content": "## Prepended section",
+                "position": {"type": "start"},
+            },
+        }
 
     def test_template_cannot_mix_with_children(self):
         with pytest.raises(ValueError, match="template cannot be used"):

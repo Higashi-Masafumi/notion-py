@@ -185,6 +185,8 @@ from .responses.list_response import (
     ListCommentsResponse,
     ListFileUploadsResponse,
     ListCustomEmojisResponse,
+    QueryMeetingNotesResponse,
+    RequestStatusResponse,
     CommentObject,
 )
 from .helper import Field, NotionMapper, NotionPropertyDescriptor
@@ -212,6 +214,8 @@ __all__ = [
     "ListCommentsResponse",
     "ListFileUploadsResponse",
     "ListCustomEmojisResponse",
+    "QueryMeetingNotesResponse",
+    "RequestStatusResponse",
     # Comment
     "CommentObject",
     # Block base

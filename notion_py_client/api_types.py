@@ -190,9 +190,24 @@ class ListUsersParameters(TypedDict, total=False):
 class CreateCommentParameters(TypedDict, total=False):
     """コメント作成のパラメータ."""
 
-    parent: dict[str, str]
-    rich_text: list[dict[str, Any]]
+    parent: NotRequired[dict[str, str]]
+    rich_text: NotRequired[list[dict[str, Any]]]
+    markdown: NotRequired[str]
     discussion_id: NotRequired[str]
+
+
+class UpdateCommentParameters(TypedDict, total=False):
+    """コメント更新のパラメータ."""
+
+    comment_id: str
+    rich_text: NotRequired[list[dict[str, Any]]]
+    markdown: NotRequired[str]
+
+
+class DeleteCommentParameters(TypedDict):
+    """コメント削除のパラメータ."""
+
+    comment_id: str
 
 
 class ListCommentsParameters(TypedDict, total=False):

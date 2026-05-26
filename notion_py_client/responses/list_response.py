@@ -24,6 +24,15 @@ from ..blocks import BlockObject
 T = TypeVar("T")
 
 
+class RequestStatusResponse(BaseModel):
+    """Status metadata returned when a paginated result set is incomplete."""
+
+    type: Literal["complete", "incomplete"] = Field(..., description="結果の完了状態")
+    incomplete_reason: Literal["query_result_limit_reached"] | None = Field(
+        None, description="結果が不完全な理由"
+    )
+
+
 # ============ Comment Type ============
 class CommentObject(BaseModel):
     """Notionのコメントオブジェクト
@@ -71,6 +80,9 @@ class ListResponse(BaseModel, Generic[T]):
     type: StrictStr | None = Field(
         None, description="結果の型ヒント（例: 'page_or_database'）"
     )
+    request_status: RequestStatusResponse | None = Field(
+        None, description="クエリ結果の完了状態"
+    )
 
 
 # 具体的なリストレスポンス型
@@ -103,6 +115,18 @@ class ListBlockChildrenResponse(ListResponse[BlockObject | PartialBlock]):
 
     備考: ブロックは完全なオブジェクト(BaseBlockObject)または部分的なオブジェクト(PartialBlock)が返される。
     """
+
+
+class QueryMeetingNotesResponse(BaseModel):
+    """blocks.meetingNotes.query() のレスポンス型."""
+
+    object: Literal["list"] = Field(..., description="オブジェクトタイプ")
+    results: list[BlockObject | PartialBlock] = Field(..., description="会議メモブロック")
+    has_more: StrictBool = Field(..., description="さらに結果があるか")
+    type: StrictStr | None = Field(None, description="結果の型ヒント")
+    request_status: RequestStatusResponse | None = Field(
+        None, description="クエリ結果の完了状態"
+    )
 
 
 class ListCommentsResponse(ListResponse[CommentObject]):

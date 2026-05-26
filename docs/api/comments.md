@@ -1,6 +1,6 @@
 # Comments API
 
-Create and retrieve comments on pages and blocks.
+Create, retrieve, update, and delete comments on pages and blocks.
 
 ## Methods
 
@@ -11,12 +11,15 @@ Create a new comment.
 ```python
 async def create(
     *,
-    parent: dict[str, Any],
-    rich_text: list[dict[str, Any]],
+    parent: dict[str, Any] | None = None,
+    rich_text: list[dict[str, Any]] | None = None,
+    markdown: str | None = None,
     discussion_id: str | None = None,
     auth: AuthParam | None = None
 ) -> dict[str, Any]
 ```
+
+Provide exactly one location (`parent` or `discussion_id`) and exactly one body format (`rich_text` or `markdown`). Comment markdown supports inline formatting only.
 
 **Example**:
 
@@ -26,9 +29,7 @@ from notion_py_client import NotionAsyncClient
 async with NotionAsyncClient(auth="secret_xxx") as client:
     comment = await client.comments.create(
         parent={"page_id": "page_abc123"},
-        rich_text=[
-            {"type": "text", "text": {"content": "Great work!"}}
-        ]
+        markdown="Great work with **strong** details!"
     )
 
     print(f"Comment ID: {comment['id']}")
@@ -97,6 +98,50 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
     print(f"Author: {comment['created_by']['name']}")
 ```
 
+### update
+
+Update a comment by ID. Exactly one of `rich_text` or `markdown` must be provided.
+
+```python
+async def update(
+    *,
+    comment_id: str,
+    rich_text: list[dict[str, Any]] | None = None,
+    markdown: str | None = None,
+    auth: AuthParam | None = None
+) -> dict[str, Any]
+```
+
+**Example**:
+
+```python
+async with NotionAsyncClient(auth="secret_xxx") as client:
+    comment = await client.comments.update(
+        comment_id="comment_abc123",
+        markdown="Updated with _inline_ Markdown",
+    )
+```
+
+### delete
+
+Delete a comment by ID. Notion returns the deleted comment object.
+
+```python
+async def delete(
+    *,
+    comment_id: str,
+    auth: AuthParam | None = None
+) -> dict[str, Any]
+```
+
+**Example**:
+
+```python
+async with NotionAsyncClient(auth="secret_xxx") as client:
+    deleted = await client.comments.delete(comment_id="comment_abc123")
+    print(deleted["id"])
+```
+
 ## Comment Structure
 
 ```python
@@ -137,7 +182,6 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
 
     # Reply in same discussion
     reply = await client.comments.create(
-        parent=original["parent"],
         discussion_id=original["discussion_id"],
         rich_text=[
             {"type": "text", "text": {"content": "Thanks!"}}

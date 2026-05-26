@@ -114,9 +114,10 @@ class ReplaceContentMarkdownCommand(BaseModel):
 
 
 class InsertContentMarkdownRequest(BaseModel):
-    """Legacy insert_content markdown command."""
+    """Insert markdown content into a page."""
 
     content: str
+    position: dict[str, Any] | None = None
     after: str | None = None
 
 
