@@ -120,7 +120,7 @@ Located in `notion_py.responses.property_types`:
 - `LastEditedByProperty` - Last editor (read-only)
 - `StatusProperty` - Status value
 - `UniqueIdProperty` - Unique identifier (read-only)
-- `VerificationProperty` - Verification state (read-only)
+- `VerificationProperty` - Verification state
 
 ### Property Requests
 

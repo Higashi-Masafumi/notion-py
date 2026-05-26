@@ -96,6 +96,37 @@ class TestPageMarkdownCommands:
             },
         }
 
+    def test_insert_content_serializes_end_position(self):
+        command = InsertContentMarkdownCommand(
+            insert_content={
+                "content": "## Closing section",
+                "position": {"type": "end"},
+            }
+        )
+
+        payload = command.model_dump(exclude_none=True, by_alias=True)
+
+        assert payload["insert_content"]["position"] == {"type": "end"}
+
+    def test_insert_content_rejects_position_and_after(self):
+        with pytest.raises(ValueError, match="after cannot be used with position"):
+            InsertContentMarkdownCommand(
+                insert_content={
+                    "content": "## Section",
+                    "position": {"type": "start"},
+                    "after": "Existing section",
+                }
+            )
+
+    def test_insert_content_rejects_unknown_position_type(self):
+        with pytest.raises(ValueError):
+            InsertContentMarkdownCommand(
+                insert_content={
+                    "content": "## Section",
+                    "position": {"type": "after_block"},
+                }
+            )
+
     def test_template_cannot_mix_with_children(self):
         with pytest.raises(ValueError, match="template cannot be used"):
             CreatePageParameters(
