@@ -53,6 +53,7 @@ from .responses.list_response import (
     ListCustomEmojisResponse,
     QueryMeetingNotesResponse,
     CommentObject,
+    PartialCommentObject,
 )
 from .blocks.base import BaseBlockObject, PartialBlock
 from .blocks import BlockObject
@@ -1504,6 +1505,21 @@ class _CommentsAPI:
     def __init__(self, client: NotionAsyncClient):
         self._c = client
 
+    def _parse_update_response(
+        self, response: dict[str, Any]
+    ) -> CommentObject | PartialCommentObject:
+        full_comment_keys = {
+            "parent",
+            "discussion_id",
+            "created_time",
+            "last_edited_time",
+            "created_by",
+            "rich_text",
+        }
+        if full_comment_keys.issubset(response):
+            return CommentObject(**response)
+        return PartialCommentObject(**response)
+
     async def create(
         self,
         *,
@@ -1546,7 +1562,7 @@ class _CommentsAPI:
         rich_text: list[dict[str, Any]] | None = None,
         markdown: str | None = None,
         auth: AuthParam | None = None,
-    ) -> CommentObject:
+    ) -> CommentObject | PartialCommentObject:
         """Update a comment."""
 
         if (rich_text is None) == (markdown is None):
@@ -1562,17 +1578,17 @@ class _CommentsAPI:
             body=body,
             auth=auth,
         )
-        return CommentObject(**response)
+        return self._parse_update_response(response)
 
     async def delete(
         self, *, comment_id: str, auth: AuthParam | None = None
-    ) -> CommentObject:
+    ) -> CommentObject | PartialCommentObject:
         """Delete a comment."""
 
         response = await self._c.request(
             path=f"comments/{comment_id}", method="delete", auth=auth
         )
-        return CommentObject(**response)
+        return self._parse_update_response(response)
 
     async def list(
         self,

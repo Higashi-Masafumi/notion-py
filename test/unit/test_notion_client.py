@@ -6,7 +6,11 @@ from pydantic import ValidationError
 from notion_py_client.blocks.special_blocks import MeetingNotesBlock
 from notion_py_client.notion_client import NotionAsyncClient
 from notion_py_client.requests.page_requests import ReplaceContentMarkdownCommand
-from notion_py_client.responses.list_response import CommentObject, QueryMeetingNotesResponse
+from notion_py_client.responses.list_response import (
+    CommentObject,
+    PartialCommentObject,
+    QueryMeetingNotesResponse,
+)
 from notion_py_client.responses.page_markdown import PageMarkdownResponse
 
 
@@ -228,6 +232,22 @@ class TestCommentsAPI:
         assert captured["body"] == {"markdown": "Updated"}
 
     @pytest.mark.asyncio
+    async def test_update_comment_accepts_partial_response(self):
+        client = NotionAsyncClient(auth="test-token")
+
+        async def fake_request(*, path, method, body=None, auth=None, **kwargs):
+            return {"object": "comment", "id": "comment_123"}
+
+        client.request = fake_request  # type: ignore[method-assign]
+
+        result = await client.comments.update(
+            comment_id="comment_123", markdown="Updated"
+        )
+
+        assert isinstance(result, PartialCommentObject)
+        assert result.id == "comment_123"
+
+    @pytest.mark.asyncio
     async def test_delete_comment_uses_delete(self):
         client = NotionAsyncClient(auth="test-token")
         captured: dict = {}
@@ -244,6 +264,20 @@ class TestCommentsAPI:
         assert isinstance(result, CommentObject)
         assert captured["path"] == "comments/comment_123"
         assert captured["method"] == "delete"
+
+    @pytest.mark.asyncio
+    async def test_delete_comment_accepts_partial_response(self):
+        client = NotionAsyncClient(auth="test-token")
+
+        async def fake_request(*, path, method, auth=None, **kwargs):
+            return {"object": "comment", "id": "comment_123"}
+
+        client.request = fake_request  # type: ignore[method-assign]
+
+        result = await client.comments.delete(comment_id="comment_123")
+
+        assert isinstance(result, PartialCommentObject)
+        assert result.id == "comment_123"
 
     @pytest.mark.asyncio
     async def test_comment_content_requires_exactly_one_body_format(self):
