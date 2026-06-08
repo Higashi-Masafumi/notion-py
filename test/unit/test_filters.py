@@ -159,6 +159,15 @@ class TestPropertyFilterSelect:
 
         assert filter_dict["select"]["is_empty"] is True  # type: ignore
 
+    def test_multi_value_equals_filter(self):
+        """Test select equals accepts multiple values."""
+        filter_dict: PropertyFilterSelect = {
+            "property": "Priority",
+            "select": {"equals": ["High", "Urgent"]},
+        }
+
+        assert filter_dict["select"]["equals"] == ["High", "Urgent"]  # type: ignore
+
 
 class TestPropertyFilterMultiSelect:
     """Test PropertyFilterMultiSelect TypedDict."""
@@ -176,10 +185,19 @@ class TestPropertyFilterMultiSelect:
         """Test multi_select does_not_contain filter."""
         filter_dict: PropertyFilterMultiSelect = {
             "property": "Labels",
-            "multi_select": {"does_not_contain": "archived"},
+            "multi_select": {"does_not_contain": "stale"},
         }
 
-        assert filter_dict["multi_select"]["does_not_contain"] == "archived"  # type: ignore
+        assert filter_dict["multi_select"]["does_not_contain"] == "stale"  # type: ignore
+
+    def test_multi_value_contains_filter(self):
+        """Test multi_select contains accepts multiple values."""
+        filter_dict: PropertyFilterMultiSelect = {
+            "property": "Labels",
+            "multi_select": {"contains": ["customer", "vip"]},
+        }
+
+        assert filter_dict["multi_select"]["contains"] == ["customer", "vip"]  # type: ignore
 
 
 class TestPropertyFilterStatus:
@@ -203,6 +221,15 @@ class TestPropertyFilterStatus:
         }
 
         assert filter_dict["status"]["does_not_equal"] == "Cancelled"  # type: ignore
+
+    def test_multi_value_does_not_equal_filter(self):
+        """Test status does_not_equal accepts multiple values."""
+        filter_dict: PropertyFilterStatus = {
+            "property": "State",
+            "status": {"does_not_equal": ["Done", "Archived"]},
+        }
+
+        assert filter_dict["status"]["does_not_equal"] == ["Done", "Archived"]  # type: ignore
 
 
 class TestPropertyFilterDate:

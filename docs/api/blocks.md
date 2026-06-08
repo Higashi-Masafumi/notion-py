@@ -10,6 +10,7 @@ Blocks are the building blocks of Notion pages. The Blocks API provides methods 
 - Update block content
 - Delete (archive) blocks
 - List and append child blocks
+- Query AI meeting notes
 
 ## Methods
 
@@ -170,6 +171,33 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
             }
         ]
     )
+```
+
+### meetingNotes.query
+
+Query AI meeting notes visible to the integration's user.
+
+```python
+async def meetingNotes.query(
+    *,
+    filter: dict[str, Any] | None = None,
+    sort: list[dict[str, Any]] | None = None,
+    limit: int | None = None,
+    auth: AuthParam | None = None
+) -> QueryMeetingNotesResponse
+```
+
+**Example**:
+
+```python
+async with NotionAsyncClient(auth="secret_xxx") as client:
+    response = await client.blocks.meetingNotes.query(
+        sort=[{"property": "last_edited_time", "direction": "descending"}],
+        limit=10,
+    )
+
+    for block in response.results:
+        print(block.id)
 ```
 
 ## Block Types

@@ -79,7 +79,19 @@ class DataSourceParent(TypedDict):
     data_source_id: str
 
 
+class AgentParent(TypedDict):
+    """エージェントを親とするオブジェクト."""
+
+    type: Literal["agent_id"]
+    agent_id: str
+
+
 # すべての親タイプのUnion型
 NotionParent = (
-    DatabaseParent | PageParent | WorkspaceParent | BlockParent | DataSourceParent
+    DatabaseParent
+    | PageParent
+    | WorkspaceParent
+    | BlockParent
+    | DataSourceParent
+    | AgentParent
 )

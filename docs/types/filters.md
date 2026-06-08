@@ -21,7 +21,7 @@ the helper functions for AND/OR combinations.
 filter = {"property": "Name", "rich_text": {"contains": "urgent"}}
 
 # Does not contain
-filter = {"property": "Description", "rich_text": {"does_not_contain": "archived"}}
+filter = {"property": "Description", "rich_text": {"does_not_contain": "stale"}}
 
 # Equals
 filter = {"property": "Title", "rich_text": {"equals": "Exact Match"}}
@@ -86,9 +86,11 @@ Filter select properties.
 ```python
 # Equals
 filter = {"property": "Priority", "select": {"equals": "High"}}
+filter = {"property": "Priority", "select": {"equals": ["High", "Urgent"]}}
 
 # Does not equal
 filter = {"property": "Priority", "select": {"does_not_equal": "Low"}}
+filter = {"property": "Priority", "select": {"does_not_equal": ["Low", "Backlog"]}}
 
 # Is empty
 filter = {"property": "Category", "select": {"is_empty": True}}
@@ -102,9 +104,11 @@ filter = {"property": "Category", "select": {"is_not_empty": True}}
 ```python
 # Contains
 filter = {"property": "Tags", "multi_select": {"contains": "Important"}}
+filter = {"property": "Tags", "multi_select": {"contains": ["Important", "Review"]}}
 
 # Does not contain
 filter = {"property": "Labels", "multi_select": {"does_not_contain": "Archived"}}
+filter = {"property": "Labels", "multi_select": {"does_not_contain": ["Archived", "Hidden"]}}
 
 # Is empty
 filter = {"property": "Categories", "multi_select": {"is_empty": True}}
@@ -118,9 +122,11 @@ filter = {"property": "Categories", "multi_select": {"is_not_empty": True}}
 ```python
 # Equals
 filter = {"property": "Status", "status": {"equals": "In Progress"}}
+filter = {"property": "Status", "status": {"equals": ["In Progress", "Review"]}}
 
 # Does not equal
 filter = {"property": "Status", "status": {"does_not_equal": "Done"}}
+filter = {"property": "Status", "status": {"does_not_equal": ["Done", "Archived"]}}
 
 # Is empty
 filter = {"property": "Workflow", "status": {"is_empty": True}}

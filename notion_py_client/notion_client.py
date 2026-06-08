@@ -51,7 +51,9 @@ from .responses.list_response import (
     ListCommentsResponse,
     ListFileUploadsResponse,
     ListCustomEmojisResponse,
+    QueryMeetingNotesResponse,
     CommentObject,
+    PartialCommentObject,
 )
 from .blocks.base import BaseBlockObject, PartialBlock
 from .blocks import BlockObject
@@ -610,6 +612,7 @@ class _BlocksAPI:
     def __init__(self, client: NotionAsyncClient):
         self._c = client
         self.children = _BlockChildrenAPI(client)
+        self.meetingNotes = _MeetingNotesAPI(client)
 
     async def retrieve(
         self, *, block_id: str, auth: AuthParam | None = None
@@ -709,6 +712,7 @@ class _BlockChildrenAPI:
             next_cursor=response.get("next_cursor"),
             has_more=response.get("has_more", False),
             type="block",
+            request_status=response.get("request_status"),
         )
 
     async def list(
@@ -749,6 +753,53 @@ class _BlockChildrenAPI:
             next_cursor=response.get("next_cursor"),
             has_more=response.get("has_more", False),
             type="block",
+            request_status=response.get("request_status"),
+        )
+
+
+class _MeetingNotesAPI:
+    def __init__(self, client: NotionAsyncClient):
+        self._c = client
+
+    async def query(
+        self,
+        *,
+        filter: dict[str, Any] | None = None,
+        sort: list[dict[str, Any]] | None = None,
+        limit: int | None = None,
+        auth: AuthParam | None = None,
+    ) -> QueryMeetingNotesResponse:
+        """Query AI meeting notes visible to the integration's user."""
+
+        body = pick(
+            {
+                "filter": filter,
+                "sort": sort,
+                "limit": limit,
+            },
+            ["filter", "sort", "limit"],
+        )
+        response = await self._c.request(
+            path="blocks/meeting_notes/query",
+            method="post",
+            body=body,
+            auth=auth,
+        )
+
+        results = []
+        block_adapter = TypeAdapter(BlockObject)
+        for item in response.get("results", []):
+            if "type" in item and item.get("type") is not None:
+                results.append(block_adapter.validate_python(item))
+            else:
+                results.append(PartialBlock(**item))
+
+        return QueryMeetingNotesResponse(
+            object="list",
+            results=results,
+            has_more=response.get("has_more", False),
+            type=response.get("type"),
+            request_status=response.get("request_status"),
         )
 
 
@@ -887,6 +938,7 @@ class _DatabasesAPI:
             next_cursor=response.get("next_cursor"),
             has_more=response.get("has_more", False),
             type="page_or_database",
+            request_status=response.get("request_status"),
         )
 
     async def update(
@@ -1102,6 +1154,7 @@ class _DataSourcesAPI:
             next_cursor=response.get("next_cursor"),
             has_more=response.get("has_more", False),
             type="page_or_data_source",
+            request_status=response.get("request_status"),
         )
 
     async def query_legacy(
@@ -1140,6 +1193,7 @@ class _DataSourcesAPI:
             next_cursor=response.get("next_cursor"),
             has_more=response.get("has_more", False),
             type="page_or_data_source",
+            request_status=response.get("request_status"),
         )
 
     async def create(
@@ -1451,11 +1505,27 @@ class _CommentsAPI:
     def __init__(self, client: NotionAsyncClient):
         self._c = client
 
+    def _parse_update_response(
+        self, response: dict[str, Any]
+    ) -> CommentObject | PartialCommentObject:
+        full_comment_keys = {
+            "parent",
+            "discussion_id",
+            "created_time",
+            "last_edited_time",
+            "created_by",
+            "rich_text",
+        }
+        if full_comment_keys.issubset(response):
+            return CommentObject(**response)
+        return PartialCommentObject(**response)
+
     async def create(
         self,
         *,
-        parent: dict[str, Any],
-        rich_text: list[dict[str, Any]],
+        parent: dict[str, Any] | None = None,
+        rich_text: list[dict[str, Any]] | None = None,
+        markdown: str | None = None,
         discussion_id: str | None = None,
         auth: AuthParam | None = None,
     ) -> CommentObject:
@@ -1464,15 +1534,61 @@ class _CommentsAPI:
         Returns:
             CommentObjectResponse: 作成されたコメントオブジェクト
         """
+        if (parent is None) == (discussion_id is None):
+            raise ValueError("Provide exactly one of parent or discussion_id")
+        if (rich_text is None) == (markdown is None):
+            raise ValueError("Provide exactly one of rich_text or markdown")
+
         body = {
-            "parent": parent,
-            "rich_text": rich_text,
-            **pick({"discussion_id": discussion_id}, ["discussion_id"]),
+            **pick(
+                {
+                    "parent": parent,
+                    "discussion_id": discussion_id,
+                    "rich_text": rich_text,
+                    "markdown": markdown,
+                },
+                ["parent", "discussion_id", "rich_text", "markdown"],
+            ),
         }
         response = await self._c.request(
             path="comments", method="post", body=body, auth=auth
         )
         return CommentObject(**response)
+
+    async def update(
+        self,
+        *,
+        comment_id: str,
+        rich_text: list[dict[str, Any]] | None = None,
+        markdown: str | None = None,
+        auth: AuthParam | None = None,
+    ) -> CommentObject | PartialCommentObject:
+        """Update a comment."""
+
+        if (rich_text is None) == (markdown is None):
+            raise ValueError("Provide exactly one of rich_text or markdown")
+
+        body = pick(
+            {"rich_text": rich_text, "markdown": markdown},
+            ["rich_text", "markdown"],
+        )
+        response = await self._c.request(
+            path=f"comments/{comment_id}",
+            method="patch",
+            body=body,
+            auth=auth,
+        )
+        return self._parse_update_response(response)
+
+    async def delete(
+        self, *, comment_id: str, auth: AuthParam | None = None
+    ) -> CommentObject | PartialCommentObject:
+        """Delete a comment."""
+
+        response = await self._c.request(
+            path=f"comments/{comment_id}", method="delete", auth=auth
+        )
+        return self._parse_update_response(response)
 
     async def list(
         self,
@@ -1508,6 +1624,7 @@ class _CommentsAPI:
             next_cursor=response.get("next_cursor"),
             has_more=response.get("has_more", False),
             type="comment",
+            request_status=response.get("request_status"),
         )
 
     async def retrieve(

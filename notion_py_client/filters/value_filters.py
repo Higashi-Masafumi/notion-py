@@ -174,13 +174,13 @@ class SelectFilterEquals(TypedDict):
         ```
     """
 
-    equals: str
+    equals: str | list[str]
 
 
 class SelectFilterDoesNotEqual(TypedDict):
     """選択肢が等しくない"""
 
-    does_not_equal: str
+    does_not_equal: str | list[str]
 
 
 # Matches TypeScript: type SelectPropertyFilter = { equals: string } | { does_not_equal: string } | ExistencePropertyFilter
@@ -205,13 +205,13 @@ class MultiSelectFilterContains(TypedDict):
         ```
     """
 
-    contains: str
+    contains: str | list[str]
 
 
 class MultiSelectFilterDoesNotContain(TypedDict):
     """マルチセレクトが含まない"""
 
-    does_not_contain: str
+    does_not_contain: str | list[str]
 
 
 # Matches TypeScript: type MultiSelectPropertyFilter = { contains: string } | { does_not_contain: string } | ExistencePropertyFilter
@@ -236,13 +236,13 @@ class StatusFilterEquals(TypedDict):
         ```
     """
 
-    equals: str
+    equals: str | list[str]
 
 
 class StatusFilterDoesNotEqual(TypedDict):
     """ステータスが等しくない"""
 
-    does_not_equal: str
+    does_not_equal: str | list[str]
 
 
 # Matches TypeScript: type StatusPropertyFilter = { equals: string } | { does_not_equal: string } | ExistencePropertyFilter

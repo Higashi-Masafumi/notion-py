@@ -220,6 +220,25 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
     print(markdown_page.markdown)
 ```
 
+To prepend or explicitly append markdown, use `InsertContentMarkdownCommand` with
+`insert_content.position` (`{"type": "start"}` or `{"type": "end"}`). Use either
+`position` or `after`, not both.
+
+```python
+from notion_py_client.requests import InsertContentMarkdownCommand
+
+async with NotionAsyncClient(auth="secret_xxx") as client:
+    await client.pages.update_markdown(
+        page_id="page_abc123",
+        command=InsertContentMarkdownCommand(
+            insert_content={
+                "content": "## New opening section",
+                "position": {"type": "start"},
+            }
+        ),
+    )
+```
+
 ### properties.retrieve
 
 Retrieve a specific property value (useful for paginated properties like relations).

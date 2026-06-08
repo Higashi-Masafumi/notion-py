@@ -127,6 +127,7 @@ from .requests import (
     PageMarkdownCommand,
     UpdateContentMarkdownCommand,
     ReplaceContentMarkdownCommand,
+    MarkdownInsertPositionRequest,
     InsertContentMarkdownCommand,
     ReplaceContentRangeMarkdownCommand,
     PageTemplateRequest,
@@ -185,7 +186,10 @@ from .responses.list_response import (
     ListCommentsResponse,
     ListFileUploadsResponse,
     ListCustomEmojisResponse,
+    QueryMeetingNotesResponse,
+    RequestStatusResponse,
     CommentObject,
+    PartialCommentObject,
 )
 from .helper import Field, NotionMapper, NotionPropertyDescriptor
 
@@ -212,8 +216,11 @@ __all__ = [
     "ListCommentsResponse",
     "ListFileUploadsResponse",
     "ListCustomEmojisResponse",
+    "QueryMeetingNotesResponse",
+    "RequestStatusResponse",
     # Comment
     "CommentObject",
+    "PartialCommentObject",
     # Block base
     "BlockObject",
     "PartialBlock",
@@ -282,6 +289,7 @@ __all__ = [
     "PageMarkdownCommand",
     "UpdateContentMarkdownCommand",
     "ReplaceContentMarkdownCommand",
+    "MarkdownInsertPositionRequest",
     "InsertContentMarkdownCommand",
     "ReplaceContentRangeMarkdownCommand",
     "PageTemplateRequest",
