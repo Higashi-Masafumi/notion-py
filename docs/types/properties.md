@@ -274,6 +274,8 @@ when creating or updating a data source schema:
 from notion_py_client.schema import StatusPropertyConfig
 
 config = StatusPropertyConfig(
+    id="status",
+    name="Status",
     status={
         "options": [
             {"name": "Needs review", "group": "In progress"}

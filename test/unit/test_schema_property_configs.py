@@ -10,6 +10,8 @@ class TestStatusPropertyConfig:
 
     def test_status_option_group_serializes(self):
         config = StatusPropertyConfig(
+            id="status",
+            name="Status",
             status={
                 "options": [
                     {
