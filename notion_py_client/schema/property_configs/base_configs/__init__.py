@@ -15,7 +15,12 @@ from .people_config import PeoplePropertyConfig
 from .phone_number_config import PhoneNumberPropertyConfig
 from .rich_text_config import RichTextPropertyConfig
 from .select_config import SelectOptionConfig, SelectOptions, SelectPropertyConfig
-from .status_config import StatusPropertyConfig
+from .status_config import (
+    StatusConfig,
+    StatusGroupConfig,
+    StatusOptionConfig,
+    StatusPropertyConfig,
+)
 from .title_config import TitlePropertyConfig
 from .unique_id_config import UniqueIdPropertyConfig
 from .url_config import UrlPropertyConfig
@@ -45,6 +50,9 @@ __all__ = [
     "SelectOptionConfig",
     "SelectOptions",
     "SelectPropertyConfig",
+    "StatusConfig",
+    "StatusGroupConfig",
+    "StatusOptionConfig",
     "StatusPropertyConfig",
     "TitlePropertyConfig",
     "UniqueIdPropertyConfig",

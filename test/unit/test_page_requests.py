@@ -42,12 +42,14 @@ class TestCreatePageParameters:
             properties={},
             markdown="# Heading\n\nBody",
             position={"type": "page_end"},
+            allow_async=True,
         )
 
         payload = params.model_dump(exclude_none=True, by_alias=True)
 
         assert payload["markdown"] == "# Heading\n\nBody"
         assert payload["position"]["type"] == "page_end"
+        assert payload["allow_async"] is True
 
     def test_template_serializes(self):
         params = CreatePageParameters(
@@ -72,6 +74,14 @@ class TestCreatePageParameters:
                 properties={},
                 markdown="# Heading",
                 children=[{"object": "block", "type": "paragraph", "paragraph": {}}],
+            )
+
+    def test_allow_async_requires_markdown(self):
+        with pytest.raises(ValueError, match="allow_async can only be used"):
+            CreatePageParameters(
+                parent={"type": "page_id", "page_id": "page_123"},
+                properties={},
+                allow_async=True,
             )
 
 

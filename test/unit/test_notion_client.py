@@ -1,16 +1,21 @@
 """Unit tests for client facade additions and defaults."""
 
+import httpx
 import pytest
 from pydantic import ValidationError
 
 from notion_py_client.blocks.special_blocks import MeetingNotesBlock
 from notion_py_client.notion_client import NotionAsyncClient
-from notion_py_client.requests.page_requests import ReplaceContentMarkdownCommand
+from notion_py_client.requests.page_requests import (
+    CreatePageParameters,
+    ReplaceContentMarkdownCommand,
+)
 from notion_py_client.responses.list_response import (
     CommentObject,
     PartialCommentObject,
     QueryMeetingNotesResponse,
 )
+from notion_py_client.responses.async_task import AsyncTaskResponse
 from notion_py_client.responses.page_markdown import PageMarkdownResponse
 
 
@@ -46,6 +51,23 @@ def _comment_response(content: str = "Hello") -> dict:
     }
 
 
+def _async_task_response(status: str = "queued") -> dict:
+    response = {
+        "object": "async_task",
+        "id": "task_123",
+        "status": status,
+        "status_url": "https://api.notion.com/v1/async_tasks/task_123",
+        "created_time": "2026-07-01T00:00:00.000Z",
+        "operation": {
+            "surface": "rest",
+            "name": "PATCH /v1/pages/:page_id/markdown",
+        },
+    }
+    if status in {"queued", "running", "retrying"}:
+        response["poll_after_seconds"] = 2
+    return response
+
+
 class TestNotionAsyncClientDefaults:
     """Test client default configuration."""
 
@@ -54,6 +76,79 @@ class TestNotionAsyncClientDefaults:
 
         assert client.default_notion_version == "2026-03-11"
         assert client._notion_version == "2026-03-11"
+
+
+class TestRequestRetries:
+    """Test retry behavior for transient Notion API errors."""
+
+    @pytest.mark.asyncio
+    async def test_retries_service_overload_with_retry_after(self, monkeypatch):
+        slept: list[float] = []
+
+        async def fake_sleep(seconds: float):
+            slept.append(seconds)
+
+        monkeypatch.setattr(
+            "notion_py_client.notion_client.asyncio.sleep", fake_sleep
+        )
+
+        calls = 0
+
+        def handler(request: httpx.Request) -> httpx.Response:
+            nonlocal calls
+            calls += 1
+            if calls == 1:
+                return httpx.Response(
+                    529,
+                    headers={"Retry-After": "0"},
+                    json={
+                        "object": "error",
+                        "status": 529,
+                        "code": "service_overload",
+                        "message": "Notion is temporarily overloaded.",
+                    },
+                    request=request,
+                )
+            return httpx.Response(200, json={"ok": True}, request=request)
+
+        client = NotionAsyncClient(
+            auth="test-token", options={"max_retries": 1}
+        )
+        await client._client.aclose()
+        client._client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+
+        try:
+            result = await client.request(path="test", method="get")
+        finally:
+            await client.aclose()
+
+        assert result == {"ok": True}
+        assert calls == 2
+        assert slept == [0.0]
+
+
+class TestAsyncTasksAPI:
+    """Test async task polling facade."""
+
+    @pytest.mark.asyncio
+    async def test_retrieve_async_task(self):
+        client = NotionAsyncClient(auth="test-token")
+        captured: dict = {}
+
+        async def fake_request(*, path, method, auth=None, **kwargs):
+            captured["path"] = path
+            captured["method"] = method
+            return _async_task_response(status="running")
+
+        client.request = fake_request  # type: ignore[method-assign]
+
+        result = await client.asyncTasks.retrieve(task_id="task_123")
+
+        assert isinstance(result, AsyncTaskResponse)
+        assert captured["path"] == "async_tasks/task_123"
+        assert captured["method"] == "get"
+        assert result.status == "running"
+        assert result.poll_after_seconds == 2
 
 
 class TestPageMarkdownAPI:
@@ -127,6 +222,62 @@ class TestPageMarkdownAPI:
             },
         }
         assert result.markdown == "# Fresh Start"
+
+    @pytest.mark.asyncio
+    async def test_update_markdown_allows_async_task_response(self):
+        client = NotionAsyncClient(auth="test-token")
+        captured: dict = {}
+
+        async def fake_request(*, path, method, body=None, auth=None, **kwargs):
+            captured["path"] = path
+            captured["method"] = method
+            captured["body"] = body
+            return _async_task_response()
+
+        client.request = fake_request  # type: ignore[method-assign]
+
+        result = await client.pages.update_markdown(
+            page_id="page_123",
+            command=ReplaceContentMarkdownCommand(
+                replace_content={"new_str": "# Fresh Start"}
+            ),
+            allow_async=True,
+        )
+
+        assert isinstance(result, AsyncTaskResponse)
+        assert captured["path"] == "pages/page_123/markdown"
+        assert captured["method"] == "patch"
+        assert captured["body"]["allow_async"] is True
+
+    @pytest.mark.asyncio
+    async def test_create_markdown_page_allows_async_task_response(self):
+        client = NotionAsyncClient(auth="test-token")
+        captured: dict = {}
+
+        async def fake_request(*, path, method, body=None, auth=None, **kwargs):
+            captured["path"] = path
+            captured["method"] = method
+            captured["body"] = body
+            return {
+                **_async_task_response(),
+                "operation": {"surface": "rest", "name": "POST /v1/pages"},
+            }
+
+        client.request = fake_request  # type: ignore[method-assign]
+
+        result = await client.pages.create(
+            CreatePageParameters(
+                parent={"type": "page_id", "page_id": "page_123"},
+                properties={},
+                markdown="# Large page",
+                allow_async=True,
+            )
+        )
+
+        assert isinstance(result, AsyncTaskResponse)
+        assert captured["path"] == "pages"
+        assert captured["method"] == "post"
+        assert captured["body"]["allow_async"] is True
 
 
 class TestCustomEmojisAPI:

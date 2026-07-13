@@ -25,6 +25,14 @@ class DatabaseQuerySort(TypedDict, total=False):
     timestamp: NotRequired[Literal["created_time", "last_edited_time"]]
 
 
+class SearchSort(TypedDict, total=False):
+    """検索結果のソート条件."""
+
+    property: NotRequired[Literal["relevance"]]
+    timestamp: NotRequired[Literal["last_edited_time"]]
+    direction: NotRequired[Literal["ascending", "descending"]]
+
+
 class _QueryDatabaseRequired(TypedDict):
     """QueryDatabaseParametersの必須フィールド."""
 
@@ -48,7 +56,7 @@ class QueryDatabaseParameters(_QueryDatabaseRequired, total=False):
 
     filter: FilterCondition | dict[str, Any]
     sorts: list[DatabaseQuerySort]
-    start_cursor: str
+    start_cursor: str | None
     page_size: int
     filter_properties: list[str]
 
@@ -113,8 +121,8 @@ class SearchParameters(TypedDict, total=False):
 
     query: NotRequired[str]
     filter: NotRequired[dict[str, str]]
-    sort: NotRequired[dict[str, str]]
-    start_cursor: NotRequired[str]
+    sort: NotRequired[SearchSort]
+    start_cursor: NotRequired[str | None]
     page_size: NotRequired[int]
 
 
@@ -160,7 +168,7 @@ class ListBlockChildrenParameters(TypedDict, total=False):
     """ブロックの子要素リスト取得のパラメータ."""
 
     block_id: str
-    start_cursor: NotRequired[str]
+    start_cursor: NotRequired[str | None]
     page_size: NotRequired[int]
 
 
@@ -182,7 +190,7 @@ class RetrieveUserParameters(TypedDict):
 class ListUsersParameters(TypedDict, total=False):
     """ユーザーリスト取得のパラメータ."""
 
-    start_cursor: NotRequired[str]
+    start_cursor: NotRequired[str | None]
     page_size: NotRequired[int]
 
 
@@ -214,5 +222,5 @@ class ListCommentsParameters(TypedDict, total=False):
     """コメントリスト取得のパラメータ."""
 
     block_id: NotRequired[str]
-    start_cursor: NotRequired[str]
+    start_cursor: NotRequired[str | None]
     page_size: NotRequired[int]

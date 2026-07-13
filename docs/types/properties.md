@@ -267,6 +267,21 @@ property: StatusProperty = {
 status = property.status.name if property.status else None
 ```
 
+Status schema options can assign an option to one of Notion's built-in groups
+when creating or updating a data source schema:
+
+```python
+from notion_py_client.schema import StatusPropertyConfig
+
+config = StatusPropertyConfig(
+    status={
+        "options": [
+            {"name": "Needs review", "group": "In progress"}
+        ]
+    }
+)
+```
+
 ## Read-Only Properties
 
 ### FormulaProperty

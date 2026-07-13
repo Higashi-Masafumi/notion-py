@@ -1,6 +1,8 @@
-from typing import Literal
+from __future__ import annotations
 
-from pydantic import BaseModel, Field, StrictStr
+from typing import Literal, Self
+
+from pydantic import BaseModel, Field, StrictStr, model_validator
 
 from ._base_config import BasePropertyConfig
 
@@ -8,10 +10,19 @@ from ._base_config import BasePropertyConfig
 class StatusOptionConfig(BaseModel):
     """statusのオプション定義"""
 
-    id: StrictStr = Field(..., description="ステータスオプションID")
-    name: StrictStr = Field(..., description="オプション名")
-    color: StrictStr = Field(..., description="表示カラー")
+    id: StrictStr | None = Field(None, description="ステータスオプションID")
+    name: StrictStr | None = Field(None, description="オプション名")
+    color: StrictStr | None = Field(None, description="表示カラー")
     description: StrictStr | None = Field(None, description="オプション説明")
+    group: Literal["To-do", "In progress", "Complete"] | None = Field(
+        None, description="割り当てるステータスグループ"
+    )
+
+    @model_validator(mode="after")
+    def validate_identifier(self) -> Self:
+        if not self.id and not self.name:
+            raise ValueError("Status option requires either id or name")
+        return self
 
 
 class StatusGroupConfig(BaseModel):

@@ -2,6 +2,7 @@ from .responses.datasource import DataSource, PartialDataSource
 from .responses.database import NotionDatabase, PartialDatabase
 from .responses.page import NotionPage, PartialPage
 from .responses.file_upload import FileUploadObject
+from .responses.async_task import AsyncTaskError, AsyncTaskOperation, AsyncTaskResponse
 from .responses.page_markdown import PageMarkdownResponse
 from .responses.property_item import PropertyItemObject, PropertyItemListResponse
 from .blocks import (
@@ -156,6 +157,9 @@ from .schema import (
     SelectOptions,
     DatePropertyConfig,
     NumberPropertyConfig,
+    StatusConfig,
+    StatusGroupConfig,
+    StatusOptionConfig,
     PhoneNumberPropertyConfig,
     UrlPropertyConfig,
     UniqueIdPropertyConfig,
@@ -204,6 +208,9 @@ __all__ = [
     "NotionPage",
     "PartialPage",
     "FileUploadObject",
+    "AsyncTaskResponse",
+    "AsyncTaskOperation",
+    "AsyncTaskError",
     "PageMarkdownResponse",
     "PropertyItemObject",
     "PropertyItemListResponse",
@@ -366,6 +373,9 @@ __all__ = [
     "MultiSelectPropertyConfig",
     "MultiSelectOptions",
     "StatusPropertyConfig",
+    "StatusConfig",
+    "StatusGroupConfig",
+    "StatusOptionConfig",
     "SelectOptionConfig",
     "SelectOptions",
     "DatePropertyConfig",

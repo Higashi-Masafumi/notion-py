@@ -22,7 +22,7 @@ async def create(
     params: CreatePageParameters,
     *,
     auth: AuthParam | None = None
-) -> NotionPage
+) -> NotionPage | AsyncTaskResponse
 ```
 
 **Parameters**:
@@ -32,8 +32,10 @@ async def create(
 - `params.icon` (optional): Page icon
 - `params.cover` (optional): Cover image
 - `params.children` (optional): Child blocks
+- `params.markdown` (optional): Page content as Notion-flavored Markdown
+- `params.allow_async` (optional): Return an async task when creating a large markdown page
 
-**Returns**: Created `NotionPage`
+**Returns**: Created `NotionPage`, or `AsyncTaskResponse` when `allow_async=True`
 
 **Example**:
 
@@ -201,8 +203,9 @@ async def update_markdown(
     *,
     page_id: str,
     command: PageMarkdownCommand,
+    allow_async: bool | None = None,
     auth: AuthParam | None = None
-) -> PageMarkdownResponse
+) -> PageMarkdownResponse | AsyncTaskResponse
 ```
 
 **Example**:
@@ -218,6 +221,22 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
         ),
     )
     print(markdown_page.markdown)
+```
+
+For large markdown writes, pass `allow_async=True` to receive an
+`AsyncTaskResponse` and poll it with `client.asyncTasks.retrieve(...)`.
+
+```python
+async_task = await client.pages.update_markdown(
+    page_id="page_abc123",
+    command=ReplaceContentMarkdownCommand(
+        replace_content={"new_str": "# Large replacement"}
+    ),
+    allow_async=True,
+)
+
+polled = await client.asyncTasks.retrieve(task_id=async_task.id)
+print(polled.status)
 ```
 
 To prepend or explicitly append markdown, use `InsertContentMarkdownCommand` with

@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import base64
 import json
+import math
 from collections.abc import Sequence
 from enum import Enum, auto
 from typing import (
@@ -40,6 +41,7 @@ from .responses.database import NotionDatabase
 from .responses.datasource import DataSource
 from .responses.page import NotionPage
 from .responses.file_upload import FileUploadObject
+from .responses.async_task import AsyncTaskResponse
 from .responses.page_markdown import PageMarkdownResponse
 from .responses.property_item import PropertyItemListResponse, PropertyItemObject
 from .responses.list_response import (
@@ -93,6 +95,7 @@ class APIErrorCode(str, Enum):
     RestrictedResource = "restricted_resource"
     ObjectNotFound = "object_not_found"
     RateLimited = "rate_limited"
+    ServiceOverload = "service_overload"
     InvalidJSON = "invalid_json"
     InvalidRequestURL = "invalid_request_url"
     InvalidRequest = "invalid_request"
@@ -242,7 +245,7 @@ def _normalize_query(
 Method = Literal["get", "post", "patch", "delete"]
 
 # QueryParams type (公式SDKと同じ)
-QueryParams = dict[str, str | int | bool | list[str]]
+QueryParams = dict[str, str | int | bool | list[str] | None]
 
 
 class FileParam(TypedDict, total=False):
@@ -274,6 +277,7 @@ class ClientOptions(TypedDict, total=False):
     """
 
     timeout_ms: NotRequired[int]
+    max_retries: NotRequired[int]
     base_url: NotRequired[str]
     log_level: NotRequired[LogLevel]
     logger: NotRequired[Logger | None]
@@ -348,6 +352,7 @@ class NotionAsyncClient:
         opts = options or {}
         self._auth = auth
         self._timeout_ms = opts.get("timeout_ms", 60_000)
+        self._max_retries = opts.get("max_retries", 3)
         base_url = opts.get("base_url", "https://api.notion.com")
         self._prefix_url = f"{base_url.rstrip('/')}/v1/"
         self._notion_version = opts.get("notion_version") or self.default_notion_version
@@ -358,6 +363,7 @@ class NotionAsyncClient:
         self._client = httpx.AsyncClient(timeout=self._timeout_ms / 1000)
 
         # ------- public API groups（JSに合わせた名前/階層）-------
+        self.asyncTasks = _AsyncTasksAPI(self)
         self.blocks = _BlocksAPI(self)
         self.customEmojis = _CustomEmojisAPI(self)
         self.databases = _DatabasesAPI(self)
@@ -455,17 +461,50 @@ class NotionAsyncClient:
                 files=files_payload,
             )
 
-        try:
-            response: httpx.Response = await asyncio.wait_for(
-                _send(), timeout=self._timeout_ms / 1000
-            )
-        except asyncio.TimeoutError:
+        def _retry_after_seconds(response: httpx.Response, attempt: int) -> float:
+            retry_after = response.headers.get("retry-after")
+            if retry_after is not None:
+                try:
+                    seconds = float(retry_after)
+                except ValueError:
+                    seconds = 0.0
+                if math.isfinite(seconds) and seconds >= 0:
+                    return seconds
+            return float(min(2**attempt, 30))
+
+        max_retries = max(0, self._max_retries)
+        response: httpx.Response | None = None
+        for attempt in range(max_retries + 1):
+            try:
+                response = await asyncio.wait_for(
+                    _send(), timeout=self._timeout_ms / 1000
+                )
+            except asyncio.TimeoutError:
+                self._log(
+                    LogLevel.WARN,
+                    "request fail",
+                    {"code": ClientErrorCode.RequestTimeout, "message": "timeout"},
+                )
+                raise RequestTimeoutError()
+
+            if response.status_code != 529 or attempt >= max_retries:
+                break
+
+            delay = _retry_after_seconds(response, attempt)
             self._log(
                 LogLevel.WARN,
-                "request fail",
-                {"code": ClientErrorCode.RequestTimeout, "message": "timeout"},
+                "request retry",
+                {
+                    "code": APIErrorCode.ServiceOverload,
+                    "status": response.status_code,
+                    "retryAfterSeconds": delay,
+                    "attempt": attempt + 1,
+                },
             )
-            raise RequestTimeoutError()
+            await response.aclose()
+            await asyncio.sleep(delay)
+
+        assert response is not None
 
         text = await response.aread()
         text_str = text.decode(errors="replace")
@@ -608,6 +647,21 @@ class NotionAsyncClient:
 
 
 # ========== Endpoint groups（JSの形に合わせた薄い Facade） ==========
+class _AsyncTasksAPI:
+    def __init__(self, client: NotionAsyncClient):
+        self._c = client
+
+    async def retrieve(
+        self, *, task_id: str, auth: AuthParam | None = None
+    ) -> AsyncTaskResponse:
+        """Retrieve an async task returned by an async-capable operation."""
+
+        response = await self._c.request(
+            path=f"async_tasks/{task_id}", method="get", auth=auth
+        )
+        return AsyncTaskResponse.model_validate(response)
+
+
 class _BlocksAPI:
     def __init__(self, client: NotionAsyncClient):
         self._c = client
@@ -1293,7 +1347,7 @@ class _PagesAPI:
 
     async def create(
         self, params: CreatePageParameters, *, auth: AuthParam | None = None
-    ) -> NotionPage:
+    ) -> NotionPage | AsyncTaskResponse:
         """Create a page
 
         Returns:
@@ -1303,6 +1357,8 @@ class _PagesAPI:
         response = await self._c.request(
             path="pages", method="post", body=body, auth=auth
         )
+        if response.get("object") == "async_task":
+            return AsyncTaskResponse.model_validate(response)
         return NotionPage(**response)
 
     async def retrieve(
@@ -1366,17 +1422,22 @@ class _PagesAPI:
         *,
         page_id: str,
         command: PageMarkdownCommand,
+        allow_async: bool | None = None,
         auth: AuthParam | None = None,
-    ) -> PageMarkdownResponse:
+    ) -> PageMarkdownResponse | AsyncTaskResponse:
         """Update page content through the markdown API."""
 
         body = command.model_dump(exclude_none=True, by_alias=True)
+        if allow_async is not None:
+            body["allow_async"] = allow_async
         response = await self._c.request(
             path=f"pages/{page_id}/markdown",
             method="patch",
             body=body,
             auth=auth,
         )
+        if response.get("object") == "async_task":
+            return AsyncTaskResponse.model_validate(response)
         return PageMarkdownResponse.model_validate(response)
 
 
