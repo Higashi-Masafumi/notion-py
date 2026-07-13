@@ -41,6 +41,7 @@ from .responses.datasource import DataSource
 from .responses.page import NotionPage
 from .responses.file_upload import FileUploadObject
 from .responses.page_markdown import PageMarkdownResponse
+from .responses.async_task import AsyncTaskResponse
 from .responses.property_item import PropertyItemListResponse, PropertyItemObject
 from .responses.list_response import (
     QueryDatabaseResponse,
@@ -100,6 +101,7 @@ class APIErrorCode(str, Enum):
     ConflictError = "conflict_error"
     InternalServerError = "internal_server_error"
     ServiceUnavailable = "service_unavailable"
+    GatewayTimeout = "gateway_timeout"
 
 
 class ClientErrorCode(str, Enum):
@@ -360,6 +362,7 @@ class NotionAsyncClient:
         # ------- public API groups（JSに合わせた名前/階層）-------
         self.blocks = _BlocksAPI(self)
         self.customEmojis = _CustomEmojisAPI(self)
+        self.asyncTasks = _AsyncTasksAPI(self)
         self.databases = _DatabasesAPI(self)
         self.dataSources = _DataSourcesAPI(self)
         self.pages = _PagesAPI(self)
@@ -1499,6 +1502,21 @@ class _CustomEmojisAPI:
             path="custom_emojis", method="get", query=query, auth=auth
         )
         return ListCustomEmojisResponse.model_validate(response)
+
+
+class _AsyncTasksAPI:
+    def __init__(self, client: NotionAsyncClient):
+        self._c = client
+
+    async def retrieve(
+        self, *, task_id: str, auth: AuthParam | None = None
+    ) -> AsyncTaskResponse:
+        """Retrieve the status of an async task."""
+
+        response = await self._c.request(
+            path=f"async_tasks/{task_id}", method="get", auth=auth
+        )
+        return AsyncTaskResponse.model_validate(response)
 
 
 class _CommentsAPI:
