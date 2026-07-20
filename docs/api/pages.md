@@ -168,6 +168,42 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
     print(f"Updated: {page.id}")
 ```
 
+### move
+
+Move a page to a new parent page or data source (`POST /pages/{page_id}/move`, added in API version `2026-03-11`).
+
+```python
+async def move(
+    params: MovePageParameters,
+    *,
+    auth: AuthParam | None = None
+) -> NotionPage
+```
+
+**Parameters**:
+
+- `params.page_id` (str): Page ID to move
+- `params.parent`: New parent — `{"type": "page_id", "page_id": ...}` or `{"type": "data_source_id", "data_source_id": ...}`
+
+**Returns**: Updated `NotionPage`
+
+> Note: only regular pages can be moved. Moving a database itself is not supported.
+
+**Example**:
+
+```python
+from notion_py_client.requests.page_requests import MovePageParameters
+
+async with NotionAsyncClient(auth="secret_xxx") as client:
+    params = MovePageParameters(
+        page_id="page_abc123",
+        parent={"type": "data_source_id", "data_source_id": "ds_abc123"},
+    )
+
+    page = await client.pages.move(params)
+    print(f"Moved: {page.id}")
+```
+
 ### retrieve_markdown
 
 Retrieve page content as Notion-flavored Markdown.

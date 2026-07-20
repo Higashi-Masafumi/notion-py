@@ -7,7 +7,7 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, StrictBool, model_validator
 
-from ..models.parent import NotionParent
+from ..models.parent import DataSourceParent, NotionParent, PageParent
 from .common import (
     IdRequest,
     PageCoverRequest,
@@ -75,6 +75,20 @@ class UpdatePageParameters(BaseModel):
     erase_content: StrictBool | None = None
     is_locked: StrictBool | None = None
     in_trash: StrictBool | None = None
+
+
+class MovePageParameters(BaseModel):
+    """Move a page to a new parent (POST /pages/{page_id}/move).
+
+    Examples:
+        >>> params = MovePageParameters(
+        ...     page_id="page-id-here",
+        ...     parent={"type": "page_id", "page_id": "new-parent-id"},
+        ... )
+    """
+
+    page_id: IdRequest
+    parent: PageParent | DataSourceParent
 
 
 class MarkdownContentUpdateRequest(BaseModel):

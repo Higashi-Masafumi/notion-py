@@ -33,6 +33,7 @@ from .api_types import (
 from .filters import FilterCondition
 from .requests.page_requests import (
     CreatePageParameters,
+    MovePageParameters,
     PageMarkdownCommand,
     UpdatePageParameters,
 )
@@ -1340,6 +1341,21 @@ class _PagesAPI:
         page_id = payload.pop("page_id")
         response = await self._c.request(
             path=f"pages/{page_id}", method="patch", body=payload, auth=auth
+        )
+        return NotionPage(**response)
+
+    async def move(
+        self, params: MovePageParameters, *, auth: AuthParam | None = None
+    ) -> NotionPage:
+        """Move a page to a new parent (page or data source).
+
+        Returns:
+            NotionPage: 移動後のページオブジェクト
+        """
+        payload = params.model_dump(exclude_none=True, by_alias=True)
+        page_id = payload.pop("page_id")
+        response = await self._c.request(
+            path=f"pages/{page_id}/move", method="post", body=payload, auth=auth
         )
         return NotionPage(**response)
 

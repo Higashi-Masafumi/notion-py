@@ -92,6 +92,7 @@ Located in `notion_py.requests`:
 
 - `CreatePageParameters` - Page creation parameters
 - `UpdatePageParameters` - Page update parameters
+- `MovePageParameters` - Page move parameters
 - `CreateDatabaseParameters` - Database creation
 - `UpdateDatabaseParameters` - Database update
 
