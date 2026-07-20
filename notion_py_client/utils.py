@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import hashlib
+import hmac
 import re
 from typing import (
     Any,
@@ -222,6 +224,38 @@ def is_mention_rich_text_item_response(
 ) -> TypeGuard[MentionRichTextItem]:
     """Type guard: rich text item is `mention` variant (ensures `.mention` not None)."""
     return _get_attr(rich_text, "type") == "mention"
+
+
+# ========= Webhook signature verification =========
+
+
+def sign_webhook_payload(*, body: str | bytes, verification_token: str) -> str:
+    """Compute the `X-Notion-Signature` value for a webhook payload.
+
+    Mirrors the official `signWebhookPayload` helper: HMAC-SHA256 over the
+    raw request body, keyed by the subscription's verification token.
+    """
+
+    raw_body = body.encode("utf-8") if isinstance(body, str) else body
+    digest = hmac.new(
+        verification_token.encode("utf-8"), raw_body, hashlib.sha256
+    ).hexdigest()
+    return f"sha256={digest}"
+
+
+def verify_webhook_signature(
+    *, body: str | bytes, signature: str | None, verification_token: str
+) -> bool:
+    """Verify that a webhook payload was signed by Notion.
+
+    `body` must be the raw request body exactly as received (re-serializing
+    parsed JSON will change whitespace/key order and fail verification).
+    """
+
+    if not signature:
+        return False
+    expected = sign_webhook_payload(body=body, verification_token=verification_token)
+    return hmac.compare_digest(expected.encode("utf-8"), signature.encode("utf-8"))
 
 
 # ========= Notion ID extractors =========

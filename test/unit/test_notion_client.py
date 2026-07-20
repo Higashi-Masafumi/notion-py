@@ -4,11 +4,12 @@ import pytest
 from pydantic import ValidationError
 
 from notion_py_client.blocks.special_blocks import MeetingNotesBlock
-from notion_py_client.notion_client import NotionAsyncClient
+from notion_py_client.notion_client import APIErrorCode, NotionAsyncClient
 from notion_py_client.requests.page_requests import (
     MovePageParameters,
     ReplaceContentMarkdownCommand,
 )
+from notion_py_client.responses.async_task import AsyncTaskResponse
 from notion_py_client.responses.list_response import (
     CommentObject,
     PartialCommentObject,
@@ -57,6 +58,9 @@ class TestNotionAsyncClientDefaults:
 
         assert client.default_notion_version == "2026-03-11"
         assert client._notion_version == "2026-03-11"
+
+    def test_api_error_code_includes_gateway_timeout(self):
+        assert APIErrorCode.GatewayTimeout == "gateway_timeout"
 
 
 class TestPageMarkdownAPI:
@@ -227,6 +231,68 @@ class TestCustomEmojisAPI:
 
         with pytest.raises(ValidationError):
             await client.customEmojis.list()
+
+
+class TestAsyncTasksAPI:
+    """Test async task status retrieval facade."""
+
+    @pytest.mark.asyncio
+    async def test_retrieve_running_task(self):
+        client = NotionAsyncClient(auth="test-token")
+        captured: dict = {}
+
+        async def fake_request(*, path, method, auth=None, **kwargs):
+            captured["path"] = path
+            captured["method"] = method
+            return {
+                "object": "async_task",
+                "id": "task_123",
+                "status_url": "https://api.notion.com/v1/async_tasks/task_123",
+                "created_time": "2026-07-01T00:00:00.000Z",
+                "operation": {"surface": "pages", "name": "create"},
+                "status": "running",
+                "poll_after_seconds": 2,
+            }
+
+        client.request = fake_request  # type: ignore[method-assign]
+
+        result = await client.asyncTasks.retrieve(task_id="task_123")
+
+        assert isinstance(result, AsyncTaskResponse)
+        assert captured["path"] == "async_tasks/task_123"
+        assert captured["method"] == "get"
+        assert result.status == "running"
+        assert result.poll_after_seconds == 2
+        assert result.result is None
+        assert result.error is None
+
+    @pytest.mark.asyncio
+    async def test_retrieve_failed_task(self):
+        client = NotionAsyncClient(auth="test-token")
+
+        async def fake_request(*, path, method, auth=None, **kwargs):
+            return {
+                "object": "async_task",
+                "id": "task_123",
+                "status_url": "https://api.notion.com/v1/async_tasks/task_123",
+                "created_time": "2026-07-01T00:00:00.000Z",
+                "operation": {"surface": "pages", "name": "create"},
+                "status": "failed",
+                "error": {
+                    "object": "error",
+                    "status": 400,
+                    "code": "validation_error",
+                    "message": "Invalid request",
+                },
+            }
+
+        client.request = fake_request  # type: ignore[method-assign]
+
+        result = await client.asyncTasks.retrieve(task_id="task_123")
+
+        assert result.status == "failed"
+        assert result.error is not None
+        assert result.error.code == "validation_error"
 
 
 class TestCommentsAPI:
