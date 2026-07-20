@@ -255,7 +255,7 @@ def verify_webhook_signature(
     if not signature:
         return False
     expected = sign_webhook_payload(body=body, verification_token=verification_token)
-    return hmac.compare_digest(expected, signature)
+    return hmac.compare_digest(expected.encode("utf-8"), signature.encode("utf-8"))
 
 
 # ========= Notion ID extractors =========

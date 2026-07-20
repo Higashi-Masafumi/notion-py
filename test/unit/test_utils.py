@@ -57,3 +57,8 @@ class TestWebhookSignature:
         assert verify_webhook_signature(
             body=body, signature=signature, verification_token=token
         )
+
+    def test_verify_webhook_signature_rejects_malformed_non_ascii_signature(self):
+        assert not verify_webhook_signature(
+            body="{}", signature="sha256=ééé", verification_token="token"
+        )
