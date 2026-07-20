@@ -96,6 +96,19 @@ params = UpdatePageParameters(
 )
 ```
 
+### MovePageParameters
+
+Move a page to a new parent page or data source.
+
+```python
+from notion_py_client.requests.page_requests import MovePageParameters
+
+params = MovePageParameters(
+    page_id="page_abc123",
+    parent={"type": "data_source_id", "data_source_id": "ds_abc123"}
+)
+```
+
 ## Property Requests
 
 All property request types are located in `notion_py.requests.property_requests`.

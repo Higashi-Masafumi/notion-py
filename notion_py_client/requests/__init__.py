@@ -34,6 +34,7 @@ from .page_requests import (
     InsertContentMarkdownRequest,
     MarkdownInsertPositionRequest,
     MarkdownContentUpdateRequest,
+    MovePageParameters,
     PageMarkdownCommand,
     ReplaceContentMarkdownCommand,
     ReplaceContentMarkdownRequest,
@@ -68,6 +69,7 @@ __all__ = [
     # Page requests
     "CreatePageParameters",
     "UpdatePageParameters",
+    "MovePageParameters",
     "PageMarkdownCommand",
     "MarkdownContentUpdateRequest",
     "UpdateContentMarkdownRequest",

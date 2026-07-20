@@ -5,7 +5,10 @@ from pydantic import ValidationError
 
 from notion_py_client.blocks.special_blocks import MeetingNotesBlock
 from notion_py_client.notion_client import NotionAsyncClient
-from notion_py_client.requests.page_requests import ReplaceContentMarkdownCommand
+from notion_py_client.requests.page_requests import (
+    MovePageParameters,
+    ReplaceContentMarkdownCommand,
+)
 from notion_py_client.responses.list_response import (
     CommentObject,
     PartialCommentObject,
@@ -127,6 +130,49 @@ class TestPageMarkdownAPI:
             },
         }
         assert result.markdown == "# Fresh Start"
+
+
+class TestMovePageAPI:
+    """Test the move-a-page facade (POST /pages/{page_id}/move)."""
+
+    @pytest.mark.asyncio
+    async def test_move_page_to_new_parent(self):
+        client = NotionAsyncClient(auth="test-token")
+        captured: dict = {}
+
+        async def fake_request(*, path, method, body=None, auth=None, **kwargs):
+            captured["path"] = path
+            captured["method"] = method
+            captured["body"] = body
+            return {
+                "object": "page",
+                "id": "page_123",
+                "created_time": "2026-05-01T00:00:00.000Z",
+                "last_edited_time": "2026-05-01T00:00:00.000Z",
+                "created_by": {"object": "user", "id": "user_123"},
+                "last_edited_by": {"object": "user", "id": "user_123"},
+                "parent": {"type": "page_id", "page_id": "new_parent_123"},
+                "in_trash": False,
+                "is_locked": False,
+                "properties": {},
+                "url": "https://www.notion.so/page_123",
+            }
+
+        client.request = fake_request  # type: ignore[method-assign]
+
+        result = await client.pages.move(
+            MovePageParameters(
+                page_id="page_123",
+                parent={"type": "page_id", "page_id": "new_parent_123"},
+            )
+        )
+
+        assert captured["path"] == "pages/page_123/move"
+        assert captured["method"] == "post"
+        assert captured["body"] == {
+            "parent": {"type": "page_id", "page_id": "new_parent_123"},
+        }
+        assert result.parent["page_id"] == "new_parent_123"
 
 
 class TestCustomEmojisAPI:
