@@ -95,6 +95,7 @@ class APIErrorCode(str, Enum):
     RestrictedResource = "restricted_resource"
     ObjectNotFound = "object_not_found"
     RateLimited = "rate_limited"
+    ServiceOverload = "service_overload"
     InvalidJSON = "invalid_json"
     InvalidRequestURL = "invalid_request_url"
     InvalidRequest = "invalid_request"
@@ -520,12 +521,17 @@ class NotionAsyncClient:
 
         Examples:
             ```python
-            from api_types import SearchParameters
+            from notion_py_client.api_types import SearchParameters
 
             results = await client.search({
                 "query": "プロジェクト",
                 "filter": {"property": "object", "value": "page"},
                 "page_size": 20
+            })
+
+            # ゴミ箱内のみ
+            trashed = await client.search({
+                "filter": {"in_trash": True},
             })
             ```
         """
@@ -1036,6 +1042,7 @@ class _DataSourcesAPI:
         sorts: list[DatabaseQuerySort] | None = None,
         start_cursor: str | None = None,
         page_size: int | None = None,
+        is_archived: bool | None = None,
         auth: AuthParam | None = None,
     ) -> QueryDataSourceResponse:
         """
@@ -1074,6 +1081,7 @@ class _DataSourcesAPI:
                 - `[{"timestamp": "created_time", "direction": "descending"}]`
             start_cursor: ページネーション用カーソル
             page_size: 取得件数（最大100）
+            is_archived: True のときアーカイブ済みページのみ返す。省略または False では非アーカイブ
             auth: 認証トークン（オプション）
 
         Returns:
@@ -1110,6 +1118,12 @@ class _DataSourcesAPI:
                 }
             )
 
+            # アーカイブ済みページのみ
+            response = await client.dataSources.query(
+                data_source_id="ds_abc123",
+                is_archived=True,
+            )
+
             # ページネーション
             for page in response.results:
                 if isinstance(page, NotionPage):
@@ -1132,8 +1146,9 @@ class _DataSourcesAPI:
                 "sorts": sorts,
                 "start_cursor": start_cursor,
                 "page_size": page_size,
+                "is_archived": is_archived,
             },
-            ["filter", "sorts", "start_cursor", "page_size"],
+            ["filter", "sorts", "start_cursor", "page_size", "is_archived"],
         )
         response = await self._c.request(
             path=f"data_sources/{data_source_id}/query",
@@ -1297,16 +1312,18 @@ class _PagesAPI:
 
     async def create(
         self, params: CreatePageParameters, *, auth: AuthParam | None = None
-    ) -> NotionPage:
+    ) -> NotionPage | AsyncTaskResponse:
         """Create a page
 
         Returns:
-            NotionPage: 作成されたページオブジェクト
+            NotionPage | AsyncTaskResponse: 作成されたページ、または allow_async 時の非同期タスク
         """
         body = params.model_dump(exclude_none=True, by_alias=True)
         response = await self._c.request(
             path="pages", method="post", body=body, auth=auth
         )
+        if response.get("object") == "async_task":
+            return AsyncTaskResponse.model_validate(response)
         return NotionPage(**response)
 
     async def retrieve(
@@ -1385,17 +1402,22 @@ class _PagesAPI:
         *,
         page_id: str,
         command: PageMarkdownCommand,
+        allow_async: bool | None = None,
         auth: AuthParam | None = None,
-    ) -> PageMarkdownResponse:
+    ) -> PageMarkdownResponse | AsyncTaskResponse:
         """Update page content through the markdown API."""
 
         body = command.model_dump(exclude_none=True, by_alias=True)
+        if allow_async is not None:
+            body["allow_async"] = allow_async
         response = await self._c.request(
             path=f"pages/{page_id}/markdown",
             method="patch",
             body=body,
             auth=auth,
         )
+        if response.get("object") == "async_task":
+            return AsyncTaskResponse.model_validate(response)
         return PageMarkdownResponse.model_validate(response)
 
 
