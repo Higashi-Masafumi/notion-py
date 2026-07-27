@@ -38,11 +38,14 @@ class CreatePageParameters(BaseModel):
     template: PageTemplateRequest | None = None
     position: PagePositionRequest | None = None
     markdown: str | None = None
+    allow_async: StrictBool | None = None
     content: list[Any] | None = None  # BlockObjectRequest
     children: list[Any] | None = None  # BlockObjectRequest
 
     @model_validator(mode="after")
     def validate_body_modes(self) -> "CreatePageParameters":
+        if self.allow_async is not None and self.markdown is None:
+            raise ValueError("allow_async can only be used with markdown")
         if self.markdown is not None and (
             self.content is not None or self.children is not None
         ):

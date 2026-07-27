@@ -104,6 +104,31 @@ class UpdateDatabaseParameters(_UpdateDatabaseRequired, total=False):
 
 
 # ========== Search API Types ==========
+class SearchObjectFilter(TypedDict):
+    """オブジェクト種別で絞り込む検索フィルター."""
+
+    property: Literal["object"]
+    value: Literal["page", "data_source"]
+    in_trash: NotRequired[bool]
+
+
+class SearchTrashFilter(TypedDict):
+    """ゴミ箱内だけを検索するフィルター."""
+
+    in_trash: bool
+
+
+SearchFilter = SearchObjectFilter | SearchTrashFilter
+
+
+class SearchSort(TypedDict, total=False):
+    """検索結果のソート条件."""
+
+    property: NotRequired[Literal["relevance"]]
+    timestamp: NotRequired[Literal["last_edited_time"]]
+    direction: NotRequired[Literal["ascending", "descending"]]
+
+
 class SearchParameters(TypedDict, total=False):
     """検索のパラメータ.
 
@@ -112,9 +137,9 @@ class SearchParameters(TypedDict, total=False):
     """
 
     query: NotRequired[str]
-    filter: NotRequired[dict[str, str]]
-    sort: NotRequired[dict[str, str]]
-    start_cursor: NotRequired[str]
+    filter: NotRequired[SearchFilter]
+    sort: NotRequired[SearchSort]
+    start_cursor: NotRequired[str | None]
     page_size: NotRequired[int]
 
 
