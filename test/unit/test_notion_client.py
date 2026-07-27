@@ -6,6 +6,7 @@ from pydantic import ValidationError
 from notion_py_client.blocks.special_blocks import MeetingNotesBlock
 from notion_py_client.notion_client import APIErrorCode, NotionAsyncClient
 from notion_py_client.requests.page_requests import (
+    CreatePageParameters,
     MovePageParameters,
     ReplaceContentMarkdownCommand,
 )
@@ -61,6 +62,9 @@ class TestNotionAsyncClientDefaults:
 
     def test_api_error_code_includes_gateway_timeout(self):
         assert APIErrorCode.GatewayTimeout == "gateway_timeout"
+
+    def test_api_error_code_includes_service_overload(self):
+        assert APIErrorCode.ServiceOverload == "service_overload"
 
 
 class TestPageMarkdownAPI:
@@ -134,6 +138,136 @@ class TestPageMarkdownAPI:
             },
         }
         assert result.markdown == "# Fresh Start"
+
+    @pytest.mark.asyncio
+    async def test_update_markdown_allow_async_returns_task(self):
+        client = NotionAsyncClient(auth="test-token")
+        captured: dict = {}
+
+        async def fake_request(*, path, method, body=None, auth=None, **kwargs):
+            captured["path"] = path
+            captured["method"] = method
+            captured["body"] = body
+            return {
+                "object": "async_task",
+                "id": "task_456",
+                "status_url": "https://api.notion.com/v1/async_tasks/task_456",
+                "created_time": "2026-07-01T00:00:00.000Z",
+                "operation": {"surface": "pages", "name": "update_markdown"},
+                "status": "queued",
+                "poll_after_seconds": 1,
+            }
+
+        client.request = fake_request  # type: ignore[method-assign]
+
+        result = await client.pages.update_markdown(
+            page_id="page_123",
+            command=ReplaceContentMarkdownCommand(
+                replace_content={"new_str": "# Async update"}
+            ),
+            allow_async=True,
+        )
+
+        assert isinstance(result, AsyncTaskResponse)
+        assert captured["body"]["allow_async"] is True
+        assert result.id == "task_456"
+
+
+class TestCreatePageAllowAsync:
+    """Test async page create via allow_async."""
+
+    @pytest.mark.asyncio
+    async def test_create_page_allow_async_returns_task(self):
+        client = NotionAsyncClient(auth="test-token")
+        captured: dict = {}
+
+        async def fake_request(*, path, method, body=None, auth=None, **kwargs):
+            captured["path"] = path
+            captured["method"] = method
+            captured["body"] = body
+            return {
+                "object": "async_task",
+                "id": "task_789",
+                "status_url": "https://api.notion.com/v1/async_tasks/task_789",
+                "created_time": "2026-07-01T00:00:00.000Z",
+                "operation": {"surface": "pages", "name": "create"},
+                "status": "queued",
+                "poll_after_seconds": 1,
+            }
+
+        client.request = fake_request  # type: ignore[method-assign]
+
+        result = await client.pages.create(
+            CreatePageParameters(
+                parent={"type": "page_id", "page_id": "page_123"},
+                properties={},
+                markdown="# Async page",
+                allow_async=True,
+            )
+        )
+
+        assert isinstance(result, AsyncTaskResponse)
+        assert captured["path"] == "pages"
+        assert captured["body"]["allow_async"] is True
+        assert result.status == "queued"
+
+
+class TestSearchAndDataSourceQuery:
+    """Test search trash filter and archived data source query."""
+
+    @pytest.mark.asyncio
+    async def test_search_passes_in_trash_filter(self):
+        client = NotionAsyncClient(auth="test-token")
+        captured: dict = {}
+
+        async def fake_request(*, path, method, body=None, auth=None, **kwargs):
+            captured["path"] = path
+            captured["method"] = method
+            captured["body"] = body
+            return {
+                "object": "list",
+                "type": "page_or_data_source",
+                "page_or_data_source": {},
+                "results": [],
+                "has_more": False,
+                "next_cursor": None,
+            }
+
+        client.request = fake_request  # type: ignore[method-assign]
+
+        await client.search({"filter": {"in_trash": True}})
+
+        assert captured["path"] == "search"
+        assert captured["method"] == "post"
+        assert captured["body"] == {"filter": {"in_trash": True}}
+
+    @pytest.mark.asyncio
+    async def test_data_source_query_passes_is_archived(self):
+        client = NotionAsyncClient(auth="test-token")
+        captured: dict = {}
+
+        async def fake_request(*, path, method, body=None, auth=None, **kwargs):
+            captured["path"] = path
+            captured["method"] = method
+            captured["body"] = body
+            return {
+                "object": "list",
+                "results": [],
+                "has_more": False,
+                "next_cursor": None,
+                "type": "page_or_data_source",
+            }
+
+        client.request = fake_request  # type: ignore[method-assign]
+
+        await client.dataSources.query(
+            data_source_id="ds_123",
+            is_archived=True,
+        )
+
+        assert captured["path"] == "data_sources/ds_123/query"
+        assert captured["method"] == "post"
+        assert captured["body"] == {"is_archived": True}
 
 
 class TestMovePageAPI:

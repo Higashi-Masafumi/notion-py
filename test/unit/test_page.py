@@ -19,6 +19,7 @@ class TestNotionPage:
             "last_edited_by": {"object": "user", "id": "user_123"},
             "parent": {"type": "database_id", "database_id": "db_123"},
             "in_trash": False,
+            "is_archived": False,
             "is_locked": False,
             "properties": {
                 "新チャネル": {
@@ -71,6 +72,7 @@ class TestNotionPage:
             "last_edited_by": {"object": "user", "id": "user_123"},
             "parent": {"type": "page_id", "page_id": "parent_123"},
             "in_trash": True,
+            "is_archived": True,
             "is_locked": False,
             "properties": {},
             "icon": {
@@ -86,6 +88,7 @@ class TestNotionPage:
         result = NotionPage.model_validate(data)
 
         assert result.in_trash is True
+        assert result.is_archived is True
         assert result.icon is not None
         assert result.icon.type == IconType.ICON
         assert result.icon.icon is not None

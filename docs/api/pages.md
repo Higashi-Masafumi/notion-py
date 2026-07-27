@@ -22,7 +22,7 @@ async def create(
     params: CreatePageParameters,
     *,
     auth: AuthParam | None = None
-) -> NotionPage
+) -> NotionPage | AsyncTaskResponse
 ```
 
 **Parameters**:
@@ -32,8 +32,10 @@ async def create(
 - `params.icon` (optional): Page icon
 - `params.cover` (optional): Cover image
 - `params.children` (optional): Child blocks
+- `params.markdown` (optional): Page content as markdown (alternative to children)
+- `params.allow_async` (optional): When `True` with `markdown`, return an async task handle
 
-**Returns**: Created `NotionPage`
+**Returns**: Created `NotionPage`, or `AsyncTaskResponse` when `allow_async=True`
 
 **Example**:
 
@@ -237,8 +239,9 @@ async def update_markdown(
     *,
     page_id: str,
     command: PageMarkdownCommand,
+    allow_async: bool | None = None,
     auth: AuthParam | None = None
-) -> PageMarkdownResponse
+) -> PageMarkdownResponse | AsyncTaskResponse
 ```
 
 **Example**:
@@ -254,6 +257,16 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
         ),
     )
     print(markdown_page.markdown)
+
+    # Large writes can opt into async responses
+    task = await client.pages.update_markdown(
+        page_id="page_abc123",
+        command=ReplaceContentMarkdownCommand(
+            replace_content={"new_str": "# Fresh Start"}
+        ),
+        allow_async=True,
+    )
+    status = await client.asyncTasks.retrieve(task_id=task.id)
 ```
 
 To prepend or explicitly append markdown, use `InsertContentMarkdownCommand` with
@@ -555,6 +568,7 @@ page: NotionPage = {
     "last_edited_by": {...},
     "parent": {...},
     "in_trash": false,
+    "is_archived": false,
     "icon": {...},
     "cover": {...},
     "properties": {

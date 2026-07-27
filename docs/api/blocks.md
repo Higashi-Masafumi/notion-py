@@ -361,6 +361,16 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
     }
 }
 
+# HTML block (embed backed by an uploaded .html file)
+{
+    "type": "embed",
+    "embed": {
+        "type": "file_upload",
+        "file_upload": {"id": "file-upload-id"},
+        "caption": []
+    }
+}
+
 # PDF
 {
     "type": "pdf",

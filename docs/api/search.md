@@ -19,12 +19,12 @@ async def search(
 **Parameters**:
 
 - `params.query` (optional): Search query string
-- `params.filter` (optional): Filter by object type
-- `params.sort` (optional): Sort criteria
+- `params.filter` (optional): Filter by object type (`page` / `data_source`) and/or `in_trash`
+- `params.sort` (optional): Sort criteria (`last_edited_time` or `relevance`)
 - `params.start_cursor` (optional): Pagination cursor
 - `params.page_size` (optional): Results per page (max 100)
 
-**Returns**: `SearchResponse` with pages and databases
+**Returns**: `SearchResponse` with pages and data sources
 
 ## Examples
 
@@ -59,11 +59,31 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
         }
     })
 
-    # Search only databases
-    databases = await client.search({
+    # Search only data sources
+    data_sources = await client.search({
         "filter": {
             "property": "object",
-            "value": "database"
+            "value": "data_source"
+        }
+    })
+```
+
+### Search Trash
+
+By default search returns live content only. Pass `filter.in_trash: true` to
+return trashed pages and data sources instead.
+
+```python
+async with NotionAsyncClient(auth="secret_xxx") as client:
+    trashed = await client.search({
+        "filter": {"in_trash": True}
+    })
+
+    trashed_pages = await client.search({
+        "filter": {
+            "property": "object",
+            "value": "page",
+            "in_trash": True,
         }
     })
 ```

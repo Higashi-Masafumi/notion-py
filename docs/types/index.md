@@ -230,6 +230,7 @@ Located in `notion_py.models`:
 - `RichTextItem` - Rich text element with annotations
 - `SelectOption` - Select option configuration
 - `StatusOption` - Status option configuration
+- `StatusOptionConfig` - Status schema option (`group`: `To-do` / `In progress` / `Complete`)
 - `FileObject` - File reference
 - `DateInfo` - Date or date range
 - `FormulaResult` - Formula computation result
