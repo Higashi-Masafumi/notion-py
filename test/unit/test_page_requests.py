@@ -49,6 +49,18 @@ class TestCreatePageParameters:
         assert payload["markdown"] == "# Heading\n\nBody"
         assert payload["position"]["type"] == "page_end"
 
+    def test_allow_async_serializes(self):
+        params = CreatePageParameters(
+            parent={"type": "page_id", "page_id": "page_123"},
+            properties={},
+            markdown="# Heading",
+            allow_async=True,
+        )
+
+        payload = params.model_dump(exclude_none=True, by_alias=True)
+
+        assert payload["allow_async"] is True
+
     def test_template_serializes(self):
         params = CreatePageParameters(
             parent={"type": "data_source_id", "data_source_id": "ds_123"},

@@ -237,9 +237,12 @@ async def update_markdown(
     *,
     page_id: str,
     command: PageMarkdownCommand,
+    allow_async: bool | None = None,
     auth: AuthParam | None = None
 ) -> PageMarkdownResponse
 ```
+
+Pass `allow_async=True` to let Notion process large markdown updates asynchronously.
 
 **Example**:
 

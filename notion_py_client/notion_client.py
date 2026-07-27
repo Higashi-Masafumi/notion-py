@@ -1385,11 +1385,14 @@ class _PagesAPI:
         *,
         page_id: str,
         command: PageMarkdownCommand,
+        allow_async: bool | None = None,
         auth: AuthParam | None = None,
     ) -> PageMarkdownResponse:
         """Update page content through the markdown API."""
 
         body = command.model_dump(exclude_none=True, by_alias=True)
+        if allow_async is not None:
+            body["allow_async"] = allow_async
         response = await self._c.request(
             path=f"pages/{page_id}/markdown",
             method="patch",

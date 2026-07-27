@@ -135,6 +135,33 @@ class TestPageMarkdownAPI:
         }
         assert result.markdown == "# Fresh Start"
 
+    @pytest.mark.asyncio
+    async def test_update_markdown_includes_allow_async(self):
+        client = NotionAsyncClient(auth="test-token")
+        captured: dict = {}
+
+        async def fake_request(*, path, method, body=None, auth=None, **kwargs):
+            captured["body"] = body
+            return {
+                "object": "page_markdown",
+                "id": "page_123",
+                "markdown": "# Fresh Start",
+                "truncated": False,
+                "unknown_block_ids": [],
+            }
+
+        client.request = fake_request  # type: ignore[method-assign]
+
+        await client.pages.update_markdown(
+            page_id="page_123",
+            command=ReplaceContentMarkdownCommand(
+                replace_content={"new_str": "# Fresh Start"}
+            ),
+            allow_async=True,
+        )
+
+        assert captured["body"]["allow_async"] is True
+
 
 class TestMovePageAPI:
     """Test the move-a-page facade (POST /pages/{page_id}/move)."""

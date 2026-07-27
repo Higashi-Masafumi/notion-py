@@ -40,6 +40,7 @@ class CreatePageParameters(BaseModel):
     markdown: str | None = None
     content: list[Any] | None = None  # BlockObjectRequest
     children: list[Any] | None = None  # BlockObjectRequest
+    allow_async: StrictBool | None = None
 
     @model_validator(mode="after")
     def validate_body_modes(self) -> "CreatePageParameters":
