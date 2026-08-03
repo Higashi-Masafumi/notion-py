@@ -6,6 +6,7 @@ from pydantic import ValidationError
 from notion_py_client.blocks.special_blocks import MeetingNotesBlock
 from notion_py_client.notion_client import APIErrorCode, NotionAsyncClient
 from notion_py_client.requests.page_requests import (
+    CreatePageParameters,
     MovePageParameters,
     ReplaceContentMarkdownCommand,
 )
@@ -134,6 +135,83 @@ class TestPageMarkdownAPI:
             },
         }
         assert result.markdown == "# Fresh Start"
+
+
+def _async_task_response(operation_name: str) -> dict:
+    return {
+        "object": "async_task",
+        "id": "task_123",
+        "status_url": "https://api.notion.com/v1/async_tasks/task_123",
+        "created_time": "2026-07-08T00:00:00.000Z",
+        "operation": {"surface": "rest", "name": operation_name},
+        "status": "queued",
+        "poll_after_seconds": 2,
+    }
+
+
+class TestAsyncPageWrites:
+    """Test allow_async support for page create and markdown update."""
+
+    @pytest.mark.asyncio
+    async def test_create_page_with_allow_async_returns_task(self):
+        client = NotionAsyncClient(auth="test-token")
+        captured: dict = {}
+
+        async def fake_request(*, path, method, body=None, auth=None, **kwargs):
+            captured["path"] = path
+            captured["method"] = method
+            captured["body"] = body
+            return _async_task_response("create_page")
+
+        client.request = fake_request  # type: ignore[method-assign]
+
+        result = await client.pages.create(
+            CreatePageParameters(
+                parent={"type": "database_id", "database_id": "db_123"},
+                properties={},
+                markdown="# Large page",
+                allow_async=True,
+            )
+        )
+
+        assert captured["path"] == "pages"
+        assert captured["body"]["allow_async"] is True
+        assert isinstance(result, AsyncTaskResponse)
+        assert result.status == "queued"
+        assert result.poll_after_seconds == 2
+
+    def test_create_page_allow_async_requires_markdown(self):
+        with pytest.raises(ValidationError, match="allow_async"):
+            CreatePageParameters(
+                parent={"type": "database_id", "database_id": "db_123"},
+                properties={},
+                allow_async=True,
+            )
+
+    @pytest.mark.asyncio
+    async def test_update_markdown_with_allow_async_returns_task(self):
+        client = NotionAsyncClient(auth="test-token")
+        captured: dict = {}
+
+        async def fake_request(*, path, method, body=None, auth=None, **kwargs):
+            captured["path"] = path
+            captured["method"] = method
+            captured["body"] = body
+            return _async_task_response("update_page_markdown")
+
+        client.request = fake_request  # type: ignore[method-assign]
+
+        result = await client.pages.update_markdown(
+            page_id="page_123",
+            command=ReplaceContentMarkdownCommand(
+                replace_content={"new_str": "# Fresh Start"},
+                allow_async=True,
+            ),
+        )
+
+        assert captured["body"]["allow_async"] is True
+        assert isinstance(result, AsyncTaskResponse)
+        assert result.operation.name == "update_page_markdown"
 
 
 class TestMovePageAPI:

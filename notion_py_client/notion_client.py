@@ -1297,16 +1297,20 @@ class _PagesAPI:
 
     async def create(
         self, params: CreatePageParameters, *, auth: AuthParam | None = None
-    ) -> NotionPage:
+    ) -> NotionPage | AsyncTaskResponse:
         """Create a page
 
         Returns:
             NotionPage: 作成されたページオブジェクト
+            AsyncTaskResponse: allow_async=True で大きな markdown 作成が
+                キューイングされた場合のタスクハンドル
         """
         body = params.model_dump(exclude_none=True, by_alias=True)
         response = await self._c.request(
             path="pages", method="post", body=body, auth=auth
         )
+        if response.get("object") == "async_task":
+            return AsyncTaskResponse.model_validate(response)
         return NotionPage(**response)
 
     async def retrieve(
@@ -1386,8 +1390,14 @@ class _PagesAPI:
         page_id: str,
         command: PageMarkdownCommand,
         auth: AuthParam | None = None,
-    ) -> PageMarkdownResponse:
-        """Update page content through the markdown API."""
+    ) -> PageMarkdownResponse | AsyncTaskResponse:
+        """Update page content through the markdown API.
+
+        Returns:
+            PageMarkdownResponse: 同期的に完了した場合の markdown レスポンス
+            AsyncTaskResponse: allow_async=True で大きな更新がキューイングされた
+                場合のタスクハンドル
+        """
 
         body = command.model_dump(exclude_none=True, by_alias=True)
         response = await self._c.request(
@@ -1396,6 +1406,8 @@ class _PagesAPI:
             body=body,
             auth=auth,
         )
+        if response.get("object") == "async_task":
+            return AsyncTaskResponse.model_validate(response)
         return PageMarkdownResponse.model_validate(response)
 
 

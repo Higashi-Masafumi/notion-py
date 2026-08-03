@@ -40,6 +40,7 @@ class CreatePageParameters(BaseModel):
     markdown: str | None = None
     content: list[Any] | None = None  # BlockObjectRequest
     children: list[Any] | None = None  # BlockObjectRequest
+    allow_async: StrictBool | None = None
 
     @model_validator(mode="after")
     def validate_body_modes(self) -> "CreatePageParameters":
@@ -51,6 +52,8 @@ class CreatePageParameters(BaseModel):
             self.content is not None or self.children is not None
         ):
             raise ValueError("template cannot be used with content or children")
+        if self.allow_async and self.markdown is None:
+            raise ValueError("allow_async is only supported when markdown is provided")
         return self
 
 
@@ -111,6 +114,7 @@ class UpdateContentMarkdownCommand(BaseModel):
 
     type: Literal["update_content"] = "update_content"
     update_content: UpdateContentMarkdownRequest
+    allow_async: StrictBool | None = None
 
 
 class ReplaceContentMarkdownRequest(BaseModel):
@@ -125,6 +129,7 @@ class ReplaceContentMarkdownCommand(BaseModel):
 
     type: Literal["replace_content"] = "replace_content"
     replace_content: ReplaceContentMarkdownRequest
+    allow_async: StrictBool | None = None
 
 
 class MarkdownInsertPositionRequest(BaseModel):
@@ -152,6 +157,7 @@ class InsertContentMarkdownCommand(BaseModel):
 
     type: Literal["insert_content"] = "insert_content"
     insert_content: InsertContentMarkdownRequest
+    allow_async: StrictBool | None = None
 
 
 class ReplaceContentRangeMarkdownRequest(BaseModel):
@@ -167,6 +173,7 @@ class ReplaceContentRangeMarkdownCommand(BaseModel):
 
     type: Literal["replace_content_range"] = "replace_content_range"
     replace_content_range: ReplaceContentRangeMarkdownRequest
+    allow_async: StrictBool | None = None
 
 
 PageMarkdownCommand = (
