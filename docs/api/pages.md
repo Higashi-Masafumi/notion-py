@@ -238,7 +238,7 @@ async def update_markdown(
     page_id: str,
     command: PageMarkdownCommand,
     auth: AuthParam | None = None
-) -> PageMarkdownResponse
+) -> PageMarkdownResponse | AsyncTaskResponse
 ```
 
 **Example**:
@@ -273,6 +273,27 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
             }
         ),
     )
+```
+
+For large writes, set `allow_async=True` on the command (or on
+`CreatePageParameters` when creating a page with `markdown`) to receive an
+`AsyncTaskResponse` instead of blocking. Poll it with
+`client.asyncTasks.retrieve(task_id=task.id)`.
+
+```python
+from notion_py_client import AsyncTaskResponse
+from notion_py_client.requests import ReplaceContentMarkdownCommand
+
+async with NotionAsyncClient(auth="secret_xxx") as client:
+    result = await client.pages.update_markdown(
+        page_id="page_abc123",
+        command=ReplaceContentMarkdownCommand(
+            replace_content={"new_str": large_markdown},
+            allow_async=True,
+        ),
+    )
+    if isinstance(result, AsyncTaskResponse):
+        task = await client.asyncTasks.retrieve(task_id=result.id)
 ```
 
 ### properties.retrieve
