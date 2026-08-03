@@ -527,6 +527,11 @@ class NotionAsyncClient:
                 "filter": {"property": "object", "value": "page"},
                 "page_size": 20
             })
+
+            # ゴミ箱内を検索
+            trashed = await client.search({
+                "filter": {"in_trash": True},
+            })
             ```
         """
         response = await self.request(
@@ -1036,6 +1041,7 @@ class _DataSourcesAPI:
         sorts: list[DatabaseQuerySort] | None = None,
         start_cursor: str | None = None,
         page_size: int | None = None,
+        is_archived: bool | None = None,
         auth: AuthParam | None = None,
     ) -> QueryDataSourceResponse:
         """
@@ -1074,6 +1080,8 @@ class _DataSourcesAPI:
                 - `[{"timestamp": "created_time", "direction": "descending"}]`
             start_cursor: ページネーション用カーソル
             page_size: 取得件数（最大100）
+            is_archived: True のときアーカイブ済みページを返す。省略時 / False は非アーカイブ。
+                ``in_trash`` とは別概念で、このエンドポイントのボディでは ``in_trash`` は使えない。
             auth: 認証トークン（オプション）
 
         Returns:
@@ -1110,6 +1118,12 @@ class _DataSourcesAPI:
                 }
             )
 
+            # アーカイブ済みページを照会
+            archived = await client.dataSources.query(
+                data_source_id="ds_abc123",
+                is_archived=True,
+            )
+
             # ページネーション
             for page in response.results:
                 if isinstance(page, NotionPage):
@@ -1124,7 +1138,7 @@ class _DataSourcesAPI:
 
         Note:
             IDE補完を活用するには、型安全な`create_and_filter()`などのヘルパー関数を使用してください。
-            公式ドキュメント: https://developers.notion.com/reference/post-database-query
+            公式ドキュメント: https://developers.notion.com/reference/query-a-data-source
         """
         body = pick(
             {
@@ -1132,8 +1146,9 @@ class _DataSourcesAPI:
                 "sorts": sorts,
                 "start_cursor": start_cursor,
                 "page_size": page_size,
+                "is_archived": is_archived,
             },
-            ["filter", "sorts", "start_cursor", "page_size"],
+            ["filter", "sorts", "start_cursor", "page_size", "is_archived"],
         )
         response = await self._c.request(
             path=f"data_sources/{data_source_id}/query",

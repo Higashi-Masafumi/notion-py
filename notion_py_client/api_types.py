@@ -104,15 +104,35 @@ class UpdateDatabaseParameters(_UpdateDatabaseRequired, total=False):
 
 
 # ========== Search API Types ==========
+class SearchObjectFilter(TypedDict):
+    """オブジェクト種別で絞り込む検索フィルター.
+
+    ``in_trash`` を併用すると、ゴミ箱内のページ / データソースだけを対象にできる。
+    """
+
+    property: Literal["object"]
+    value: Literal["page", "data_source"]
+    in_trash: NotRequired[bool]
+
+
+class SearchTrashFilter(TypedDict):
+    """ゴミ箱内のページ / データソースを検索するフィルター."""
+
+    in_trash: bool
+
+
+SearchFilter = SearchObjectFilter | SearchTrashFilter
+
+
 class SearchParameters(TypedDict, total=False):
     """検索のパラメータ.
 
     References:
-        - https://github.com/makenotion/notion-sdk-js/blob/main/src/api-endpoints.ts#L2345
+        - https://developers.notion.com/reference/post-search
     """
 
     query: NotRequired[str]
-    filter: NotRequired[dict[str, str]]
+    filter: NotRequired[SearchFilter]
     sort: NotRequired[dict[str, str]]
     start_cursor: NotRequired[str]
     page_size: NotRequired[int]

@@ -25,6 +25,7 @@ async def query(
     sorts: list[DatabaseQuerySort] | None = None,
     start_cursor: str | None = None,
     page_size: int | None = None,
+    is_archived: bool | None = None,
     auth: AuthParam | None = None
 ) -> QueryDataSourceResponse
 ```
@@ -36,6 +37,7 @@ async def query(
 - `sorts` (optional): Sort criteria (`list[DatabaseQuerySort]`)
 - `start_cursor` (optional): Pagination cursor
 - `page_size` (optional): Results per page (max 100)
+- `is_archived` (optional): When `True`, return archived pages instead of the default non-archived set. Distinct from `in_trash`.
 
 **Returns**: `QueryDataSourceResponse` with:
 
@@ -74,6 +76,12 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
     response = await client.dataSources.query(
         data_source_id="ds_abc123",
         sorts=[{"property": "Created", "direction": "descending"}]
+    )
+
+    # Archived pages only
+    archived = await client.dataSources.query(
+        data_source_id="ds_abc123",
+        is_archived=True,
     )
 ```
 

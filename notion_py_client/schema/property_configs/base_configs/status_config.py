@@ -6,12 +6,20 @@ from ._base_config import BasePropertyConfig
 
 
 class StatusOptionConfig(BaseModel):
-    """statusのオプション定義"""
+    """statusのオプション定義
 
-    id: StrictStr = Field(..., description="ステータスオプションID")
+    スキーマ作成・更新時は ``group`` で ``To-do`` / ``In progress`` / ``Complete``
+    のいずれかに割り当てられる。レスポンスでは通常省略され、所属は ``groups`` 側で返る。
+    """
+
+    id: StrictStr | None = Field(None, description="ステータスオプションID")
     name: StrictStr = Field(..., description="オプション名")
-    color: StrictStr = Field(..., description="表示カラー")
+    color: StrictStr | None = Field(None, description="表示カラー")
     description: StrictStr | None = Field(None, description="オプション説明")
+    group: Literal["To-do", "In progress", "Complete"] | None = Field(
+        None,
+        description="作成・更新時に割り当てるステータスグループ",
+    )
 
 
 class StatusGroupConfig(BaseModel):

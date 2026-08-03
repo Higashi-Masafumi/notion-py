@@ -93,7 +93,8 @@ Users can be either people or bots:
     "id": "user_abc123",
     "type": "person",
     "person": {
-        "email": "user@example.com"
+        "email": "user@example.com",
+        "email_verified": true
     },
     "name": "John Doe",
     "avatar_url": "https://..."

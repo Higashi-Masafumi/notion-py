@@ -11,6 +11,9 @@ class Person(BaseModel):
     """personタイプの詳細情報"""
 
     email: StrictStr | None = Field(None, description="メールアドレス")
+    email_verified: StrictBool | None = Field(
+        None, description="Notionがそのメールアドレスを検証済みかどうか"
+    )
 
 
 class PartialUser(BaseModel):
