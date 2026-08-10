@@ -1,7 +1,8 @@
-from typing import Any, Literal, Union
+from typing import Literal, Union
 
 from pydantic import BaseModel, Field, StrictFloat, StrictInt, StrictStr
 
+from ..models.primitives import EmptyObject
 from .base_properties import (
     BaseProperty,
     ButtonProperty,
@@ -32,7 +33,10 @@ from .relation_property import RelationProperty
 class Rollup(BaseModel):
     """Notionのrollup項目"""
 
-    type: StrictStr = Field(..., description="rollupのタイプ（numberまたはarray）")
+    type: StrictStr = Field(
+        ...,
+        description="rollupのタイプ（number、array、date、incomplete、unsupported）",
+    )
     number: StrictInt | StrictFloat | None = Field(
         None, description="数値（typeがnumberの場合のみ設定）"
     )
@@ -69,6 +73,10 @@ class Rollup(BaseModel):
         ]
         | None
     ) = Field(None, description="配列（typeがarrayの場合のみ設定）")
+    unsupported: EmptyObject | None = Field(
+        None,
+        description="計算不能な結果（typeがunsupportedの場合の空オブジェクト）",
+    )
 
     def get_display_value(self) -> int | StrictFloat | StrictStr | bool | None:
         """
@@ -87,6 +95,8 @@ class Rollup(BaseModel):
                     return self.array[0].get_display_value()
                 else:
                     return None
+            case "unsupported" | "incomplete":
+                return None
             case _:
                 return None
 

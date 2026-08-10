@@ -1,12 +1,16 @@
 from pydantic import BaseModel, Field, StrictBool, StrictFloat, StrictInt, StrictStr
 
 from .date_info import DateInfo
+from .primitives import EmptyObject
 
 
 class FormulaResult(BaseModel):
     """Notionのformula結果"""
 
-    type: StrictStr = Field(..., description="結果タイプ（string、number、boolean等）")
+    type: StrictStr = Field(
+        ...,
+        description="結果タイプ（string、number、boolean、date、unsupported）",
+    )
     string: StrictStr | None = Field(
         None, description="文字列結果（typeがstringの場合）"
     )
@@ -18,4 +22,8 @@ class FormulaResult(BaseModel):
     )
     date: DateInfo | None = Field(
         None, description="日付結果（typeがdateの場合）"
+    )
+    unsupported: EmptyObject | None = Field(
+        None,
+        description="計算不能な結果（typeがunsupportedの場合の空オブジェクト）",
     )

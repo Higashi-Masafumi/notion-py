@@ -27,16 +27,15 @@ class FormulaProperty(BaseProperty[Literal["formula"]]):
         """
         if self.formula.type == "string":
             return self.formula.string
-        elif self.formula.type == "number":
+        if self.formula.type == "number":
             return self.formula.number
-        elif self.formula.type == "boolean":
+        if self.formula.type == "boolean":
             return self.formula.boolean
-        elif self.formula.type == "date":
+        if self.formula.type == "date":
             if self.formula.date is None:
                 return None
             if self.formula.date.start and self.formula.date.end:
                 return f"{self.formula.date.start}→{self.formula.date.end}"
-            else:
-                return self.formula.date.start
-        else:
-            return None
+            return self.formula.date.start
+        # unsupported / unknown result types have no displayable value
+        return None
