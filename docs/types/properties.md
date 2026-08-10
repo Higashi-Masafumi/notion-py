@@ -314,11 +314,23 @@ property: FormulaProperty = {
     }
 }
 
+# Unsupported formula (too many related pages / nested formulas)
+property: FormulaProperty = {
+    "id": "abc123",
+    "type": "formula",
+    "formula": {
+        "type": "unsupported",
+        "unsupported": {}
+    }
+}
+
 # Access value (type guard required)
 if property.formula.type == "number":
     value = property.formula.number or 0
 elif property.formula.type == "string":
     value = property.formula.string or ""
+elif property.formula.type == "unsupported":
+    value = None  # treat as unavailable
 ```
 
 ### RelationProperty
@@ -388,9 +400,22 @@ property: RollupProperty = {
     }
 }
 
+# Unsupported rollup (too many related pages / nested formulas)
+property: RollupProperty = {
+    "id": "abc123",
+    "type": "rollup",
+    "rollup": {
+        "type": "unsupported",
+        "unsupported": {},
+        "function": "sum"
+    }
+}
+
 # Access value (type guard required)
 if property.rollup.type == "number":
     total = property.rollup.number or 0
+elif property.rollup.type == "unsupported":
+    total = None  # treat as unavailable
 ```
 
 ### CreatedTimeProperty

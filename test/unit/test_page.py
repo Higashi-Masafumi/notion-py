@@ -1,6 +1,6 @@
 """Unit tests for page response models."""
 
-from notion_py_client.properties import RelationProperty, RollupProperty
+from notion_py_client.properties import FormulaProperty, RelationProperty, RollupProperty
 from notion_py_client.models.icon import IconType
 from notion_py_client.responses.page import NotionPage
 
@@ -59,6 +59,55 @@ class TestNotionPage:
             "page-id-2",
         ]
         assert relation_property.get_display_value() == "page-id-1, page-id-2"
+
+    def test_parse_unsupported_formula_and_rollup_properties(self):
+        """Formula/rollup may return type=unsupported with an empty object."""
+        data = {
+            "object": "page",
+            "id": "page_unsupported",
+            "created_time": "2025-01-01T00:00:00.000Z",
+            "last_edited_time": "2025-01-02T00:00:00.000Z",
+            "created_by": {"object": "user", "id": "user_123"},
+            "last_edited_by": {"object": "user", "id": "user_123"},
+            "parent": {"type": "database_id", "database_id": "db_123"},
+            "in_trash": False,
+            "is_locked": False,
+            "properties": {
+                "Calculated": {
+                    "id": "prop_formula",
+                    "type": "formula",
+                    "formula": {
+                        "type": "unsupported",
+                        "unsupported": {},
+                    },
+                },
+                "Rollup Total": {
+                    "id": "prop_rollup",
+                    "type": "rollup",
+                    "rollup": {
+                        "type": "unsupported",
+                        "unsupported": {},
+                        "function": "sum",
+                    },
+                },
+            },
+            "url": "https://www.notion.so/page_unsupported",
+        }
+
+        result = NotionPage.model_validate(data)
+
+        formula_property = result.properties["Calculated"]
+        assert isinstance(formula_property, FormulaProperty)
+        assert formula_property.formula.type == "unsupported"
+        assert formula_property.formula.unsupported is not None
+        assert formula_property.get_display_value() is None
+
+        rollup_property = result.properties["Rollup Total"]
+        assert isinstance(rollup_property, RollupProperty)
+        assert rollup_property.rollup.type == "unsupported"
+        assert rollup_property.rollup.unsupported is not None
+        assert rollup_property.rollup.function == "sum"
+        assert rollup_property.get_display_value() is None
 
     def test_parse_native_icon(self):
         """Page responses should accept native icons."""

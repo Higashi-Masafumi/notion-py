@@ -765,6 +765,44 @@ class _MeetingNotesAPI:
     def __init__(self, client: NotionAsyncClient):
         self._c = client
 
+    async def create(
+        self,
+        *,
+        source: dict[str, Any],
+        parent: dict[str, Any] | None = None,
+        title: str | None = None,
+        language: str | None = None,
+        options: dict[str, Any] | None = None,
+        auth: AuthParam | None = None,
+    ) -> BaseBlockObject | PartialBlock:
+        """Create AI meeting notes from a file upload or existing media block.
+
+        For ``source.type == "file_upload"``, ``parent`` with ``type: "page_id"``
+        is required. For ``source.type == "block"``, omit ``parent``.
+        """
+
+        body = pick(
+            {
+                "source": source,
+                "parent": parent,
+                "title": title,
+                "language": language,
+                "options": options,
+            },
+            ["source", "parent", "title", "language", "options"],
+        )
+        response = await self._c.request(
+            path="blocks/meeting_notes",
+            method="post",
+            body=body,
+            auth=auth,
+        )
+
+        if "type" in response and response.get("type") is not None:
+            block_adapter = TypeAdapter(BlockObject)
+            return block_adapter.validate_python(response)
+        return PartialBlock(**response)
+
     async def query(
         self,
         *,
