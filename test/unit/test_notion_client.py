@@ -3,6 +3,7 @@
 import pytest
 from pydantic import ValidationError
 
+from notion_py_client.blocks.base import PartialBlock
 from notion_py_client.blocks.special_blocks import MeetingNotesBlock
 from notion_py_client.notion_client import APIErrorCode, NotionAsyncClient
 from notion_py_client.requests.page_requests import (
@@ -478,7 +479,77 @@ class TestCommentsAPI:
 
 
 class TestMeetingNotesAPI:
-    """Test meeting notes query helper."""
+    """Test meeting notes create/query helpers."""
+
+    @pytest.mark.asyncio
+    async def test_create_meeting_notes_from_file_upload(self):
+        client = NotionAsyncClient(auth="test-token")
+        captured: dict = {}
+
+        async def fake_request(*, path, method, body=None, auth=None, **kwargs):
+            captured["path"] = path
+            captured["method"] = method
+            captured["body"] = body
+            return {
+                "object": "block",
+                "id": "meeting_notes_456",
+                "type": "meeting_notes",
+                "created_time": "2026-05-01T00:00:00.000Z",
+                "last_edited_time": "2026-05-01T00:00:00.000Z",
+                "created_by": {"object": "user", "id": "user_123"},
+                "last_edited_by": {"object": "user", "id": "user_123"},
+                "parent": {"type": "page_id", "page_id": "page_123"},
+                "has_children": True,
+                "in_trash": False,
+                "meeting_notes": {
+                    "title": _rich_text("Weekly sync"),
+                    "status": "transcription_in_progress",
+                },
+            }
+
+        client.request = fake_request  # type: ignore[method-assign]
+
+        result = await client.blocks.meetingNotes.create(
+            source={
+                "type": "file_upload",
+                "file_upload_id": "file_upload_123",
+            },
+            parent={"type": "page_id", "page_id": "page_123"},
+            title="Weekly sync",
+            language="ja",
+            options={"kickoff_summary": True},
+        )
+
+        assert isinstance(result, MeetingNotesBlock)
+        assert captured["path"] == "blocks/meeting_notes"
+        assert captured["method"] == "post"
+        assert captured["body"] == {
+            "source": {
+                "type": "file_upload",
+                "file_upload_id": "file_upload_123",
+            },
+            "parent": {"type": "page_id", "page_id": "page_123"},
+            "title": "Weekly sync",
+            "language": "ja",
+            "options": {"kickoff_summary": True},
+        }
+        assert result.meeting_notes.status == "transcription_in_progress"
+
+    @pytest.mark.asyncio
+    async def test_create_meeting_notes_partial_response(self):
+        client = NotionAsyncClient(auth="test-token")
+
+        async def fake_request(*, path, method, body=None, auth=None, **kwargs):
+            return {"object": "block", "id": "meeting_notes_partial"}
+
+        client.request = fake_request  # type: ignore[method-assign]
+
+        result = await client.blocks.meetingNotes.create(
+            source={"type": "block", "block_id": "audio_123"}
+        )
+
+        assert isinstance(result, PartialBlock)
+        assert result.id == "meeting_notes_partial"
 
     @pytest.mark.asyncio
     async def test_query_meeting_notes(self):

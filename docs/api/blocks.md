@@ -10,7 +10,7 @@ Blocks are the building blocks of Notion pages. The Blocks API provides methods 
 - Update block content
 - Delete (archive) blocks
 - List and append child blocks
-- Query AI meeting notes
+- Create and query AI meeting notes
 
 ## Methods
 
@@ -170,6 +170,46 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
                 }
             }
         ]
+    )
+```
+
+### meetingNotes.create
+
+Create AI meeting notes from a completed file upload or an existing audio, video, or file block.
+
+```python
+async def meetingNotes.create(
+    *,
+    source: dict[str, Any],
+    parent: dict[str, Any] | None = None,
+    title: str | None = None,
+    language: str | None = None,
+    options: dict[str, Any] | None = None,
+    auth: AuthParam | None = None
+) -> BaseBlockObject | PartialBlock
+```
+
+**Example**:
+
+```python
+async with NotionAsyncClient(auth="secret_xxx") as client:
+    # From a completed file upload
+    block = await client.blocks.meetingNotes.create(
+        source={
+            "type": "file_upload",
+            "file_upload_id": "file_upload_abc123",
+        },
+        parent={"type": "page_id", "page_id": "page_abc123"},
+        title="Weekly sync",
+        options={"kickoff_summary": True},
+    )
+
+    # From an existing media block (omit parent)
+    block = await client.blocks.meetingNotes.create(
+        source={
+            "type": "block",
+            "block_id": "audio_block_abc123",
+        }
     )
 ```
 
