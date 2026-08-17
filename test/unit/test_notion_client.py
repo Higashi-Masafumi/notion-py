@@ -9,6 +9,7 @@ from notion_py_client.requests.page_requests import (
     CreatePageParameters,
     MovePageParameters,
     ReplaceContentMarkdownCommand,
+    UpdatePageParameters,
 )
 from notion_py_client.responses.async_task import AsyncTaskResponse
 from notion_py_client.responses.list_response import (
@@ -62,6 +63,9 @@ class TestNotionAsyncClientDefaults:
 
     def test_api_error_code_includes_gateway_timeout(self):
         assert APIErrorCode.GatewayTimeout == "gateway_timeout"
+
+    def test_api_error_code_includes_invalid_beta(self):
+        assert APIErrorCode.InvalidBeta == "invalid_beta"
 
 
 class TestPageMarkdownAPI:
@@ -212,6 +216,81 @@ class TestAsyncPageWrites:
         assert captured["body"]["allow_async"] is True
         assert isinstance(result, AsyncTaskResponse)
         assert result.operation.name == "update_page_markdown"
+
+
+def _page_response(*, page_id: str = "page_123") -> dict:
+    return {
+        "object": "page",
+        "id": page_id,
+        "created_time": "2026-05-01T00:00:00.000Z",
+        "last_edited_time": "2026-05-01T00:00:00.000Z",
+        "created_by": {"object": "user", "id": "user_123"},
+        "last_edited_by": {"object": "user", "id": "user_123"},
+        "parent": {"type": "page_id", "page_id": "parent_123"},
+        "in_trash": False,
+        "is_locked": False,
+        "properties": {},
+        "url": "https://www.notion.so/page_123",
+    }
+
+
+class TestPageWriteFilterProperties:
+    """Test filter_properties query param on page create/update."""
+
+    @pytest.mark.asyncio
+    async def test_create_sends_filter_properties_as_query(self):
+        client = NotionAsyncClient(auth="test-token")
+        captured: dict = {}
+
+        async def fake_request(*, path, method, body=None, query=None, auth=None, **kwargs):
+            captured["path"] = path
+            captured["method"] = method
+            captured["body"] = body
+            captured["query"] = query
+            return _page_response()
+
+        client.request = fake_request  # type: ignore[method-assign]
+
+        await client.pages.create(
+            CreatePageParameters(
+                parent={"type": "page_id", "page_id": "parent_123"},
+                properties={},
+                filter_properties=["title", "Status"],
+            )
+        )
+
+        assert captured["path"] == "pages"
+        assert captured["method"] == "post"
+        assert captured["query"] == {"filter_properties": ["title", "Status"]}
+        assert "filter_properties" not in captured["body"]
+
+    @pytest.mark.asyncio
+    async def test_update_sends_filter_properties_as_query(self):
+        client = NotionAsyncClient(auth="test-token")
+        captured: dict = {}
+
+        async def fake_request(*, path, method, body=None, query=None, auth=None, **kwargs):
+            captured["path"] = path
+            captured["method"] = method
+            captured["body"] = body
+            captured["query"] = query
+            return _page_response()
+
+        client.request = fake_request  # type: ignore[method-assign]
+
+        await client.pages.update(
+            UpdatePageParameters(
+                page_id="page_123",
+                in_trash=True,
+                filter_properties=["title"],
+            )
+        )
+
+        assert captured["path"] == "pages/page_123"
+        assert captured["method"] == "patch"
+        assert captured["query"] == {"filter_properties": ["title"]}
+        assert captured["body"] == {"in_trash": True}
+        assert "filter_properties" not in captured["body"]
 
 
 class TestMovePageAPI:
