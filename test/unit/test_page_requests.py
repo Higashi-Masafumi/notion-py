@@ -32,6 +32,16 @@ class TestUpdatePageParameters:
         assert payload["template"]["timezone"] == "Asia/Tokyo"
         assert payload["erase_content"] is True
 
+    def test_filter_properties_serializes(self):
+        params = UpdatePageParameters(
+            page_id="page_123",
+            filter_properties=["title"],
+        )
+
+        payload = params.model_dump(exclude_none=True, by_alias=True)
+
+        assert payload["filter_properties"] == ["title"]
+
 
 class TestCreatePageParameters:
     """Test page create parameters."""
@@ -64,6 +74,17 @@ class TestCreatePageParameters:
 
         assert payload["template"]["template_id"] == "template_123"
         assert payload["template"]["timezone"] == "America/New_York"
+
+    def test_filter_properties_serializes(self):
+        params = CreatePageParameters(
+            parent={"type": "page_id", "page_id": "page_123"},
+            properties={},
+            filter_properties=["title", "Status"],
+        )
+
+        payload = params.model_dump(exclude_none=True, by_alias=True)
+
+        assert payload["filter_properties"] == ["title", "Status"]
 
     def test_markdown_cannot_mix_with_children(self):
         with pytest.raises(ValueError, match="markdown cannot be used"):

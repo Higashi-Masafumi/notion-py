@@ -135,21 +135,25 @@ def is_full_page(
     )
 
 
+def _has_field(obj: Any, key: str) -> bool:
+    """True when `key` is present, matching JS `"key" in response` checks."""
+    if isinstance(obj, Mapping):
+        return key in obj
+    return getattr(obj, key, None) is not None
+
+
 def is_full_data_source(
     response: DataSource | PartialDataSource | Mapping[str, Any] | Any,
 ) -> TypeGuard[DataSource]:
-    """Type guard: data source (full schema object)."""
-    return (
-        _get_object_type(response) == "data_source"
-        and _get_attr(response, "url") is not None
-    )
+    """Type guard: data source with full fields (`title` present)."""
+    return _get_object_type(response) == "data_source" and _has_field(response, "title")
 
 
 def is_full_database(
     response: NotionDatabase | PartialDatabase | Mapping[str, Any] | Any,
 ) -> TypeGuard[NotionDatabase]:
-    """Type guard: database (full metadata object)."""
-    return _get_object_type(response) == "database" and hasattr(response, "title")
+    """Type guard: database with full fields (`title` present)."""
+    return _get_object_type(response) == "database" and _has_field(response, "title")
 
 
 def is_full_page_or_data_source(

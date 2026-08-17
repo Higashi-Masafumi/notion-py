@@ -103,6 +103,7 @@ class APIErrorCode(str, Enum):
     InternalServerError = "internal_server_error"
     ServiceUnavailable = "service_unavailable"
     GatewayTimeout = "gateway_timeout"
+    InvalidBeta = "invalid_beta"
 
 
 class ClientErrorCode(str, Enum):
@@ -1306,8 +1307,14 @@ class _PagesAPI:
                 キューイングされた場合のタスクハンドル
         """
         body = params.model_dump(exclude_none=True, by_alias=True)
+        query = pick(body, ["filter_properties"])
+        body.pop("filter_properties", None)
         response = await self._c.request(
-            path="pages", method="post", body=body, auth=auth
+            path="pages",
+            method="post",
+            body=body,
+            query=query or None,
+            auth=auth,
         )
         if response.get("object") == "async_task":
             return AsyncTaskResponse.model_validate(response)
@@ -1343,8 +1350,14 @@ class _PagesAPI:
         """
         payload = params.model_dump(exclude_none=True, by_alias=True)
         page_id = payload.pop("page_id")
+        query = pick(payload, ["filter_properties"])
+        payload.pop("filter_properties", None)
         response = await self._c.request(
-            path=f"pages/{page_id}", method="patch", body=payload, auth=auth
+            path=f"pages/{page_id}",
+            method="patch",
+            body=payload,
+            query=query or None,
+            auth=auth,
         )
         return NotionPage(**response)
 
