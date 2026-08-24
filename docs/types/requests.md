@@ -37,6 +37,7 @@ params = CreatePageParameters(
         "type": "external",
         "external": {"url": "https://example.com/cover.jpg"}
     },
+    filter_properties=["title", "Status"],
     children=[
         {
             "object": "block",
@@ -86,7 +87,8 @@ params = UpdatePageParameters(
         "emoji": "✅"
     },
     cover=None,  # Remove cover
-    in_trash=False
+    in_trash=False,
+    filter_properties=["Status"],
 )
 
 # Move page to trash

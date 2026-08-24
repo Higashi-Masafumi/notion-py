@@ -8,6 +8,8 @@ from notion_py_client.utils import (
     collect_paginated_api,
     is_full_page,
     is_full_block,
+    is_full_data_source,
+    is_full_database,
     is_full_page_or_data_source,
     is_text_rich_text_item_response,
     is_equation_rich_text_item_response,
@@ -63,7 +65,9 @@ Helpers to quickly check object kinds from mixed results (e.g., search or data s
 
 - `is_full_page(obj)` — True if a full page (has `url`).
 - `is_full_block(obj)` — True if a block (has `type`).
-- `is_full_page_or_data_source(obj)` — True if page or data source.
+- `is_full_data_source(obj)` — True if a full data source (has `title`).
+- `is_full_database(obj)` — True if a full database (has `title`).
+- `is_full_page_or_data_source(obj)` — True if a full page or full data source.
 - `is_text_rich_text_item_response(item)` — True if rich text `type == "text"`.
 - `is_equation_rich_text_item_response(item)` — `type == "equation"`.
 - `is_mention_rich_text_item_response(item)` — `type == "mention"`.

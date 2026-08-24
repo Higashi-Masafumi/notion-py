@@ -30,9 +30,9 @@ type RollupPropertyFilter =
   | { date: DatePropertyFilter }
   | { number: NumberPropertyFilter }
 
-type VerificationPropertyStatusFilter = {
-  status: "verified" | "expired" | "none"
-}
+type VerificationPropertyStatusFilter =
+  | { status: "verified" | "expired" | "none" }
+  | { does_not_equal: "verified" | "expired" | "none" }
 """
 
 from typing import Literal, TypedDict, Union
@@ -234,13 +234,23 @@ RollupPropertyFilter = Union[
 # ============================================================================
 
 
-class VerificationPropertyStatusFilter(TypedDict):
-    """検証ステータスフィルター
+VerificationStatus = Literal["verified", "expired", "none"]
 
-    Examples:
-        ```python
-        filter: VerificationPropertyStatusFilter = {"status": "verified"}
-        ```
-    """
 
-    status: Literal["verified", "expired", "none"]
+class VerificationFilterStatus(TypedDict):
+    """検証ステータスが指定値と一致するフィルター."""
+
+    status: VerificationStatus
+
+
+class VerificationFilterDoesNotEqual(TypedDict):
+    """検証ステータスが指定値以外のフィルター."""
+
+    does_not_equal: VerificationStatus
+
+
+# Matches TypeScript: type VerificationPropertyStatusFilter
+VerificationPropertyStatusFilter = Union[
+    VerificationFilterStatus,
+    VerificationFilterDoesNotEqual,
+]
