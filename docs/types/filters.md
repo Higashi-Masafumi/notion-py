@@ -291,6 +291,19 @@ filter = {"property": "All Statuses", "rollup": {"every": {"select": {"equals": 
 filter = {"property": "No Blockers", "rollup": {"none": {"checkbox": {"equals": True}}}}
 ```
 
+### VerificationPropertyStatusFilter
+
+Filter wiki verification properties. Both conditions accept `verified`,
+`expired`, or `none`.
+
+```python
+# Status equals
+filter = {"property": "Verification", "verification": {"status": "verified"}}
+
+# Status does not equal
+filter = {"property": "Verification", "verification": {"does_not_equal": "expired"}}
+```
+
 ## Compound Filters
 
 Combine multiple filters with AND/OR logic using helpers.

@@ -41,6 +41,7 @@ class CreatePageParameters(BaseModel):
     content: list[Any] | None = None  # BlockObjectRequest
     children: list[Any] | None = None  # BlockObjectRequest
     allow_async: StrictBool | None = None
+    filter_properties: list[str] | None = None
 
     @model_validator(mode="after")
     def validate_body_modes(self) -> "CreatePageParameters":
@@ -78,6 +79,7 @@ class UpdatePageParameters(BaseModel):
     erase_content: StrictBool | None = None
     is_locked: StrictBool | None = None
     in_trash: StrictBool | None = None
+    filter_properties: list[str] | None = None
 
 
 class MovePageParameters(BaseModel):
