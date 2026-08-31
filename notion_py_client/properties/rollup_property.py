@@ -2,6 +2,8 @@ from typing import Any, Literal, Union
 
 from pydantic import BaseModel, Field, StrictFloat, StrictInt, StrictStr
 
+from ..models.primitives.empty_object import EmptyObject
+
 from .base_properties import (
     BaseProperty,
     ButtonProperty,
@@ -40,6 +42,9 @@ class Rollup(BaseModel):
         None, description="日付（typeがdateの場合のみ設定）"
     )
     function: StrictStr = Field(..., description="rollup関数（show_original、sum等）")
+    unsupported: EmptyObject | None = Field(
+        None, description="計算不能な値（typeがunsupportedの場合）"
+    )
     array: (
         list[
             Union[
@@ -87,6 +92,8 @@ class Rollup(BaseModel):
                     return self.array[0].get_display_value()
                 else:
                     return None
+            case "unsupported":
+                return None
             case _:
                 return None
 

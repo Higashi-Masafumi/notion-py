@@ -207,6 +207,7 @@ Common concrete filter dict shapes:
 - `Status`: `{ "property": "Status", "status": {"does_not_equal": "Done"} }`
 - `Date`: `{ "property": "Due", "date": {"on_or_after": "2025-01-01"} }`
 - `People`: `{ "property": "Assignee", "people": {"is_not_empty": True} }`
+- `Verification`: `{ "property": "Verification", "verification": {"does_not_equal": "expired"} }`
 
 Use helpers to combine:
 

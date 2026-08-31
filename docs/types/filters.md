@@ -135,6 +135,16 @@ filter = {"property": "Workflow", "status": {"is_empty": True}}
 filter = {"property": "Workflow", "status": {"is_not_empty": True}}
 ```
 
+### VerificationPropertyStatusFilter
+
+```python
+# Matching status
+filter = {"property": "Verification", "verification": {"status": "verified"}}
+
+# Non-matching status
+filter = {"property": "Verification", "verification": {"does_not_equal": "expired"}}
+```
+
 ### DatePropertyFilter
 
 ```python
