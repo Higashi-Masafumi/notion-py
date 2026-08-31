@@ -38,5 +38,7 @@ class FormulaProperty(BaseProperty[Literal["formula"]]):
                 return f"{self.formula.date.start}→{self.formula.date.end}"
             else:
                 return self.formula.date.start
+        elif self.formula.type == "unsupported":
+            return None
         else:
             return None

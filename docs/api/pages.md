@@ -32,6 +32,7 @@ async def create(
 - `params.icon` (optional): Page icon
 - `params.cover` (optional): Cover image
 - `params.children` (optional): Child blocks
+- `params.filter_properties` (optional): Property IDs to include in the write response
 
 **Returns**: Created `NotionPage`
 
@@ -146,6 +147,7 @@ async def update(
 - `params.template` (optional): Apply a default or specific template
 - `params.erase_content` (optional): Clear existing block children before applying updates
 - `params.in_trash` (optional): Trash status
+- `params.filter_properties` (optional): Property IDs to include in the write response
 
 **Returns**: Updated `NotionPage`
 

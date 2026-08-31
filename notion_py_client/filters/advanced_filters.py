@@ -234,13 +234,20 @@ RollupPropertyFilter = Union[
 # ============================================================================
 
 
-class VerificationPropertyStatusFilter(TypedDict):
-    """検証ステータスフィルター
-
-    Examples:
-        ```python
-        filter: VerificationPropertyStatusFilter = {"status": "verified"}
-        ```
-    """
+class VerificationFilterStatus(TypedDict):
+    """検証ステータスが一致する"""
 
     status: Literal["verified", "expired", "none"]
+
+
+class VerificationFilterDoesNotEqual(TypedDict):
+    """検証ステータスが一致しない"""
+
+    does_not_equal: Literal["verified", "expired", "none"]
+
+
+# Matches TypeScript: { status: ... } | { does_not_equal: ... }
+VerificationPropertyStatusFilter = Union[
+    VerificationFilterStatus,
+    VerificationFilterDoesNotEqual,
+]

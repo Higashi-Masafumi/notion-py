@@ -12,6 +12,9 @@ class StatusOptionConfig(BaseModel):
     name: StrictStr = Field(..., description="オプション名")
     color: StrictStr = Field(..., description="表示カラー")
     description: StrictStr | None = Field(None, description="オプション説明")
+    group: Literal["To-do", "In progress", "Complete"] | None = Field(
+        None, description="書き込み時のステータスグループ"
+    )
 
 
 class StatusGroupConfig(BaseModel):

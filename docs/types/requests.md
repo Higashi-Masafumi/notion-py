@@ -47,7 +47,8 @@ params = CreatePageParameters(
                 ]
             }
         }
-    ]
+    ],
+    filter_properties=["title", "status"],
 )
 
 # Create as child page

@@ -63,6 +63,9 @@ class TestNotionAsyncClientDefaults:
     def test_api_error_code_includes_gateway_timeout(self):
         assert APIErrorCode.GatewayTimeout == "gateway_timeout"
 
+    def test_api_error_code_includes_invalid_beta(self):
+        assert APIErrorCode.InvalidBeta == "invalid_beta"
+
 
 class TestPageMarkdownAPI:
     """Test page markdown helpers."""

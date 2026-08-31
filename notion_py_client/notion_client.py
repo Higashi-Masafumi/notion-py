@@ -103,6 +103,7 @@ class APIErrorCode(str, Enum):
     InternalServerError = "internal_server_error"
     ServiceUnavailable = "service_unavailable"
     GatewayTimeout = "gateway_timeout"
+    InvalidBeta = "invalid_beta"
 
 
 class ClientErrorCode(str, Enum):
@@ -806,6 +807,40 @@ class _MeetingNotesAPI:
             request_status=response.get("request_status"),
         )
 
+    async def create(
+        self,
+        *,
+        source: dict[str, Any],
+        parent: dict[str, Any] | None = None,
+        processing: dict[str, Any] | None = None,
+        auth: AuthParam | None = None,
+    ) -> BlockObject | PartialBlock:
+        """Create AI meeting notes from a file upload or existing media block."""
+
+        source_type = source.get("type")
+        if source_type == "file_upload" and parent is None:
+            raise ValueError("parent is required when source.type is file_upload")
+        if source_type == "block" and parent is not None:
+            raise ValueError("parent is not accepted when source.type is block")
+
+        body = pick(
+            {
+                "source": source,
+                "parent": parent,
+                "processing": processing,
+            },
+            ["source", "parent", "processing"],
+        )
+        response = await self._c.request(
+            path="blocks/meeting_notes",
+            method="post",
+            body=body,
+            auth=auth,
+        )
+        if "type" in response and response.get("type") is not None:
+            return TypeAdapter(BlockObject).validate_python(response)
+        return PartialBlock(**response)
+
 
 class _DatabasesAPI:
     """
@@ -1036,6 +1071,7 @@ class _DataSourcesAPI:
         sorts: list[DatabaseQuerySort] | None = None,
         start_cursor: str | None = None,
         page_size: int | None = None,
+        is_archived: bool | None = None,
         auth: AuthParam | None = None,
     ) -> QueryDataSourceResponse:
         """
@@ -1074,6 +1110,7 @@ class _DataSourcesAPI:
                 - `[{"timestamp": "created_time", "direction": "descending"}]`
             start_cursor: ページネーション用カーソル
             page_size: 取得件数（最大100）
+            is_archived: True でアーカイブ済みページのみ返す。省略または False は非アーカイブ
             auth: 認証トークン（オプション）
 
         Returns:
@@ -1132,8 +1169,9 @@ class _DataSourcesAPI:
                 "sorts": sorts,
                 "start_cursor": start_cursor,
                 "page_size": page_size,
+                "is_archived": is_archived,
             },
-            ["filter", "sorts", "start_cursor", "page_size"],
+            ["filter", "sorts", "start_cursor", "page_size", "is_archived"],
         )
         response = await self._c.request(
             path=f"data_sources/{data_source_id}/query",
@@ -1305,9 +1343,17 @@ class _PagesAPI:
             AsyncTaskResponse: allow_async=True で大きな markdown 作成が
                 キューイングされた場合のタスクハンドル
         """
-        body = params.model_dump(exclude_none=True, by_alias=True)
+        payload = params.model_dump(exclude_none=True, by_alias=True)
+        query = pick(
+            {"filter_properties": payload.pop("filter_properties", None)},
+            ["filter_properties"],
+        )
         response = await self._c.request(
-            path="pages", method="post", body=body, auth=auth
+            path="pages",
+            method="post",
+            body=payload,
+            query=cast(QueryParams, query) if query else None,
+            auth=auth,
         )
         if response.get("object") == "async_task":
             return AsyncTaskResponse.model_validate(response)
@@ -1343,8 +1389,16 @@ class _PagesAPI:
         """
         payload = params.model_dump(exclude_none=True, by_alias=True)
         page_id = payload.pop("page_id")
+        query = pick(
+            {"filter_properties": payload.pop("filter_properties", None)},
+            ["filter_properties"],
+        )
         response = await self._c.request(
-            path=f"pages/{page_id}", method="patch", body=payload, auth=auth
+            path=f"pages/{page_id}",
+            method="patch",
+            body=payload,
+            query=cast(QueryParams, query) if query else None,
+            auth=auth,
         )
         return NotionPage(**response)
 
