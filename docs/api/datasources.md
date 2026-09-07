@@ -423,6 +423,7 @@ data_source: DataSource = {
     "object": "data_source",
     "id": "ds_abc123",
     "name": "Main Data",
+    "database_type": None,
     "properties": {
         "Name": {
             "id": "title",

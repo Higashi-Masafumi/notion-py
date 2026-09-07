@@ -1,5 +1,5 @@
 from .responses.datasource import DataSource, PartialDataSource
-from .responses.database import NotionDatabase, PartialDatabase
+from .responses.database import DatabaseType, NotionDatabase, PartialDatabase
 from .responses.page import NotionPage, PartialPage
 from .responses.file_upload import FileUploadObject
 from .responses.page_markdown import PageMarkdownResponse
@@ -200,6 +200,7 @@ __all__ = [
     "DataSource",
     "PartialDataSource",
     # Database
+    "DatabaseType",
     "NotionDatabase",
     "PartialDatabase",
     # Page

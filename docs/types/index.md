@@ -81,10 +81,11 @@ Located in `notion_py.responses`:
 
 - `NotionPage` - Full page object with properties
 - `PartialPage` - Page without properties (e.g., in search results)
-- `NotionDatabase` - Database container with data sources
+- `NotionDatabase` - Database container with data sources and optional `database_type`
 - `PartialDatabase` - Database without full details
-- `DataSource` - Data source with schema (properties)
+- `DataSource` - Data source with schema (properties) and optional `database_type`
 - `PartialDataSource` - Data source without schema
+- `DatabaseType` - Read-side typed database values (`tasks`, `projects`, `skills`, plus app-created types)
 
 ### Request Types
 

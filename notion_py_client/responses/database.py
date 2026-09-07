@@ -16,6 +16,18 @@ from ..models.icon import NotionIcon
 from ..models.cover import NotionCover
 from ..schema.property_configs import DatabasePropertyConfigResponse
 
+DatabaseType = Literal[
+    "tasks",
+    "projects",
+    "sprints",
+    "docs",
+    "wiki",
+    "meetings",
+    "meeting_notes",
+    "skills",
+    "github_prs",
+]
+
 
 class DataSourceReference(TypedDict):
     """データソース参照情報 (2025-09-03で追加)"""
@@ -73,6 +85,10 @@ class NotionDatabase(BaseModel):
     )
     parent: NotionParent = Field(..., description="親オブジェクト")
     is_inline: StrictBool = Field(False, description="インラインデータベースフラグ")
+    database_type: DatabaseType | None = Field(
+        None,
+        description="Typed database の種類。通常のデータベースは null",
+    )
     in_trash: StrictBool = Field(False, description="ゴミ箱フラグ")
     is_locked: StrictBool = Field(False, description="ロックフラグ")
     created_time: StrictStr = Field(..., description="作成日時（ISO 8601形式）")

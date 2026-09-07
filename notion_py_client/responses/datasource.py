@@ -16,6 +16,7 @@ from ..models.icon import NotionIcon
 from ..models.cover import NotionCover
 from ..models.parent import NotionParent
 from ..schema.property_configs import DatabasePropertyConfigResponse
+from .database import DatabaseType
 
 
 class DataSource(BaseModel):
@@ -60,6 +61,10 @@ class DataSource(BaseModel):
         ..., description="データベースの親オブジェクト"
     )
     is_inline: StrictBool = Field(False, description="インラインフラグ")
+    database_type: DatabaseType | None = Field(
+        None,
+        description="所属する typed database の種類。通常のデータソースは null",
+    )
     in_trash: StrictBool = Field(False, description="ゴミ箱フラグ")
     created_time: StrictStr = Field(..., description="作成日時（ISO 8601形式）")
     last_edited_time: StrictStr = Field(..., description="最終編集日時（ISO 8601形式）")

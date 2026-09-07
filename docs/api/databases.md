@@ -51,7 +51,7 @@ async def retrieve(
 
 **Returns**: `NotionDatabase` object containing:
 
-- Database metadata (title, icon, cover, etc.)
+- Database metadata (title, icon, cover, `database_type`, etc.)
 - `data_sources` array with IDs and names
 
 **Example**:
@@ -85,7 +85,7 @@ db = await client.databases.retrieve({"database_id": db_id})
 
 ### create
 
-Create a new database with an initial data source.
+Create a new database with an initial data source, or a typed database from Notion's canonical schema.
 
 ```python
 async def create(
@@ -97,13 +97,15 @@ async def create(
 
 **Parameters**:
 
-- `params.parent`: Parent page or workspace
-- `params.title`: Database title (RichText array)
-- `params.initial_data_source`: Initial data source configuration
+- `params.parent`: Parent page or workspace (required)
+- `params.title` (optional): Database title (RichText array)
+- `params.description` (optional): Database description
+- `params.initial_data_source` (optional): Custom initial data source configuration
   - `properties`: Schema definition
   - `name` (optional): Data source name
+- `params.database_type` (optional): `"tasks"`, `"projects"`, or `"skills"`. Cannot be combined with `initial_data_source`. When `title` is omitted, Notion names the database after the type.
 
-**Returns**: Created `NotionDatabase`
+**Returns**: Created `NotionDatabase`. Typed databases and their data sources report the type back as `database_type`.
 
 **Example**:
 
@@ -140,6 +142,15 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
     })
 
     print(f"Created database: {db.id}")
+
+    tasks = await client.databases.create({
+        "parent": {
+            "type": "page_id",
+            "page_id": "parent_page_id"
+        },
+        "database_type": "tasks",
+    })
+    print(f"Typed database: {tasks.database_type}")
 ```
 
 ### update
@@ -245,6 +256,7 @@ database: NotionDatabase = {
     "parent": {...},
     "in_trash": false,
     "is_inline": false,
+    "database_type": None,
     "public_url": "https://...",
     "data_sources": [
         {"id": "ds_abc123", "name": "Main Data"},

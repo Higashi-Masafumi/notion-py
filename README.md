@@ -53,6 +53,7 @@ This library supports the latest Notion API version `2026-03-11`, including:
 - **Custom emojis**: `customEmojis.list()` support
 - **Pagination status**: exposes `request_status` on list responses
 - **DataSources**: Continued support for the 2025-09-03 data model split
+- **Typed databases**: `database_type` on create (`tasks`, `projects`, `skills`) and on database/data source responses
 
 ### DataSources vs Databases
 
