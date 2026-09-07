@@ -63,24 +63,33 @@ class RetrieveDatabaseParameters(TypedDict):
     database_id: str
 
 
+CreateDatabaseType = Literal["tasks", "projects", "skills"]
+
+
 class _CreateDatabaseRequired(TypedDict):
     """CreateDatabaseParametersの必須フィールド."""
 
-    parent: dict[str, str]
-    properties: dict[str, Any]
+    parent: dict[str, Any]
 
 
 class CreateDatabaseParameters(_CreateDatabaseRequired, total=False):
     """データベース作成のパラメータ.
 
+    `database_type` は Notion の正規スキーマで typed database を作る。
+    `initial_data_source` と同時には指定できない。
+
     References:
-        - https://github.com/makenotion/notion-sdk-js/blob/main/src/api-endpoints.ts#L789
+        - https://developers.notion.com/reference/create-database
+        - https://github.com/makenotion/notion-sdk-js/blob/main/src/api-endpoints/databases.ts
     """
 
     title: list[dict[str, Any]]
+    description: list[dict[str, Any]]
+    is_inline: bool
+    initial_data_source: dict[str, Any]
+    database_type: CreateDatabaseType
     icon: dict[str, Any]
     cover: dict[str, Any]
-    is_inline: bool
 
 
 class _UpdateDatabaseRequired(TypedDict):

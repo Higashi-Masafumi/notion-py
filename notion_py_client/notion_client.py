@@ -870,7 +870,9 @@ class _DatabasesAPI:
         Create a database (API version 2025-09-03)
 
         新しいデータベースと初期データソースを作成します。
-        initial_data_sourceにpropertiesを指定してください。
+        カスタムスキーマを使う場合は initial_data_source に properties を指定します。
+        Notion の正規スキーマで作る場合は database_type を指定します。
+        database_type と initial_data_source は同時に指定できません。
 
         Returns:
             NotionDatabase: 作成されたデータベースオブジェクト
@@ -886,6 +888,11 @@ class _DatabasesAPI:
                         "Status": {"select": {"options": [...]}}
                     }
                 }
+            })
+
+            tasks = await client.databases.create({
+                "parent": {"type": "page_id", "page_id": "parent_page_id"},
+                "database_type": "tasks",
             })
             ```
         """

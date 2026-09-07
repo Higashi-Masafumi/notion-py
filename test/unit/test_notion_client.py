@@ -11,6 +11,7 @@ from notion_py_client.requests.page_requests import (
     ReplaceContentMarkdownCommand,
 )
 from notion_py_client.responses.async_task import AsyncTaskResponse
+from notion_py_client.responses.database import NotionDatabase
 from notion_py_client.responses.list_response import (
     CommentObject,
     PartialCommentObject,
@@ -475,6 +476,56 @@ class TestCommentsAPI:
 
         with pytest.raises(ValueError, match="rich_text or markdown"):
             await client.comments.update(comment_id="comment_123")
+
+
+class TestDatabasesAPI:
+    """Test database create helpers."""
+
+    @pytest.mark.asyncio
+    async def test_create_typed_database_forwards_database_type(self):
+        client = NotionAsyncClient(auth="test-token")
+        captured: dict = {}
+
+        async def fake_request(*, path, method, body=None, auth=None, **kwargs):
+            captured["path"] = path
+            captured["method"] = method
+            captured["body"] = body
+            return {
+                "object": "database",
+                "id": "db_123",
+                "title": [],
+                "description": [],
+                "parent": {"type": "page_id", "page_id": "page_123"},
+                "is_inline": False,
+                "database_type": "tasks",
+                "in_trash": False,
+                "is_locked": False,
+                "created_time": "2026-09-01T00:00:00.000Z",
+                "last_edited_time": "2026-09-01T00:00:00.000Z",
+                "data_sources": [{"id": "ds_123", "name": "Tasks"}],
+                "icon": None,
+                "cover": None,
+                "url": "https://app.notion.com/p/db_123",
+                "public_url": None,
+            }
+
+        client.request = fake_request  # type: ignore[method-assign]
+
+        result = await client.databases.create(
+            {
+                "parent": {"type": "page_id", "page_id": "page_123"},
+                "database_type": "tasks",
+            }
+        )
+
+        assert isinstance(result, NotionDatabase)
+        assert captured["path"] == "databases"
+        assert captured["method"] == "post"
+        assert captured["body"] == {
+            "parent": {"type": "page_id", "page_id": "page_123"},
+            "database_type": "tasks",
+        }
+        assert result.database_type == "tasks"
 
 
 class TestMeetingNotesAPI:
