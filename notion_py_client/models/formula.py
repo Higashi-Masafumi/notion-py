@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field, StrictBool, StrictFloat, StrictInt, StrictStr
 
 from .date_info import DateInfo
+from .primitives.empty_object import EmptyObject
 
 
 class FormulaResult(BaseModel):
@@ -18,4 +19,7 @@ class FormulaResult(BaseModel):
     )
     date: DateInfo | None = Field(
         None, description="日付結果（typeがdateの場合）"
+    )
+    unsupported: EmptyObject | None = Field(
+        None, description="計算不能な値（typeがunsupportedの場合）"
     )

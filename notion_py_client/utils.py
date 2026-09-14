@@ -138,18 +138,21 @@ def is_full_page(
 def is_full_data_source(
     response: DataSource | PartialDataSource | Mapping[str, Any] | Any,
 ) -> TypeGuard[DataSource]:
-    """Type guard: data source (full schema object)."""
+    """Type guard: data source with full fields (`title` present)."""
     return (
         _get_object_type(response) == "data_source"
-        and _get_attr(response, "url") is not None
+        and _get_attr(response, "title") is not None
     )
 
 
 def is_full_database(
     response: NotionDatabase | PartialDatabase | Mapping[str, Any] | Any,
 ) -> TypeGuard[NotionDatabase]:
-    """Type guard: database (full metadata object)."""
-    return _get_object_type(response) == "database" and hasattr(response, "title")
+    """Type guard: database with full fields (`title` present)."""
+    return (
+        _get_object_type(response) == "database"
+        and _get_attr(response, "title") is not None
+    )
 
 
 def is_full_page_or_data_source(

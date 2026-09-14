@@ -25,6 +25,8 @@ async def query(
     sorts: list[DatabaseQuerySort] | None = None,
     start_cursor: str | None = None,
     page_size: int | None = None,
+    is_archived: bool | None = None,
+    filter_properties: list[str] | None = None,
     auth: AuthParam | None = None
 ) -> QueryDataSourceResponse
 ```
@@ -36,6 +38,8 @@ async def query(
 - `sorts` (optional): Sort criteria (`list[DatabaseQuerySort]`)
 - `start_cursor` (optional): Pagination cursor
 - `page_size` (optional): Results per page (max 100)
+- `is_archived` (optional): Return archived pages instead of the default non-archived set
+- `filter_properties` (optional): Property IDs or names to include in each result
 
 **Returns**: `QueryDataSourceResponse` with:
 

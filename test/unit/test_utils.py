@@ -1,6 +1,11 @@
 """Unit tests for webhook signature verification helpers."""
 
-from notion_py_client.utils import sign_webhook_payload, verify_webhook_signature
+from notion_py_client.utils import (
+    is_full_data_source,
+    is_full_database,
+    sign_webhook_payload,
+    verify_webhook_signature,
+)
 
 
 class TestWebhookSignature:
@@ -61,4 +66,30 @@ class TestWebhookSignature:
     def test_verify_webhook_signature_rejects_malformed_non_ascii_signature(self):
         assert not verify_webhook_signature(
             body="{}", signature="sha256=ééé", verification_token="token"
+        )
+
+
+class TestFullObjectGuards:
+    """Test title-based full object checks."""
+
+    def test_is_full_database_requires_title(self):
+        assert is_full_database(
+            {
+                "object": "database",
+                "id": "db_123",
+                "title": [{"plain_text": "Tasks"}],
+            }
+        )
+        assert not is_full_database({"object": "database", "id": "db_123"})
+
+    def test_is_full_data_source_requires_title(self):
+        assert is_full_data_source(
+            {
+                "object": "data_source",
+                "id": "ds_123",
+                "title": [{"plain_text": "Main"}],
+            }
+        )
+        assert not is_full_data_source(
+            {"object": "data_source", "id": "ds_123", "url": "https://example.com"}
         )

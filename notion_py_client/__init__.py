@@ -98,6 +98,9 @@ from .filters import (
     FormulaPropertyFilter,
     RollupPropertyFilter,
     ExistencePropertyFilter,
+    VerificationFilterDoesNotEqual,
+    VerificationFilterStatus,
+    VerificationPropertyStatusFilter,
     # 具体的なフィルター
     TextFilterEquals,
     TextFilterContains,
@@ -358,6 +361,9 @@ __all__ = [
     "FormulaPropertyFilter",
     "RollupPropertyFilter",
     "ExistencePropertyFilter",
+    "VerificationFilterStatus",
+    "VerificationFilterDoesNotEqual",
+    "VerificationPropertyStatusFilter",
     # 具体的なフィルター
     "TextFilterEquals",
     "TextFilterContains",

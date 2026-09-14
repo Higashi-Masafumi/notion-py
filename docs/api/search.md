@@ -19,7 +19,7 @@ async def search(
 **Parameters**:
 
 - `params.query` (optional): Search query string
-- `params.filter` (optional): Filter by object type
+- `params.filter` (optional): Filter by object type and/or trash status (`in_trash`)
 - `params.sort` (optional): Sort criteria
 - `params.start_cursor` (optional): Pagination cursor
 - `params.page_size` (optional): Results per page (max 100)
@@ -59,12 +59,17 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
         }
     })
 
-    # Search only databases
-    databases = await client.search({
+    # Search only data sources
+    data_sources = await client.search({
         "filter": {
             "property": "object",
-            "value": "database"
+            "value": "data_source"
         }
+    })
+
+    # Search trash
+    trashed = await client.search({
+        "filter": {"in_trash": True}
     })
 ```
 
@@ -128,10 +133,20 @@ filter = {
     "value": "page"
 }
 
-# Databases only
+# Data sources only
 filter = {
     "property": "object",
-    "value": "database"
+    "value": "data_source"
+}
+
+# Trash only
+filter = {"in_trash": True}
+
+# Pages in trash
+filter = {
+    "property": "object",
+    "value": "page",
+    "in_trash": True
 }
 ```
 
@@ -149,6 +164,9 @@ sort = {
     "direction": "ascending",
     "timestamp": "last_edited_time"
 }
+
+# By relevance
+sort = {"property": "relevance"}
 ```
 
 ## Common Patterns
