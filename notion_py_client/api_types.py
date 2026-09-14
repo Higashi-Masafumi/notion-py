@@ -12,6 +12,20 @@ from typing import TypedDict, NotRequired, Literal, Any
 from .filters import FilterCondition
 
 
+CreatableDatabaseType = Literal["tasks", "projects", "skills"]
+DatabaseType = Literal[
+    "tasks",
+    "projects",
+    "sprints",
+    "docs",
+    "wiki",
+    "meetings",
+    "meeting_notes",
+    "skills",
+    "github_prs",
+]
+
+
 # ========== Database API Types ==========
 class DatabaseQuerySort(TypedDict, total=False):
     """データベースクエリのソート条件.
@@ -66,21 +80,24 @@ class RetrieveDatabaseParameters(TypedDict):
 class _CreateDatabaseRequired(TypedDict):
     """CreateDatabaseParametersの必須フィールド."""
 
-    parent: dict[str, str]
-    properties: dict[str, Any]
+    parent: dict[str, Any]
 
 
 class CreateDatabaseParameters(_CreateDatabaseRequired, total=False):
     """データベース作成のパラメータ.
 
     References:
-        - https://github.com/makenotion/notion-sdk-js/blob/main/src/api-endpoints.ts#L789
+        - https://developers.notion.com/reference/create-a-database
+        - https://github.com/makenotion/notion-sdk-js/blob/main/src/api-endpoints/databases.ts
     """
 
     title: list[dict[str, Any]]
+    description: list[dict[str, Any]]
+    is_inline: bool
+    initial_data_source: dict[str, Any]
+    database_type: CreatableDatabaseType
     icon: dict[str, Any]
     cover: dict[str, Any]
-    is_inline: bool
 
 
 class _UpdateDatabaseRequired(TypedDict):
@@ -93,27 +110,57 @@ class UpdateDatabaseParameters(_UpdateDatabaseRequired, total=False):
     """データベース更新のパラメータ.
 
     References:
-        - https://github.com/makenotion/notion-sdk-js/blob/main/src/api-endpoints.ts#L1011
+        - https://github.com/makenotion/notion-sdk-js/blob/main/src/api-endpoints/databases.ts
     """
 
-    properties: dict[str, Any]
+    parent: dict[str, Any]
     title: list[dict[str, Any]]
     description: list[dict[str, Any]]
+    is_inline: bool
     icon: dict[str, Any]
     cover: dict[str, Any]
+    in_trash: bool
+    is_locked: bool
 
 
 # ========== Search API Types ==========
+class SearchObjectFilter(TypedDict, total=False):
+    """オブジェクト種別とゴミ箱の検索フィルター."""
+
+    property: Literal["object"]
+    value: Literal["page", "data_source"]
+    in_trash: bool
+
+
+class SearchInTrashFilter(TypedDict):
+    """ゴミ箱のみを対象にする検索フィルター."""
+
+    in_trash: bool
+
+
+class SearchTimestampSort(TypedDict):
+    """最終編集時刻での検索ソート."""
+
+    timestamp: Literal["last_edited_time"]
+    direction: Literal["ascending", "descending"]
+
+
+class SearchRelevanceSort(TypedDict):
+    """関連度での検索ソート."""
+
+    property: Literal["relevance"]
+
+
 class SearchParameters(TypedDict, total=False):
     """検索のパラメータ.
 
     References:
-        - https://github.com/makenotion/notion-sdk-js/blob/main/src/api-endpoints.ts#L2345
+        - https://developers.notion.com/reference/post-search
     """
 
     query: NotRequired[str]
-    filter: NotRequired[dict[str, str]]
-    sort: NotRequired[dict[str, str]]
+    filter: NotRequired[SearchObjectFilter | SearchInTrashFilter]
+    sort: NotRequired[SearchTimestampSort | SearchRelevanceSort]
     start_cursor: NotRequired[str]
     page_size: NotRequired[int]
 
@@ -216,3 +263,44 @@ class ListCommentsParameters(TypedDict, total=False):
     block_id: NotRequired[str]
     start_cursor: NotRequired[str]
     page_size: NotRequired[int]
+
+
+class MeetingNotesFileUploadSource(TypedDict):
+    """完了済みファイルアップロードを meeting notes の入力にする."""
+
+    type: Literal["file_upload"]
+    file_upload_id: str
+
+
+class MeetingNotesBlockSource(TypedDict):
+    """既存の audio/video/file ブロックを meeting notes の入力にする."""
+
+    type: Literal["block"]
+    block_id: str
+
+
+class MeetingNotesPageParent(TypedDict):
+    """file_upload ソースで必須の親ページ."""
+
+    type: Literal["page_id"]
+    page_id: str
+
+
+class MeetingNotesCreateOptions(TypedDict, total=False):
+    """meeting notes 作成時の処理オプション."""
+
+    kickoff_summary: bool
+
+
+class CreateMeetingNoteParameters(TypedDict, total=False):
+    """POST /v1/blocks/meeting_notes のパラメータ.
+
+    References:
+        - https://developers.notion.com/reference/create-meeting-note
+    """
+
+    source: MeetingNotesFileUploadSource | MeetingNotesBlockSource
+    parent: MeetingNotesPageParent
+    title: str
+    language: str
+    options: MeetingNotesCreateOptions

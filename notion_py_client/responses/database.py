@@ -11,6 +11,8 @@ from typing import Any, Literal
 from pydantic import BaseModel, Field, StrictBool, StrictStr
 from typing_extensions import TypedDict
 
+from ..api_types import DatabaseType
+
 from ..models.parent import NotionParent
 from ..models.icon import NotionIcon
 from ..models.cover import NotionCover
@@ -73,6 +75,9 @@ class NotionDatabase(BaseModel):
     )
     parent: NotionParent = Field(..., description="親オブジェクト")
     is_inline: StrictBool = Field(False, description="インラインデータベースフラグ")
+    database_type: DatabaseType | None = Field(
+        None, description="型付きデータベースの種別。通常のデータベースは null"
+    )
     in_trash: StrictBool = Field(False, description="ゴミ箱フラグ")
     is_locked: StrictBool = Field(False, description="ロックフラグ")
     created_time: StrictStr = Field(..., description="作成日時（ISO 8601形式）")
