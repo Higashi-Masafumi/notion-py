@@ -1,6 +1,6 @@
 """Unit tests for page response models."""
 
-from notion_py_client.properties import RelationProperty, RollupProperty
+from notion_py_client.properties import FormulaProperty, RelationProperty, RollupProperty
 from notion_py_client.models.icon import IconType
 from notion_py_client.responses.page import NotionPage
 
@@ -91,3 +91,66 @@ class TestNotionPage:
         assert result.icon.icon is not None
         assert result.icon.icon.name == "bullseye"
         assert result.icon.icon.color == "blue"
+
+    def test_parse_is_archived(self):
+        data = {
+            "object": "page",
+            "id": "page_archived",
+            "created_time": "2025-01-01T00:00:00.000Z",
+            "last_edited_time": "2025-01-02T00:00:00.000Z",
+            "created_by": {"object": "user", "id": "user_123"},
+            "last_edited_by": {"object": "user", "id": "user_123"},
+            "parent": {"type": "page_id", "page_id": "parent_123"},
+            "in_trash": False,
+            "is_archived": True,
+            "is_locked": False,
+            "properties": {},
+            "url": "https://www.notion.so/page_archived",
+        }
+
+        result = NotionPage.model_validate(data)
+
+        assert result.is_archived is True
+        assert result.in_trash is False
+
+    def test_parse_unsupported_formula_and_rollup(self):
+        data = {
+            "object": "page",
+            "id": "page_unsupported",
+            "created_time": "2025-01-01T00:00:00.000Z",
+            "last_edited_time": "2025-01-02T00:00:00.000Z",
+            "created_by": {"object": "user", "id": "user_123"},
+            "last_edited_by": {"object": "user", "id": "user_123"},
+            "parent": {"type": "data_source_id", "data_source_id": "ds_123"},
+            "in_trash": False,
+            "is_locked": False,
+            "properties": {
+                "Score": {
+                    "id": "prop_formula",
+                    "type": "formula",
+                    "formula": {"type": "unsupported", "unsupported": {}},
+                },
+                "Total": {
+                    "id": "prop_rollup",
+                    "type": "rollup",
+                    "rollup": {
+                        "type": "unsupported",
+                        "function": "sum",
+                        "unsupported": {},
+                    },
+                },
+            },
+            "url": "https://www.notion.so/page_unsupported",
+        }
+
+        result = NotionPage.model_validate(data)
+
+        formula = result.properties["Score"]
+        rollup = result.properties["Total"]
+        assert isinstance(formula, FormulaProperty)
+        assert formula.formula.type == "unsupported"
+        assert formula.get_display_value() is None
+        assert isinstance(rollup, RollupProperty)
+        assert rollup.rollup.type == "unsupported"
+        assert rollup.rollup.function == "sum"
+        assert rollup.get_display_value() is None

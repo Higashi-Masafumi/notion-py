@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import base64
 import json
+import random
 from collections.abc import Sequence
 from enum import Enum, auto
 from typing import (
@@ -23,6 +24,7 @@ import httpx
 
 from .api_types import (
     CreateDatabaseParameters,
+    CreateMeetingNoteParameters,
     DatabaseQuerySort,
     QueryDatabaseParameters,
     RetrieveDatabaseParameters,
@@ -103,6 +105,8 @@ class APIErrorCode(str, Enum):
     InternalServerError = "internal_server_error"
     ServiceUnavailable = "service_unavailable"
     GatewayTimeout = "gateway_timeout"
+    InvalidBeta = "invalid_beta"
+    ServiceOverload = "service_overload"
 
 
 class ClientErrorCode(str, Enum):
@@ -217,6 +221,36 @@ def build_request_error(response: httpx.Response, body_text: str) -> HTTPRespons
 # ========== utils ==========
 def pick(d: Mapping[str, Any], keys: Iterable[str]) -> dict[str, Any]:
     return {k: v for k, v in d.items() if k in keys and v is not None}
+
+
+_RETRYABLE_STATUS_ALWAYS = {429, 529}
+_RETRYABLE_STATUS_IDEMPOTENT = {500, 502, 503, 504}
+_MAX_REQUEST_ATTEMPTS = 6
+
+
+def _is_retryable_status(method: str, status: int) -> bool:
+    if status in _RETRYABLE_STATUS_ALWAYS:
+        return True
+    return method.lower() in {"get", "delete"} and status in _RETRYABLE_STATUS_IDEMPOTENT
+
+
+def _retry_delay_seconds(
+    *,
+    attempt: int,
+    retry_after_header: str | None,
+    additional_retry_after: Any = None,
+) -> float:
+    if retry_after_header is not None:
+        try:
+            return max(0.0, float(retry_after_header))
+        except ValueError:
+            pass
+    if additional_retry_after is not None:
+        try:
+            return max(0.0, float(additional_retry_after))
+        except (TypeError, ValueError):
+            pass
+    return min(2**attempt, 30) + random.uniform(0, 0.25)
 
 
 def _normalize_query(
@@ -459,39 +493,68 @@ class NotionAsyncClient:
                 files=files_payload,
             )
 
-        try:
-            response: httpx.Response = await asyncio.wait_for(
-                _send(), timeout=self._timeout_ms / 1000
-            )
-        except asyncio.TimeoutError:
-            self._log(
-                LogLevel.WARN,
-                "request fail",
-                {"code": ClientErrorCode.RequestTimeout, "message": "timeout"},
-            )
-            raise RequestTimeoutError()
+        last_error: HTTPResponseError | None = None
+        for attempt in range(_MAX_REQUEST_ATTEMPTS):
+            try:
+                response = await asyncio.wait_for(
+                    _send(), timeout=self._timeout_ms / 1000
+                )
+            except asyncio.TimeoutError:
+                self._log(
+                    LogLevel.WARN,
+                    "request fail",
+                    {"code": ClientErrorCode.RequestTimeout, "message": "timeout"},
+                )
+                raise RequestTimeoutError()
 
-        text = await response.aread()
-        text_str = text.decode(errors="replace")
+            text = await response.aread()
+            text_str = text.decode(errors="replace")
 
-        if not (200 <= response.status_code < 300):
-            err = build_request_error(response, text_str)
+            if 200 <= response.status_code < 300:
+                data: dict[str, Any] = json.loads(text_str) if text_str else {}
+                break
+
+            last_error = build_request_error(response, text_str)
+            retryable = _is_retryable_status(method, response.status_code)
+            if not retryable or attempt == _MAX_REQUEST_ATTEMPTS - 1:
+                self._log(
+                    LogLevel.WARN,
+                    "request fail",
+                    {
+                        "code": getattr(last_error, "code", "unknown"),
+                        "message": str(last_error),
+                        **(
+                            {"requestId": getattr(last_error, "request_id", None)}
+                            if getattr(last_error, "request_id", None)
+                            else {}
+                        ),
+                    },
+                )
+                raise last_error
+
+            additional_retry_after = None
+            if isinstance(last_error.additional_data, Mapping):
+                additional_retry_after = last_error.additional_data.get("retry_after")
+            delay = _retry_delay_seconds(
+                attempt=attempt,
+                retry_after_header=response.headers.get("Retry-After"),
+                additional_retry_after=additional_retry_after,
+            )
             self._log(
-                LogLevel.WARN,
-                "request fail",
+                LogLevel.INFO,
+                "request retry",
                 {
-                    "code": getattr(err, "code", "unknown"),
-                    "message": str(err),
-                    **(
-                        {"requestId": getattr(err, "request_id")}
-                        if getattr(err, "request_id", None)
-                        else {}
-                    ),
+                    "method": method,
+                    "path": path,
+                    "status": response.status_code,
+                    "attempt": attempt + 1,
+                    "delay": delay,
                 },
             )
-            raise err
-
-        data: dict[str, Any] = json.loads(text_str) if text_str else {}
+            await asyncio.sleep(delay)
+        else:
+            assert last_error is not None
+            raise last_error
         self._log(
             LogLevel.INFO,
             "request success",
@@ -512,7 +575,7 @@ class NotionAsyncClient:
         self, params: SearchParameters, *, auth: AuthParam | None = None
     ) -> SearchResponse:
         """
-        Search pages and databases
+        Search pages and data sources
 
         Args:
             params: 検索パラメータ（クエリ、フィルター、ソート）
@@ -524,7 +587,7 @@ class NotionAsyncClient:
 
             results = await client.search({
                 "query": "プロジェクト",
-                "filter": {"property": "object", "value": "page"},
+                "filter": {"property": "object", "value": "page", "in_trash": False},
                 "page_size": 20
             })
             ```
@@ -532,9 +595,8 @@ class NotionAsyncClient:
         response = await self.request(
             path="search", method="post", body=dict(params), auth=auth
         )
-        # dict を SearchResponse に変換
         from .responses.page import PartialPage
-        from .responses.database import PartialDatabase
+        from .responses.datasource import PartialDataSource
 
         results = []
         for item in response.get("results", []):
@@ -544,18 +606,19 @@ class NotionAsyncClient:
                     results.append(NotionPage(**item))
                 else:
                     results.append(PartialPage(**item))
-            elif obj_type == "database":
-                if "properties" in item:
-                    results.append(NotionDatabase(**item))
+            elif obj_type == "data_source":
+                if item.get("title") is not None:
+                    results.append(DataSource(**item))
                 else:
-                    results.append(PartialDatabase(**item))
+                    results.append(PartialDataSource(**item))
 
         return SearchResponse(
             object="list",
             results=results,
             next_cursor=response.get("next_cursor"),
             has_more=response.get("has_more", False),
-            type="page_or_database",
+            type=response.get("type", "page_or_data_source"),
+            request_status=response.get("request_status"),
         )
 
     # ---------- oauth ----------
@@ -806,6 +869,24 @@ class _MeetingNotesAPI:
             request_status=response.get("request_status"),
         )
 
+    async def create(
+        self,
+        params: CreateMeetingNoteParameters,
+        *,
+        auth: AuthParam | None = None,
+    ) -> BaseBlockObject | PartialBlock:
+        """Create AI meeting notes from an uploaded file or existing media block."""
+
+        response = await self._c.request(
+            path="blocks/meeting_notes",
+            method="post",
+            body=dict(params),
+            auth=auth,
+        )
+        if "type" in response and response.get("type") is not None:
+            return TypeAdapter(BlockObject).validate_python(response)
+        return PartialBlock(**response)
+
 
 class _DatabasesAPI:
     """
@@ -869,8 +950,10 @@ class _DatabasesAPI:
         """
         Create a database (API version 2025-09-03)
 
-        新しいデータベースと初期データソースを作成します。
-        initial_data_sourceにpropertiesを指定してください。
+        新しいデータベースを作成します。
+        通常のデータベースは `initial_data_source` でスキーマを渡し、
+        型付きデータベースは `database_type` を指定します。
+        `database_type` と `initial_data_source` は同時に指定できません。
 
         Returns:
             NotionDatabase: 作成されたデータベースオブジェクト
@@ -886,6 +969,11 @@ class _DatabasesAPI:
                         "Status": {"select": {"options": [...]}}
                     }
                 }
+            })
+
+            tasks_db = await client.databases.create({
+                "parent": {"type": "page_id", "page_id": "parent_page_id"},
+                "database_type": "tasks",
             })
             ```
         """
@@ -1036,6 +1124,9 @@ class _DataSourcesAPI:
         sorts: list[DatabaseQuerySort] | None = None,
         start_cursor: str | None = None,
         page_size: int | None = None,
+        is_archived: bool | None = None,
+        result_type: Literal["page", "data_source"] | None = None,
+        filter_properties: list[str] | None = None,
         auth: AuthParam | None = None,
     ) -> QueryDataSourceResponse:
         """
@@ -1074,6 +1165,9 @@ class _DataSourcesAPI:
                 - `[{"timestamp": "created_time", "direction": "descending"}]`
             start_cursor: ページネーション用カーソル
             page_size: 取得件数（最大100）
+            is_archived: True のときアーカイブ済みページだけを返す
+            result_type: wiki データソースで page / data_source のいずれかに絞る
+            filter_properties: レスポンスに含めるプロパティ ID または名前
             auth: 認証トークン（オプション）
 
         Returns:
@@ -1132,22 +1226,34 @@ class _DataSourcesAPI:
                 "sorts": sorts,
                 "start_cursor": start_cursor,
                 "page_size": page_size,
+                "is_archived": is_archived,
+                "result_type": result_type,
             },
-            ["filter", "sorts", "start_cursor", "page_size"],
+            ["filter", "sorts", "start_cursor", "page_size", "is_archived", "result_type"],
+        )
+        query = (
+            {"filter_properties": filter_properties} if filter_properties else None
         )
         response = await self._c.request(
             path=f"data_sources/{data_source_id}/query",
             method="post",
             body=body,
+            query=cast(QueryParams, query) if query else None,
             auth=auth,
         )
 
-        # dictの結果をNotionPage/PartialPageに変換
         from .responses.page import PartialPage
+        from .responses.datasource import PartialDataSource
 
         results = []
         for item in response.get("results", []):
-            if "properties" in item:
+            obj_type = item.get("object")
+            if obj_type == "data_source":
+                if item.get("title") is not None:
+                    results.append(DataSource(**item))
+                else:
+                    results.append(PartialDataSource(**item))
+            elif "properties" in item:
                 results.append(NotionPage(**item))
             else:
                 results.append(PartialPage(**item))
@@ -1157,7 +1263,7 @@ class _DataSourcesAPI:
             results=results,
             next_cursor=response.get("next_cursor"),
             has_more=response.get("has_more", False),
-            type="page_or_data_source",
+            type=response.get("type", "page_or_data_source"),
             request_status=response.get("request_status"),
         )
 
@@ -1306,8 +1412,14 @@ class _PagesAPI:
                 キューイングされた場合のタスクハンドル
         """
         body = params.model_dump(exclude_none=True, by_alias=True)
+        query = pick(body, ["filter_properties"])
+        body.pop("filter_properties", None)
         response = await self._c.request(
-            path="pages", method="post", body=body, auth=auth
+            path="pages",
+            method="post",
+            body=body,
+            query=cast(QueryParams, query) if query else None,
+            auth=auth,
         )
         if response.get("object") == "async_task":
             return AsyncTaskResponse.model_validate(response)
@@ -1343,8 +1455,14 @@ class _PagesAPI:
         """
         payload = params.model_dump(exclude_none=True, by_alias=True)
         page_id = payload.pop("page_id")
+        query = pick(payload, ["filter_properties"])
+        payload.pop("filter_properties", None)
         response = await self._c.request(
-            path=f"pages/{page_id}", method="patch", body=payload, auth=auth
+            path=f"pages/{page_id}",
+            method="patch",
+            body=payload,
+            query=cast(QueryParams, query) if query else None,
+            auth=auth,
         )
         return NotionPage(**response)
 

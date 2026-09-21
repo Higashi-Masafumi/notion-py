@@ -144,11 +144,11 @@ class ListCommentsResponse(ListResponse[CommentObject]):
 
 
 class SearchResponse(
-    ListResponse[NotionPage | PartialPage | NotionDatabase | PartialDatabase]
+    ListResponse[NotionPage | PartialPage | DataSource | PartialDataSource]
 ):
     """search() のレスポンス型.
 
-    備考: `type` は親クラスに準拠。
+    備考: API 2025-09-03 以降の `type` は `page_or_data_source`。
     """
 
 
