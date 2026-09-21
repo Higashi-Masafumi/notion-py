@@ -1,12 +1,12 @@
 # Search API
 
-Search for pages and databases across the workspace.
+Search for pages and data sources across the workspace.
 
 ## Method
 
 ### search
 
-Search for pages and databases.
+Search for pages and data sources.
 
 ```python
 async def search(
@@ -19,19 +19,19 @@ async def search(
 **Parameters**:
 
 - `params.query` (optional): Search query string
-- `params.filter` (optional): Filter by object type
+- `params.filter` (optional): Filter by object type and/or trash status (`in_trash`)
 - `params.sort` (optional): Sort criteria
 - `params.start_cursor` (optional): Pagination cursor
 - `params.page_size` (optional): Results per page (max 100)
 
-**Returns**: `SearchResponse` with pages and databases
+**Returns**: `SearchResponse` with pages and data sources
 
 ## Examples
 
 ### Basic Search
 
 ```python
-from notion_py_client import NotionAsyncClient
+from notion_py_client import DataSource, NotionAsyncClient, NotionPage
 
 async with NotionAsyncClient(auth="secret_xxx") as client:
     results = await client.search({
@@ -42,8 +42,8 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
     for item in results.results:
         if isinstance(item, NotionPage):
             print(f"Page: {item.id}")
-        elif isinstance(item, NotionDatabase):
-            print(f"Database: {item.id}")
+        elif isinstance(item, DataSource):
+            print(f"Data source: {item.id}")
 ```
 
 ### Filter by Object Type
@@ -59,12 +59,17 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
         }
     })
 
-    # Search only databases
-    databases = await client.search({
+    # Search only data sources
+    data_sources = await client.search({
         "filter": {
             "property": "object",
-            "value": "database"
+            "value": "data_source"
         }
+    })
+
+    # Search trash
+    trashed = await client.search({
+        "filter": {"in_trash": True}
     })
 ```
 
@@ -128,10 +133,20 @@ filter = {
     "value": "page"
 }
 
-# Databases only
+# Data sources only
 filter = {
     "property": "object",
-    "value": "database"
+    "value": "data_source"
+}
+
+# Trash only
+filter = {"in_trash": True}
+
+# Pages in trash
+filter = {
+    "property": "object",
+    "value": "page",
+    "in_trash": True
 }
 ```
 
@@ -149,6 +164,9 @@ sort = {
     "direction": "ascending",
     "timestamp": "last_edited_time"
 }
+
+# By relevance
+sort = {"property": "relevance"}
 ```
 
 ## Common Patterns
@@ -212,17 +230,17 @@ from notion_py_client.responses.list_response import SearchResponse
 response: SearchResponse = {
     "object": "list",
     "results": [
-        # NotionPage or NotionDatabase objects
+        # NotionPage or DataSource objects
     ],
     "next_cursor": "cursor_string",
     "has_more": false,
-    "type": "page_or_database"
+    "type": "page_or_data_source"
 }
 ```
 
 ## Limitations
 
-- The search API only returns pages and databases the integration has access to
+- The search API only returns pages and data sources the integration has access to
 - Maximum 100 results per request (use pagination for more)
 - Query string searches page titles and database names
 - Full-text search of page content is not supported

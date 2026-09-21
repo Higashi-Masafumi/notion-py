@@ -381,6 +381,14 @@ params: CreateDatabaseParameters = {
         "emoji": "📊"
     }
 }
+
+typed_params: CreateDatabaseParameters = {
+    "parent": {
+        "type": "page_id",
+        "page_id": "parent_page_id"
+    },
+    "database_type": "tasks",
+}
 ```
 
 ### UpdateDatabaseParameters

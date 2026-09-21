@@ -14,6 +14,7 @@ from notion_py_client.filters.property_filters import (
     PropertyFilterFiles,
     PropertyFilterRelation,
     PropertyFilterFormula,
+    PropertyFilterVerification,
 )
 from notion_py_client.filters.timestamp_filters import (
     TimestampCreatedTimeFilter,
@@ -458,6 +459,26 @@ class TestCompoundFilterHelpers:
 
         assert "and" in and_filter
         assert len(and_filter["and"]) == 2
+
+
+class TestPropertyFilterVerification:
+    """Test verification property filters."""
+
+    def test_status_filter(self):
+        filter_dict: PropertyFilterVerification = {
+            "property": "Verification",
+            "verification": {"status": "verified"},
+        }
+
+        assert filter_dict["verification"]["status"] == "verified"  # type: ignore
+
+    def test_does_not_equal_filter(self):
+        filter_dict: PropertyFilterVerification = {
+            "property": "Verification",
+            "verification": {"does_not_equal": "expired"},
+        }
+
+        assert filter_dict["verification"]["does_not_equal"] == "expired"  # type: ignore
 
 
 class TestFilterEdgeCases:

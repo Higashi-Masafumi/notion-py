@@ -5,6 +5,7 @@ import pytest
 from notion_py_client.requests.page_requests import (
     CreatePageParameters,
     InsertContentMarkdownCommand,
+    MarkdownContentUpdateRequest,
     UpdatePageParameters,
 )
 
@@ -18,6 +19,16 @@ class TestUpdatePageParameters:
         payload = params.model_dump(exclude_none=True, by_alias=True)
 
         assert payload["in_trash"] is True
+
+    def test_filter_properties_serializes(self):
+        params = UpdatePageParameters(
+            page_id="page_123",
+            filter_properties=["title", "status"],
+        )
+
+        payload = params.model_dump(exclude_none=True, by_alias=True)
+
+        assert payload["filter_properties"] == ["title", "status"]
 
     def test_template_and_erase_content_serialize(self):
         params = UpdatePageParameters(
@@ -49,6 +60,17 @@ class TestCreatePageParameters:
         assert payload["markdown"] == "# Heading\n\nBody"
         assert payload["position"]["type"] == "page_end"
 
+    def test_filter_properties_serializes(self):
+        params = CreatePageParameters(
+            parent={"type": "page_id", "page_id": "page_123"},
+            properties={},
+            filter_properties=["title"],
+        )
+
+        payload = params.model_dump(exclude_none=True, by_alias=True)
+
+        assert payload["filter_properties"] == ["title"]
+
     def test_template_serializes(self):
         params = CreatePageParameters(
             parent={"type": "data_source_id", "data_source_id": "ds_123"},
@@ -77,6 +99,10 @@ class TestCreatePageParameters:
 
 class TestPageMarkdownCommands:
     """Test page markdown command payloads."""
+
+    def test_update_content_rejects_empty_old_str(self):
+        with pytest.raises(ValueError, match="old_str must be a non-empty string"):
+            MarkdownContentUpdateRequest(old_str="", new_str="replacement")
 
     def test_insert_content_serializes_position(self):
         command = InsertContentMarkdownCommand(
