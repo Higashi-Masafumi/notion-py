@@ -110,6 +110,8 @@ from .advanced_filters import (
     RollupSubfilterRichText,
     RollupSubfilterSelect,
     RollupSubfilterStatus,
+    VerificationFilterDoesNotEqual,
+    VerificationFilterStatus,
     VerificationPropertyStatusFilter,
 )
 
@@ -240,6 +242,8 @@ __all__ = [
     "RollupSubfilterStatus",
     "RollupSubfilterPropertyFilter",
     # Verificationフィルター
+    "VerificationFilterStatus",
+    "VerificationFilterDoesNotEqual",
     "VerificationPropertyStatusFilter",
     # プロパティフィルター
     "PropertyFilterTitle",

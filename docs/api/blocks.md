@@ -200,6 +200,38 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
         print(block.id)
 ```
 
+### meetingNotes.create
+
+Create AI meeting notes from a completed file upload or an existing media block.
+
+```python
+async def meetingNotes.create(
+    params: CreateMeetingNoteParameters,
+    *,
+    auth: AuthParam | None = None
+) -> BaseBlockObject | PartialBlock
+```
+
+**Example**:
+
+```python
+from notion_py_client.api_types import CreateMeetingNoteParameters
+
+params: CreateMeetingNoteParameters = {
+    "source": {
+        "type": "file_upload",
+        "file_upload_id": "file_upload_123",
+    },
+    "parent": {
+        "type": "page_id",
+        "page_id": "page_123",
+    },
+    "title": "Weekly sync",
+    "options": {"kickoff_summary": True},
+}
+block = await client.blocks.meetingNotes.create(params)
+```
+
 ## Block Types
 
 ### Text Blocks
