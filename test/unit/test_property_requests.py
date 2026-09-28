@@ -18,6 +18,10 @@ from notion_py_client.requests.property_requests import (
     RelationPropertyRequest,
     VerificationPropertyRequest,
 )
+from notion_py_client.models.user import Person
+from notion_py_client.schema.property_configs.base_configs.status_config import (
+    StatusOptionConfig,
+)
 from notion_py_client.requests.common import (
     SelectPropertyItemRequest,
     PartialUserObjectRequest,
@@ -402,3 +406,27 @@ class TestPropertyRequestSerialization:
             result = req.model_dump(by_alias=True, exclude_none=True)
             assert isinstance(result, dict)
             assert len(result) > 0
+
+
+class TestIdentityAndStatusSchemaAdditions:
+    """Test current-spec person and status option fields."""
+
+    def test_person_parses_email_verified(self):
+        person = Person.model_validate(
+            {"email": "user@example.com", "email_verified": True}
+        )
+
+        assert person.email == "user@example.com"
+        assert person.email_verified is True
+
+    def test_status_option_config_accepts_group(self):
+        option = StatusOptionConfig(
+            id="opt_123",
+            name="Ready",
+            color="blue",
+            group="To-do",
+        )
+
+        payload = option.model_dump(exclude_none=True)
+
+        assert payload["group"] == "To-do"

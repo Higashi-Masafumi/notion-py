@@ -11,7 +11,6 @@ from typing import Generic, Literal, TypeVar
 from pydantic import BaseModel, Field, StrictBool, StrictStr
 
 from .page import NotionPage, PartialPage
-from .database import NotionDatabase, PartialDatabase
 from .datasource import DataSource, PartialDataSource
 from .file_upload import FileUploadObject
 from ..models.primitives import CustomEmoji
@@ -144,11 +143,11 @@ class ListCommentsResponse(ListResponse[CommentObject]):
 
 
 class SearchResponse(
-    ListResponse[NotionPage | PartialPage | NotionDatabase | PartialDatabase]
+    ListResponse[NotionPage | PartialPage | DataSource | PartialDataSource]
 ):
     """search() のレスポンス型.
 
-    備考: `type` は親クラスに準拠。
+    備考: API 2025-09-03 以降の `type` は `page_or_data_source`。
     """
 
 

@@ -98,10 +98,11 @@ async def create(
 **Parameters**:
 
 - `params.parent`: Parent page or workspace
-- `params.title`: Database title (RichText array)
-- `params.initial_data_source`: Initial data source configuration
+- `params.title` (optional): Database title (RichText array). Omitted typed databases are named after their type
+- `params.initial_data_source` (optional): Initial data source configuration
   - `properties`: Schema definition
   - `name` (optional): Data source name
+- `params.database_type` (optional): `tasks`, `projects`, or `skills`. Cannot be combined with `initial_data_source`
 
 **Returns**: Created `NotionDatabase`
 
@@ -140,6 +141,15 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
     })
 
     print(f"Created database: {db.id}")
+
+    tasks_db = await client.databases.create({
+        "parent": {
+            "type": "page_id",
+            "page_id": "parent_page_id"
+        },
+        "database_type": "tasks",
+    })
+    print(tasks_db.database_type)
 ```
 
 ### update

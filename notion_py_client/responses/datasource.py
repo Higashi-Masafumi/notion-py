@@ -11,6 +11,8 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field, StrictBool, StrictStr
 
+from ..api_types import DatabaseType
+
 from ..models.user import PartialUser
 from ..models.icon import NotionIcon
 from ..models.cover import NotionCover
@@ -60,6 +62,9 @@ class DataSource(BaseModel):
         ..., description="データベースの親オブジェクト"
     )
     is_inline: StrictBool = Field(False, description="インラインフラグ")
+    database_type: DatabaseType | None = Field(
+        None, description="所属する型付きデータベースの種別。通常のデータソースは null"
+    )
     in_trash: StrictBool = Field(False, description="ゴミ箱フラグ")
     created_time: StrictStr = Field(..., description="作成日時（ISO 8601形式）")
     last_edited_time: StrictStr = Field(..., description="最終編集日時（ISO 8601形式）")

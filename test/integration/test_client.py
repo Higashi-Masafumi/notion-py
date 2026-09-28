@@ -539,11 +539,11 @@ class TestSearchAPI:
     )
     @pytest.mark.asyncio
     async def test_search_databases(self, notion_client):
-        """Test search functionality for databases."""
+        """Test search functionality for data sources."""
         from notion_py_client.api_types import SearchParameters
 
         params: SearchParameters = {
-            "filter": {"property": "object", "value": "database"},
+            "filter": {"property": "object", "value": "data_source"},
             "page_size": 5,
         }
 

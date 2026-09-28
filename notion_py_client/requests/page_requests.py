@@ -41,6 +41,7 @@ class CreatePageParameters(BaseModel):
     content: list[Any] | None = None  # BlockObjectRequest
     children: list[Any] | None = None  # BlockObjectRequest
     allow_async: StrictBool | None = None
+    filter_properties: list[str] | None = None
 
     @model_validator(mode="after")
     def validate_body_modes(self) -> "CreatePageParameters":
@@ -78,6 +79,7 @@ class UpdatePageParameters(BaseModel):
     erase_content: StrictBool | None = None
     is_locked: StrictBool | None = None
     in_trash: StrictBool | None = None
+    filter_properties: list[str] | None = None
 
 
 class MovePageParameters(BaseModel):
@@ -100,6 +102,12 @@ class MarkdownContentUpdateRequest(BaseModel):
     old_str: str
     new_str: str
     replace_all_matches: StrictBool | None = None
+
+    @model_validator(mode="after")
+    def validate_old_str(self) -> "MarkdownContentUpdateRequest":
+        if self.old_str == "":
+            raise ValueError("old_str must be a non-empty string")
+        return self
 
 
 class UpdateContentMarkdownRequest(BaseModel):

@@ -25,6 +25,9 @@ async def query(
     sorts: list[DatabaseQuerySort] | None = None,
     start_cursor: str | None = None,
     page_size: int | None = None,
+    is_archived: bool | None = None,
+    result_type: Literal["page", "data_source"] | None = None,
+    filter_properties: list[str] | None = None,
     auth: AuthParam | None = None
 ) -> QueryDataSourceResponse
 ```
@@ -36,10 +39,13 @@ async def query(
 - `sorts` (optional): Sort criteria (`list[DatabaseQuerySort]`)
 - `start_cursor` (optional): Pagination cursor
 - `page_size` (optional): Results per page (max 100)
+- `is_archived` (optional): Return archived pages instead of the default non-archived set
+- `result_type` (optional): For wiki data sources, return only `"page"` or `"data_source"` children
+- `filter_properties` (optional): Property IDs or names to include in each result
 
 **Returns**: `QueryDataSourceResponse` with:
 
-- `results`: List of `NotionPage` or `PartialPage`
+- `results`: List of `NotionPage`, `PartialPage`, `DataSource`, or `PartialDataSource`
 - `has_more`: Whether more results exist
 - `next_cursor`: Cursor for next page
 - `request_status`: Present when Notion reports an incomplete result set, such as `query_result_limit_reached`
