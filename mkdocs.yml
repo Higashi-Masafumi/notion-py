@@ -65,6 +65,7 @@ nav:
       - Users: api/users.md
       - Comments: api/comments.md
       - Search: api/search.md
+      - Agent Skills: api/agent-skills.md
   - Type Reference:
       - Overview: types/index.md
       - Blocks: types/blocks.md

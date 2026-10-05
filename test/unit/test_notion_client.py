@@ -529,3 +529,105 @@ class TestMeetingNotesAPI:
         }
         assert isinstance(result.results[0], MeetingNotesBlock)
         assert result.results[0].parent["type"] == "agent_id"
+
+
+class TestAgentSkillsAPI:
+    """Test Agent Skills plugin and skill directory facades."""
+
+    @pytest.mark.asyncio
+    async def test_list_plugins(self):
+        client = NotionAsyncClient(auth="test-token")
+        captured: dict = {}
+
+        async def fake_request(*, path, method, query=None, auth=None, **kwargs):
+            captured["path"] = path
+            captured["method"] = method
+            captured["query"] = query
+            return {
+                "object": "list",
+                "type": "plugin",
+                "results": [
+                    {
+                        "id": "plugin_123",
+                        "name": "Engineering",
+                        "description": "Skills for engineering workflows.",
+                        "version_id": "abc123",
+                    }
+                ],
+                "has_more": False,
+                "next_cursor": None,
+            }
+
+        client.request = fake_request  # type: ignore[method-assign]
+
+        result = await client.plugins.list(page_size=100)
+
+        assert captured["path"] == "ai/plugins"
+        assert captured["method"] == "get"
+        assert captured["query"] == {"page_size": 100}
+        assert result.type == "plugin"
+        assert result.results[0].name == "Engineering"
+        assert result.results[0].version_id == "abc123"
+
+    @pytest.mark.asyncio
+    async def test_list_plugins_requires_plugin_type(self):
+        client = NotionAsyncClient(auth="test-token")
+
+        async def fake_request(*, path, method, query=None, auth=None, **kwargs):
+            return {
+                "object": "list",
+                "results": [],
+                "has_more": False,
+                "next_cursor": None,
+            }
+
+        client.request = fake_request  # type: ignore[method-assign]
+
+        with pytest.raises(ValidationError):
+            await client.plugins.list()
+
+    @pytest.mark.asyncio
+    async def test_retrieve_plugin_directory(self):
+        client = NotionAsyncClient(auth="test-token")
+        captured: dict = {}
+
+        async def fake_request(*, path, method, auth=None, **kwargs):
+            captured["path"] = path
+            captured["method"] = method
+            return {
+                "id": "plugin_123",
+                "version_id": "abc123",
+                "url": "https://example.com/plugin.tar.gz",
+            }
+
+        client.request = fake_request  # type: ignore[method-assign]
+
+        result = await client.plugins.retrieve(plugin_id="plugin_123")
+
+        assert captured["path"] == "ai/plugins/plugin_123"
+        assert captured["method"] == "get"
+        assert result.url == "https://example.com/plugin.tar.gz"
+        assert result.version_id == "abc123"
+
+    @pytest.mark.asyncio
+    async def test_retrieve_skill_directory(self):
+        client = NotionAsyncClient(auth="test-token")
+        captured: dict = {}
+
+        async def fake_request(*, path, method, auth=None, **kwargs):
+            captured["path"] = path
+            captured["method"] = method
+            return {
+                "id": "skill_123",
+                "version_id": "def456",
+                "url": "https://example.com/skill.tar.gz",
+            }
+
+        client.request = fake_request  # type: ignore[method-assign]
+
+        result = await client.skills.retrieve(skill_id="skill_123")
+
+        assert captured["path"] == "ai/skills/skill_123"
+        assert captured["method"] == "get"
+        assert result.id == "skill_123"
+        assert result.url == "https://example.com/skill.tar.gz"

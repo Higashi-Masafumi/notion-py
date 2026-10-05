@@ -179,6 +179,11 @@ from .schema import (
     FormulaPropertyConfig,
 )
 from .notion_client import NotionAsyncClient, NotionErrorCode
+from .responses.agent_skills import (
+    ListPluginsResponse,
+    Plugin,
+    SignedDirectoryResponse,
+)
 from .responses.list_response import (
     ListUsersResponse,
     QueryDatabaseResponse,
@@ -223,6 +228,9 @@ __all__ = [
     "ListCustomEmojisResponse",
     "QueryMeetingNotesResponse",
     "RequestStatusResponse",
+    "Plugin",
+    "ListPluginsResponse",
+    "SignedDirectoryResponse",
     # Comment
     "CommentObject",
     "PartialCommentObject",

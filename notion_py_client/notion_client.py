@@ -44,6 +44,7 @@ from .responses.file_upload import FileUploadObject
 from .responses.page_markdown import PageMarkdownResponse
 from .responses.async_task import AsyncTaskResponse
 from .responses.property_item import PropertyItemListResponse, PropertyItemObject
+from .responses.agent_skills import ListPluginsResponse, SignedDirectoryResponse
 from .responses.list_response import (
     QueryDatabaseResponse,
     QueryDataSourceResponse,
@@ -363,6 +364,8 @@ class NotionAsyncClient:
         # ------- public API groups（JSに合わせた名前/階層）-------
         self.blocks = _BlocksAPI(self)
         self.customEmojis = _CustomEmojisAPI(self)
+        self.plugins = _PluginsAPI(self)
+        self.skills = _SkillsAPI(self)
         self.asyncTasks = _AsyncTasksAPI(self)
         self.databases = _DatabasesAPI(self)
         self.dataSources = _DataSourcesAPI(self)
@@ -1530,6 +1533,57 @@ class _CustomEmojisAPI:
             path="custom_emojis", method="get", query=query, auth=auth
         )
         return ListCustomEmojisResponse.model_validate(response)
+
+
+class _PluginsAPI:
+    def __init__(self, client: NotionAsyncClient):
+        self._c = client
+
+    async def list(
+        self,
+        *,
+        start_cursor: str | None = None,
+        page_size: int | None = None,
+        auth: AuthParam | None = None,
+    ) -> ListPluginsResponse:
+        """List plugins visible to the connection.
+
+        Returns:
+            ListPluginsResponse: plugin のページ
+        """
+        query = pick(
+            {"start_cursor": start_cursor, "page_size": page_size},
+            ["start_cursor", "page_size"],
+        )
+        response = await self._c.request(
+            path="ai/plugins", method="get", query=query, auth=auth
+        )
+        return ListPluginsResponse.model_validate(response)
+
+    async def retrieve(
+        self, *, plugin_id: str, auth: AuthParam | None = None
+    ) -> SignedDirectoryResponse:
+        """Return a signed URL for one plugin directory archive."""
+
+        response = await self._c.request(
+            path=f"ai/plugins/{plugin_id}", method="get", auth=auth
+        )
+        return SignedDirectoryResponse.model_validate(response)
+
+
+class _SkillsAPI:
+    def __init__(self, client: NotionAsyncClient):
+        self._c = client
+
+    async def retrieve(
+        self, *, skill_id: str, auth: AuthParam | None = None
+    ) -> SignedDirectoryResponse:
+        """Return a signed URL for one skill directory archive."""
+
+        response = await self._c.request(
+            path=f"ai/skills/{skill_id}", method="get", auth=auth
+        )
+        return SignedDirectoryResponse.model_validate(response)
 
 
 class _AsyncTasksAPI:

@@ -51,6 +51,7 @@ This library supports the latest Notion API version `2026-03-11`, including:
 - **Comments**: create/update comments with rich text or inline markdown, plus delete support
 - **Meeting notes**: query AI meeting notes through `blocks.meetingNotes.query()`
 - **Custom emojis**: `customEmojis.list()` support
+- **Agent Skills**: `plugins.list()`, `plugins.retrieve()`, and `skills.retrieve()` return plugin metadata and signed archive URLs
 - **Pagination status**: exposes `request_status` on list responses
 - **DataSources**: Continued support for the 2025-09-03 data model split
 
