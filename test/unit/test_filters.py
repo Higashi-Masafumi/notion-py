@@ -231,6 +231,24 @@ class TestPropertyFilterStatus:
 
         assert filter_dict["status"]["does_not_equal"] == ["Done", "Archived"]  # type: ignore
 
+    def test_group_equals_filter(self):
+        """Test status group_equals filter."""
+        filter_dict: PropertyFilterStatus = {
+            "property": "Status",
+            "status": {"group_equals": ["To-do", "Complete"]},
+        }
+
+        assert filter_dict["status"]["group_equals"] == ["To-do", "Complete"]  # type: ignore
+
+    def test_group_does_not_equal_filter(self):
+        """Test status group_does_not_equal filter."""
+        filter_dict: PropertyFilterStatus = {
+            "property": "Status",
+            "status": {"group_does_not_equal": "In progress"},
+        }
+
+        assert filter_dict["status"]["group_does_not_equal"] == "In progress"  # type: ignore
+
 
 class TestPropertyFilterDate:
     """Test PropertyFilterDate TypedDict."""

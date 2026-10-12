@@ -127,6 +127,7 @@ from .requests import (
     CreatePageParameters,
     MovePageParameters,
     PageMarkdownCommand,
+    PageWriteNotifications,
     UpdateContentMarkdownCommand,
     ReplaceContentMarkdownCommand,
     MarkdownInsertPositionRequest,
@@ -178,7 +179,11 @@ from .schema import (
     RollupSettings,
     FormulaPropertyConfig,
 )
-from .notion_client import NotionAsyncClient, NotionErrorCode
+from .notion_client import (
+    NotionAsyncClient,
+    NotionErrorCode,
+    STATUS_GROUP_FILTERS_BETA,
+)
 from .responses.list_response import (
     ListUsersResponse,
     QueryDatabaseResponse,
@@ -293,6 +298,7 @@ __all__ = [
     "CreatePageParameters",
     "MovePageParameters",
     "PageMarkdownCommand",
+    "PageWriteNotifications",
     "UpdateContentMarkdownCommand",
     "ReplaceContentMarkdownCommand",
     "MarkdownInsertPositionRequest",
@@ -398,6 +404,7 @@ __all__ = [
     # Client
     "NotionAsyncClient",
     "NotionErrorCode",
+    "STATUS_GROUP_FILTERS_BETA",
     # Helper
     "Field",
     "NotionMapper",

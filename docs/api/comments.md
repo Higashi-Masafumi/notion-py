@@ -14,12 +14,13 @@ async def create(
     parent: dict[str, Any] | None = None,
     rich_text: list[dict[str, Any]] | None = None,
     markdown: str | None = None,
+    markdown_version: Literal["v1", "v2"] | None = None,
     discussion_id: str | None = None,
     auth: AuthParam | None = None
 ) -> dict[str, Any]
 ```
 
-Provide exactly one location (`parent` or `discussion_id`) and exactly one body format (`rich_text` or `markdown`). Comment markdown supports inline formatting only.
+Provide exactly one location (`parent` or `discussion_id`) and exactly one body format (`rich_text` or `markdown`). Comment markdown supports inline formatting only. `markdown_version` is only valid with `markdown`: `v1` is enhanced markdown and `v2` is Notion-flavored Markdown.
 
 **Example**:
 
@@ -108,9 +109,12 @@ async def update(
     comment_id: str,
     rich_text: list[dict[str, Any]] | None = None,
     markdown: str | None = None,
+    markdown_version: Literal["v1", "v2"] | None = None,
     auth: AuthParam | None = None
 ) -> dict[str, Any]
 ```
+
+`markdown_version` is only valid together with `markdown`.
 
 Depending on the integration's comment read capability, Notion may return either
 a full comment object or a partial comment object containing only `object` and

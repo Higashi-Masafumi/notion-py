@@ -170,6 +170,7 @@ class AppendBlockChildrenParameters(TypedDict, total=False):
     block_id: str
     children: list[dict[str, Any]]
     position: NotRequired[dict[str, Any]]
+    notifications: NotRequired[dict[str, Any]]
 
 
 # ========== User API Types ==========
@@ -193,6 +194,7 @@ class CreateCommentParameters(TypedDict, total=False):
     parent: NotRequired[dict[str, str]]
     rich_text: NotRequired[list[dict[str, Any]]]
     markdown: NotRequired[str]
+    markdown_version: NotRequired[Literal["v1", "v2"]]
     discussion_id: NotRequired[str]
 
 
@@ -202,6 +204,7 @@ class UpdateCommentParameters(TypedDict, total=False):
     comment_id: str
     rich_text: NotRequired[list[dict[str, Any]]]
     markdown: NotRequired[str]
+    markdown_version: NotRequired[Literal["v1", "v2"]]
 
 
 class DeleteCommentParameters(TypedDict):

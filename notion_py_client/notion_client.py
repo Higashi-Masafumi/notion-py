@@ -35,6 +35,7 @@ from .requests.page_requests import (
     CreatePageParameters,
     MovePageParameters,
     PageMarkdownCommand,
+    PageWriteNotifications,
     UpdatePageParameters,
 )
 from .responses.database import NotionDatabase
@@ -219,6 +220,51 @@ def pick(d: Mapping[str, Any], keys: Iterable[str]) -> dict[str, Any]:
     return {k: v for k, v in d.items() if k in keys and v is not None}
 
 
+STATUS_GROUP_FILTERS_BETA = "status-group-filters-2026-10-06"
+_MARKDOWN_VERSIONS = ("v1", "v2")
+
+
+def _format_notion_beta(value: str | Sequence[str] | None) -> str | None:
+    """Join Notion-Beta flags into the header value.
+
+    Duplicate and blank flags are dropped. Multiple flags are comma-separated,
+    which is the form the API accepts.
+    """
+
+    if value is None:
+        return None
+    parts = value.split(",") if isinstance(value, str) else value
+    flags: list[str] = []
+    for part in parts:
+        flag = part.strip()
+        if flag and flag not in flags:
+            flags.append(flag)
+    if not flags:
+        return None
+    return ",".join(flags)
+
+
+def _checked_markdown_version(
+    markdown_version: str | None,
+    *,
+    markdown_present: bool,
+    include_transcript: bool | None = None,
+) -> str | None:
+    """Validate a markdown_version value against the current markdown endpoints."""
+
+    if markdown_version is None:
+        return None
+    if markdown_version not in _MARKDOWN_VERSIONS:
+        raise ValueError("markdown_version must be 'v1' or 'v2'")
+    if not markdown_present:
+        raise ValueError("markdown_version is only supported when markdown is provided")
+    if markdown_version == "v2" and include_transcript:
+        raise ValueError(
+            "include_transcript is not supported when markdown_version is v2"
+        )
+    return markdown_version
+
+
 def _normalize_query(
     q: Mapping[str, Any] | None,
 ) -> Sequence[tuple[str, str]] | None:
@@ -270,7 +316,8 @@ class ClientOptions(TypedDict, total=False):
             options={
                 "timeout_ms": 30000,
                 "log_level": LogLevel.DEBUG,
-                "notion_version": "2026-03-11"
+                "notion_version": "2026-03-11",
+                "notion_beta": STATUS_GROUP_FILTERS_BETA,
             }
         )
         ```
@@ -281,6 +328,7 @@ class ClientOptions(TypedDict, total=False):
     log_level: NotRequired[LogLevel]
     logger: NotRequired[Logger | None]
     notion_version: NotRequired[str]
+    notion_beta: NotRequired[str | list[str]]
     user_agent: NotRequired[str]
 
 
@@ -354,6 +402,7 @@ class NotionAsyncClient:
         base_url = opts.get("base_url", "https://api.notion.com")
         self._prefix_url = f"{base_url.rstrip('/')}/v1/"
         self._notion_version = opts.get("notion_version") or self.default_notion_version
+        self._notion_beta = _format_notion_beta(opts.get("notion_beta"))
         self._logger = opts.get("logger") or make_console_logger("notionhq-client")
         self._log_level = opts.get("log_level", LogLevel.WARN)
         self._user_agent = opts.get("user_agent", "notionhq-client-python/0.1.0")
@@ -418,6 +467,7 @@ class NotionAsyncClient:
         req_headers: dict[str, str] = {
             "Notion-Version": self._notion_version,
             "user-agent": self._user_agent,
+            **({"Notion-Beta": self._notion_beta} if self._notion_beta else {}),
             **self._auth_as_headers(auth),
             **(headers or {}),
         }
@@ -684,6 +734,7 @@ class _BlockChildrenAPI:
         block_id: str,
         children: list[dict[str, Any]],
         position: dict[str, Any] | None = None,
+        notifications: PageWriteNotifications | Mapping[str, Any] | None = None,
         auth: AuthParam | None = None,
     ) -> ListBlockChildrenResponse:
         """Append block children
@@ -691,9 +742,18 @@ class _BlockChildrenAPI:
         Returns:
             AppendBlockChildrenResponse: 追加された子ブロックを含むレスポンス
         """
+        notification_body = None
+        if notifications is not None:
+            parsed_notifications = (
+                notifications
+                if isinstance(notifications, PageWriteNotifications)
+                else PageWriteNotifications.model_validate(notifications)
+            )
+            notification_body = parsed_notifications.model_dump()
         body = {
             "children": children,
             **({"position": position} if position else {}),
+            **({"notifications": notification_body} if notification_body else {}),
         }
         response = await self._c.request(
             path=f"blocks/{block_id}/children", method="patch", body=body, auth=auth
@@ -1368,13 +1428,27 @@ class _PagesAPI:
         *,
         page_id: str,
         include_transcript: bool | None = None,
+        markdown_version: Literal["v1", "v2"] | None = None,
         auth: AuthParam | None = None,
     ) -> PageMarkdownResponse:
-        """Retrieve a page as Notion-flavored Markdown."""
+        """Retrieve a page as markdown.
 
+        ``markdown_version`` selects enhanced markdown (``v1``, the default) or
+        Notion-flavored Markdown (``v2``). ``v2`` does not support
+        ``include_transcript``.
+        """
+
+        checked_version = _checked_markdown_version(
+            markdown_version,
+            markdown_present=True,
+            include_transcript=include_transcript,
+        )
         query = pick(
-            {"include_transcript": include_transcript},
-            ["include_transcript"],
+            {
+                "include_transcript": include_transcript,
+                "markdown_version": checked_version,
+            },
+            ["include_transcript", "markdown_version"],
         )
         response = await self._c.request(
             path=f"pages/{page_id}/markdown",
@@ -1572,6 +1646,7 @@ class _CommentsAPI:
         parent: dict[str, Any] | None = None,
         rich_text: list[dict[str, Any]] | None = None,
         markdown: str | None = None,
+        markdown_version: Literal["v1", "v2"] | None = None,
         discussion_id: str | None = None,
         auth: AuthParam | None = None,
     ) -> CommentObject:
@@ -1584,6 +1659,9 @@ class _CommentsAPI:
             raise ValueError("Provide exactly one of parent or discussion_id")
         if (rich_text is None) == (markdown is None):
             raise ValueError("Provide exactly one of rich_text or markdown")
+        checked_version = _checked_markdown_version(
+            markdown_version, markdown_present=markdown is not None
+        )
 
         body = {
             **pick(
@@ -1592,8 +1670,15 @@ class _CommentsAPI:
                     "discussion_id": discussion_id,
                     "rich_text": rich_text,
                     "markdown": markdown,
+                    "markdown_version": checked_version,
                 },
-                ["parent", "discussion_id", "rich_text", "markdown"],
+                [
+                    "parent",
+                    "discussion_id",
+                    "rich_text",
+                    "markdown",
+                    "markdown_version",
+                ],
             ),
         }
         response = await self._c.request(
@@ -1607,16 +1692,24 @@ class _CommentsAPI:
         comment_id: str,
         rich_text: list[dict[str, Any]] | None = None,
         markdown: str | None = None,
+        markdown_version: Literal["v1", "v2"] | None = None,
         auth: AuthParam | None = None,
     ) -> CommentObject | PartialCommentObject:
         """Update a comment."""
 
         if (rich_text is None) == (markdown is None):
             raise ValueError("Provide exactly one of rich_text or markdown")
+        checked_version = _checked_markdown_version(
+            markdown_version, markdown_present=markdown is not None
+        )
 
         body = pick(
-            {"rich_text": rich_text, "markdown": markdown},
-            ["rich_text", "markdown"],
+            {
+                "rich_text": rich_text,
+                "markdown": markdown,
+                "markdown_version": checked_version,
+            },
+            ["rich_text", "markdown", "markdown_version"],
         )
         response = await self._c.request(
             path=f"comments/{comment_id}",

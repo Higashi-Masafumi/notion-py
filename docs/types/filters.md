@@ -128,6 +128,12 @@ filter = {"property": "Status", "status": {"equals": ["In Progress", "Review"]}}
 filter = {"property": "Status", "status": {"does_not_equal": "Done"}}
 filter = {"property": "Status", "status": {"does_not_equal": ["Done", "Archived"]}}
 
+# Status group. Send Notion-Beta: status-group-filters-2026-10-06.
+# With that header, equals / does_not_equal match option names only.
+filter = {"property": "Status", "status": {"group_equals": "In progress"}}
+filter = {"property": "Status", "status": {"group_equals": ["To-do", "Complete"]}}
+filter = {"property": "Status", "status": {"group_does_not_equal": "Complete"}}
+
 # Is empty
 filter = {"property": "Workflow", "status": {"is_empty": True}}
 
