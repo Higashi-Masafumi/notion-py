@@ -136,9 +136,14 @@ async def children.append(
     block_id: str,
     children: list[dict[str, Any]],
     position: dict[str, Any] | None = None,
+    notifications: dict[str, Any] | None = None,
     auth: AuthParam | None = None
 ) -> dict[str, Any]
 ```
+
+`notifications={"mode": "silent"}` skips page-update, @mention, and
+Person-property notifications for the appended blocks. Automations, reminders,
+and webhooks still run.
 
 **Example**:
 

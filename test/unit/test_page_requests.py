@@ -5,6 +5,7 @@ import pytest
 from notion_py_client.requests.page_requests import (
     CreatePageParameters,
     InsertContentMarkdownCommand,
+    ReplaceContentMarkdownCommand,
     UpdatePageParameters,
 )
 
@@ -32,6 +33,16 @@ class TestUpdatePageParameters:
         assert payload["template"]["timezone"] == "Asia/Tokyo"
         assert payload["erase_content"] is True
 
+    def test_notifications_serialize(self):
+        params = UpdatePageParameters(
+            page_id="page_123",
+            notifications={"mode": "silent"},
+        )
+
+        payload = params.model_dump(exclude_none=True, by_alias=True)
+
+        assert payload["notifications"] == {"mode": "silent"}
+
 
 class TestCreatePageParameters:
     """Test page create parameters."""
@@ -48,6 +59,28 @@ class TestCreatePageParameters:
 
         assert payload["markdown"] == "# Heading\n\nBody"
         assert payload["position"]["type"] == "page_end"
+
+    def test_markdown_version_and_notifications_serialize(self):
+        params = CreatePageParameters(
+            parent={"type": "page_id", "page_id": "page_123"},
+            properties={},
+            markdown="# Heading",
+            markdown_version="v2",
+            notifications={"mode": "default"},
+        )
+
+        payload = params.model_dump(exclude_none=True, by_alias=True)
+
+        assert payload["markdown_version"] == "v2"
+        assert payload["notifications"] == {"mode": "default"}
+
+    def test_markdown_version_requires_markdown(self):
+        with pytest.raises(ValueError, match="markdown_version"):
+            CreatePageParameters(
+                parent={"type": "page_id", "page_id": "page_123"},
+                properties={},
+                markdown_version="v2",
+            )
 
     def test_template_serializes(self):
         params = CreatePageParameters(
@@ -117,6 +150,17 @@ class TestPageMarkdownCommands:
                     "after": "Existing section",
                 }
             )
+
+    def test_markdown_version_serializes_on_command(self):
+        command = ReplaceContentMarkdownCommand(
+            replace_content={"new_str": "# Fresh Start"},
+            markdown_version="v2",
+        )
+
+        payload = command.model_dump(exclude_none=True, by_alias=True)
+
+        assert payload["markdown_version"] == "v2"
+        assert payload["replace_content"]["new_str"] == "# Fresh Start"
 
     def test_insert_content_rejects_unknown_position_type(self):
         with pytest.raises(ValueError):

@@ -32,6 +32,9 @@ async def create(
 - `params.icon` (optional): Page icon
 - `params.cover` (optional): Cover image
 - `params.children` (optional): Child blocks
+- `params.markdown` (optional): Page content as markdown. Mutually exclusive with `children` and `content`
+- `params.markdown_version` (optional): `v1` (enhanced markdown, the default) or `v2` (Notion-flavored Markdown). Only valid with `markdown`
+- `params.notifications` (optional): `{"mode": "silent"}` skips page-update, @mention, and Person-property notifications. Automations, reminders, and webhooks still run
 
 **Returns**: Created `NotionPage`
 
@@ -146,6 +149,7 @@ async def update(
 - `params.template` (optional): Apply a default or specific template
 - `params.erase_content` (optional): Clear existing block children before applying updates
 - `params.in_trash` (optional): Trash status
+- `params.notifications` (optional): `{"mode": "silent"}` skips page-update, @mention, and Person-property notifications
 
 **Returns**: Updated `NotionPage`
 
@@ -213,9 +217,13 @@ async def retrieve_markdown(
     *,
     page_id: str,
     include_transcript: bool | None = None,
+    markdown_version: Literal["v1", "v2"] | None = None,
     auth: AuthParam | None = None
 ) -> PageMarkdownResponse
 ```
+
+Omit `markdown_version`, or set it to `"v1"`, for enhanced markdown. Set it to
+`"v2"` for Notion-flavored Markdown. `v2` does not support `include_transcript`.
 
 **Example**:
 
@@ -274,6 +282,10 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
         ),
     )
 ```
+
+Set `markdown_version="v2"` on the command to read and write Notion-flavored
+Markdown. A synchronous `v2` update can return `warnings` when the parser
+changed or ignored part of the content. Async updates do not return warnings.
 
 For large writes, set `allow_async=True` on the command (or on
 `CreatePageParameters` when creating a page with `markdown`) to receive an

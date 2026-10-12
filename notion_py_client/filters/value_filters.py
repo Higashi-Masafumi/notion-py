@@ -245,9 +245,33 @@ class StatusFilterDoesNotEqual(TypedDict):
     does_not_equal: str | list[str]
 
 
-# Matches TypeScript: type StatusPropertyFilter = { equals: string } | { does_not_equal: string } | ExistencePropertyFilter
+class StatusFilterGroupEquals(TypedDict):
+    """ステータスグループが等しい.
+
+    Requires the ``Notion-Beta: status-group-filters-2026-10-06`` header.
+    A string or a non-empty list of group names matches entries whose option
+    belongs to any listed group.
+    """
+
+    group_equals: str | list[str]
+
+
+class StatusFilterGroupDoesNotEqual(TypedDict):
+    """ステータスグループが等しくない.
+
+    Requires the ``Notion-Beta: status-group-filters-2026-10-06`` header.
+    """
+
+    group_does_not_equal: str | list[str]
+
+
+# StatusPropertyFilter matches option names with equals / does_not_equal.
+# group_equals / group_does_not_equal match status groups and require the
+# status-group-filters beta header.
 StatusPropertyFilter = Union[
     StatusFilterEquals,
     StatusFilterDoesNotEqual,
+    StatusFilterGroupEquals,
+    StatusFilterGroupDoesNotEqual,
     ExistencePropertyFilter,
 ]

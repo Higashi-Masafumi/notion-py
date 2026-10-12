@@ -18,6 +18,19 @@ from .common import (
 from .property_requests import PropertyRequest
 
 
+MarkdownVersion = Literal["v1", "v2"]
+
+
+class PageWriteNotifications(BaseModel):
+    """Notification control for page and block writes.
+
+    ``silent`` skips page-update, @mention, and Person-property notifications.
+    Database automations, reminders, and connection webhooks still run.
+    """
+
+    mode: Literal["default", "silent"]
+
+
 class CreatePageParameters(BaseModel):
     """Page作成用パラメータ.
 
@@ -38,9 +51,11 @@ class CreatePageParameters(BaseModel):
     template: PageTemplateRequest | None = None
     position: PagePositionRequest | None = None
     markdown: str | None = None
+    markdown_version: MarkdownVersion | None = None
     content: list[Any] | None = None  # BlockObjectRequest
     children: list[Any] | None = None  # BlockObjectRequest
     allow_async: StrictBool | None = None
+    notifications: PageWriteNotifications | None = None
 
     @model_validator(mode="after")
     def validate_body_modes(self) -> "CreatePageParameters":
@@ -54,6 +69,10 @@ class CreatePageParameters(BaseModel):
             raise ValueError("template cannot be used with content or children")
         if self.allow_async and self.markdown is None:
             raise ValueError("allow_async is only supported when markdown is provided")
+        if self.markdown_version is not None and self.markdown is None:
+            raise ValueError(
+                "markdown_version is only supported when markdown is provided"
+            )
         return self
 
 
@@ -78,6 +97,7 @@ class UpdatePageParameters(BaseModel):
     erase_content: StrictBool | None = None
     is_locked: StrictBool | None = None
     in_trash: StrictBool | None = None
+    notifications: PageWriteNotifications | None = None
 
 
 class MovePageParameters(BaseModel):
@@ -109,12 +129,18 @@ class UpdateContentMarkdownRequest(BaseModel):
     allow_deleting_content: StrictBool | None = None
 
 
-class UpdateContentMarkdownCommand(BaseModel):
+class _PageMarkdownCommandFields(BaseModel):
+    """Fields shared by every page markdown update command."""
+
+    allow_async: StrictBool | None = None
+    markdown_version: MarkdownVersion | None = None
+
+
+class UpdateContentMarkdownCommand(_PageMarkdownCommandFields):
     """PATCH /pages/{page_id}/markdown with update_content."""
 
     type: Literal["update_content"] = "update_content"
     update_content: UpdateContentMarkdownRequest
-    allow_async: StrictBool | None = None
 
 
 class ReplaceContentMarkdownRequest(BaseModel):
@@ -124,12 +150,11 @@ class ReplaceContentMarkdownRequest(BaseModel):
     allow_deleting_content: StrictBool | None = None
 
 
-class ReplaceContentMarkdownCommand(BaseModel):
+class ReplaceContentMarkdownCommand(_PageMarkdownCommandFields):
     """PATCH /pages/{page_id}/markdown with replace_content."""
 
     type: Literal["replace_content"] = "replace_content"
     replace_content: ReplaceContentMarkdownRequest
-    allow_async: StrictBool | None = None
 
 
 class MarkdownInsertPositionRequest(BaseModel):
@@ -152,12 +177,11 @@ class InsertContentMarkdownRequest(BaseModel):
         return self
 
 
-class InsertContentMarkdownCommand(BaseModel):
+class InsertContentMarkdownCommand(_PageMarkdownCommandFields):
     """PATCH /pages/{page_id}/markdown with insert_content."""
 
     type: Literal["insert_content"] = "insert_content"
     insert_content: InsertContentMarkdownRequest
-    allow_async: StrictBool | None = None
 
 
 class ReplaceContentRangeMarkdownRequest(BaseModel):
@@ -168,12 +192,11 @@ class ReplaceContentRangeMarkdownRequest(BaseModel):
     allow_deleting_content: StrictBool | None = None
 
 
-class ReplaceContentRangeMarkdownCommand(BaseModel):
+class ReplaceContentRangeMarkdownCommand(_PageMarkdownCommandFields):
     """PATCH /pages/{page_id}/markdown with replace_content_range."""
 
     type: Literal["replace_content_range"] = "replace_content_range"
     replace_content_range: ReplaceContentRangeMarkdownRequest
-    allow_async: StrictBool | None = None
 
 
 PageMarkdownCommand = (

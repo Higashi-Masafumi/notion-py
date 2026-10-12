@@ -47,7 +47,9 @@ asyncio.run(main())
 This library supports the latest Notion API version `2026-03-11`, including:
 
 - **Current breaking changes**: `position`, `in_trash`, and `meeting_notes`
-- **Markdown APIs**: create, read, and update page content as markdown
+- **Markdown APIs**: create, read, and update page content as markdown, including opt-in `markdown_version` `v2`
+- **Page write notifications**: `notifications.mode` of `silent` on page create, page update, and append block children
+- **Status group filters**: `group_equals` and `group_does_not_equal` when `options["notion_beta"]` includes `status-group-filters-2026-10-06`
 - **Comments**: create/update comments with rich text or inline markdown, plus delete support
 - **Meeting notes**: query AI meeting notes through `blocks.meetingNotes.query()`
 - **Custom emojis**: `customEmojis.list()` support

@@ -4,7 +4,11 @@ import pytest
 from pydantic import ValidationError
 
 from notion_py_client.blocks.special_blocks import MeetingNotesBlock
-from notion_py_client.notion_client import APIErrorCode, NotionAsyncClient
+from notion_py_client.notion_client import (
+    APIErrorCode,
+    NotionAsyncClient,
+    STATUS_GROUP_FILTERS_BETA,
+)
 from notion_py_client.requests.page_requests import (
     CreatePageParameters,
     MovePageParameters,
@@ -59,6 +63,61 @@ class TestNotionAsyncClientDefaults:
 
         assert client.default_notion_version == "2026-03-11"
         assert client._notion_version == "2026-03-11"
+        assert client._notion_beta is None
+
+    @pytest.mark.asyncio
+    async def test_notion_beta_header_is_sent(self):
+        client = NotionAsyncClient(
+            auth="test-token",
+            options={"notion_beta": [STATUS_GROUP_FILTERS_BETA, STATUS_GROUP_FILTERS_BETA]},
+        )
+        captured: dict = {}
+
+        class _FakeResponse:
+            status_code = 200
+
+            async def aread(self) -> bytes:
+                return b'{"ok": true}'
+
+        async def fake_httpx(method, url, headers=None, **kwargs):
+            captured["headers"] = headers
+            return _FakeResponse()
+
+        client._client.request = fake_httpx  # type: ignore[method-assign]
+
+        await client.request(path="users/me", method="get")
+
+        assert captured["headers"]["Notion-Beta"] == STATUS_GROUP_FILTERS_BETA
+        assert captured["headers"]["Notion-Version"] == "2026-03-11"
+
+    @pytest.mark.asyncio
+    async def test_append_block_children_sends_notifications(self):
+        client = NotionAsyncClient(auth="test-token")
+        captured: dict = {}
+
+        async def fake_request(*, path, method, body=None, auth=None, **kwargs):
+            captured["path"] = path
+            captured["method"] = method
+            captured["body"] = body
+            return {
+                "object": "list",
+                "results": [],
+                "next_cursor": None,
+                "has_more": False,
+                "type": "block",
+            }
+
+        client.request = fake_request  # type: ignore[method-assign]
+
+        await client.blocks.children.append(
+            block_id="block_123",
+            children=[{"type": "paragraph", "paragraph": {"rich_text": []}}],
+            notifications={"mode": "silent"},
+        )
+
+        assert captured["path"] == "blocks/block_123/children"
+        assert captured["method"] == "patch"
+        assert captured["body"]["notifications"] == {"mode": "silent"}
 
     def test_api_error_code_includes_gateway_timeout(self):
         assert APIErrorCode.GatewayTimeout == "gateway_timeout"
@@ -95,6 +154,50 @@ class TestPageMarkdownAPI:
         assert captured["method"] == "get"
         assert captured["query"] == {"include_transcript": True}
         assert result.markdown == "# Heading"
+        assert result.warnings == []
+
+    @pytest.mark.asyncio
+    async def test_retrieve_markdown_rejects_transcript_with_v2(self):
+        client = NotionAsyncClient(auth="test-token")
+
+        with pytest.raises(ValueError, match="include_transcript"):
+            await client.pages.retrieve_markdown(
+                page_id="page_123",
+                include_transcript=True,
+                markdown_version="v2",
+            )
+
+    @pytest.mark.asyncio
+    async def test_update_markdown_returns_v2_warnings(self):
+        client = NotionAsyncClient(auth="test-token")
+        captured: dict = {}
+
+        async def fake_request(*, path, method, body=None, auth=None, **kwargs):
+            captured["body"] = body
+            return {
+                "object": "page_markdown",
+                "id": "page_123",
+                "markdown": "# Fresh Start",
+                "truncated": False,
+                "unknown_block_ids": [],
+                "warnings": [
+                    {"code": "unsupported_tag", "message": "Dropped an unknown tag"}
+                ],
+            }
+
+        client.request = fake_request  # type: ignore[method-assign]
+
+        result = await client.pages.update_markdown(
+            page_id="page_123",
+            command=ReplaceContentMarkdownCommand(
+                replace_content={"new_str": "# Fresh Start"},
+                markdown_version="v2",
+            ),
+        )
+
+        assert captured["body"]["markdown_version"] == "v2"
+        assert result.warnings[0].code == "unsupported_tag"
+        assert result.warnings[0].message == "Dropped an unknown tag"
 
     @pytest.mark.asyncio
     async def test_update_markdown_serializes_command(self):
@@ -420,6 +523,36 @@ class TestCommentsAPI:
         assert captured["path"] == "comments/comment_123"
         assert captured["method"] == "patch"
         assert captured["body"] == {"markdown": "Updated"}
+
+    @pytest.mark.asyncio
+    async def test_create_comment_sends_markdown_version(self):
+        client = NotionAsyncClient(auth="test-token")
+        captured: dict = {}
+
+        async def fake_request(*, path, method, body=None, auth=None, **kwargs):
+            captured["body"] = body
+            return _comment_response("**Looks good**")
+
+        client.request = fake_request  # type: ignore[method-assign]
+
+        await client.comments.create(
+            parent={"type": "page_id", "page_id": "page_123"},
+            markdown="**Looks good**",
+            markdown_version="v2",
+        )
+
+        assert captured["body"]["markdown_version"] == "v2"
+
+    @pytest.mark.asyncio
+    async def test_comment_markdown_version_requires_markdown(self):
+        client = NotionAsyncClient(auth="test-token")
+
+        with pytest.raises(ValueError, match="markdown_version"):
+            await client.comments.create(
+                parent={"type": "page_id", "page_id": "page_123"},
+                rich_text=_rich_text("Hello"),
+                markdown_version="v1",
+            )
 
     @pytest.mark.asyncio
     async def test_update_comment_accepts_partial_response(self):

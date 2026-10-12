@@ -49,6 +49,8 @@ from .value_filters import (
     SelectPropertyFilter,
     StatusFilterDoesNotEqual,
     StatusFilterEquals,
+    StatusFilterGroupDoesNotEqual,
+    StatusFilterGroupEquals,
     StatusPropertyFilter,
     TextFilterContains,
     TextFilterDoesNotContain,
@@ -192,6 +194,8 @@ __all__ = [
     # ステータスフィルター
     "StatusFilterEquals",
     "StatusFilterDoesNotEqual",
+    "StatusFilterGroupEquals",
+    "StatusFilterGroupDoesNotEqual",
     "StatusPropertyFilter",
     # 日付フィルター
     "DateFilterEquals",
