@@ -107,8 +107,12 @@ class UpdateDatabaseParameters(_UpdateDatabaseRequired, total=False):
 class SearchParameters(TypedDict, total=False):
     """検索のパラメータ.
 
+    ``filter_properties`` はクエリパラメータです。ページごとに存在する
+    プロパティ名または ID だけを返し、存在しない名前はスキップします。
+    データソースの結果はプロパティスキーマをすべて含みます。
+
     References:
-        - https://github.com/makenotion/notion-sdk-js/blob/main/src/api-endpoints.ts#L2345
+        - https://developers.notion.com/reference/post-search
     """
 
     query: NotRequired[str]
@@ -116,6 +120,7 @@ class SearchParameters(TypedDict, total=False):
     sort: NotRequired[dict[str, str]]
     start_cursor: NotRequired[str]
     page_size: NotRequired[int]
+    filter_properties: NotRequired[list[str]]
 
 
 # ========== Page API Types ==========

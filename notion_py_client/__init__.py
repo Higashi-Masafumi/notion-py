@@ -2,7 +2,7 @@ from .responses.datasource import DataSource, PartialDataSource
 from .responses.database import NotionDatabase, PartialDatabase
 from .responses.page import NotionPage, PartialPage
 from .responses.file_upload import FileUploadObject
-from .responses.page_markdown import PageMarkdownResponse
+from .responses.page_markdown import PageMarkdownResponse, PageMarkdownWarning
 from .responses.async_task import AsyncTaskResponse, AsyncTaskOperation, AsyncTaskError
 from .responses.property_item import PropertyItemObject, PropertyItemListResponse
 from .blocks import (
@@ -207,6 +207,7 @@ __all__ = [
     "PartialPage",
     "FileUploadObject",
     "PageMarkdownResponse",
+    "PageMarkdownWarning",
     "AsyncTaskResponse",
     "AsyncTaskOperation",
     "AsyncTaskError",

@@ -16,7 +16,10 @@ from notion_py_client.responses.list_response import (
     PartialCommentObject,
     QueryMeetingNotesResponse,
 )
-from notion_py_client.responses.page_markdown import PageMarkdownResponse
+from notion_py_client.responses.page_markdown import (
+    PageMarkdownResponse,
+    PageMarkdownWarning,
+)
 
 
 def _rich_text(content: str) -> list[dict]:
@@ -135,6 +138,48 @@ class TestPageMarkdownAPI:
             },
         }
         assert result.markdown == "# Fresh Start"
+        assert result.warnings == []
+
+    @pytest.mark.asyncio
+    async def test_update_markdown_reads_partial_edit_warnings(self):
+        client = NotionAsyncClient(auth="test-token")
+
+        async def fake_request(*, path, method, body=None, auth=None, **kwargs):
+            return {
+                "object": "page_markdown",
+                "id": "page_123",
+                "markdown": "# Kept",
+                "truncated": False,
+                "unknown_block_ids": [],
+                "warnings": [
+                    {
+                        "code": "no_match",
+                        "message": "No match for old_str",
+                    },
+                    {
+                        "code": "indentation_mismatch",
+                        "message": "Text is present with different indentation",
+                    },
+                ],
+            }
+
+        client.request = fake_request  # type: ignore[method-assign]
+
+        result = await client.pages.update_markdown(
+            page_id="page_123",
+            command=ReplaceContentMarkdownCommand(
+                replace_content={"new_str": "# Kept"}
+            ),
+        )
+
+        assert isinstance(result, PageMarkdownResponse)
+        assert result.warnings == [
+            PageMarkdownWarning(code="no_match", message="No match for old_str"),
+            PageMarkdownWarning(
+                code="indentation_mismatch",
+                message="Text is present with different indentation",
+            ),
+        ]
 
 
 def _async_task_response(operation_name: str) -> dict:
@@ -475,6 +520,50 @@ class TestCommentsAPI:
 
         with pytest.raises(ValueError, match="rich_text or markdown"):
             await client.comments.update(comment_id="comment_123")
+
+
+class TestSearchAPI:
+    """Test search query parameters."""
+
+    @pytest.mark.asyncio
+    async def test_search_sends_filter_properties_as_query(self):
+        client = NotionAsyncClient(auth="test-token")
+        captured: dict = {}
+
+        async def fake_request(
+            *, path, method, query=None, body=None, auth=None, **kwargs
+        ):
+            captured["path"] = path
+            captured["method"] = method
+            captured["query"] = query
+            captured["body"] = body
+            return {
+                "object": "list",
+                "results": [{"object": "page", "id": "page_123"}],
+                "next_cursor": None,
+                "has_more": False,
+            }
+
+        client.request = fake_request  # type: ignore[method-assign]
+
+        result = await client.search(
+            {
+                "query": "Roadmap",
+                "filter": {"property": "object", "value": "page"},
+                "filter_properties": ["title", "Status"],
+                "page_size": 10,
+            }
+        )
+
+        assert captured["path"] == "search"
+        assert captured["method"] == "post"
+        assert captured["query"] == {"filter_properties": ["title", "Status"]}
+        assert captured["body"] == {
+            "query": "Roadmap",
+            "filter": {"property": "object", "value": "page"},
+            "page_size": 10,
+        }
+        assert result.results[0].id == "page_123"
 
 
 class TestMeetingNotesAPI:
