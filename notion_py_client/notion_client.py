@@ -525,12 +525,23 @@ class NotionAsyncClient:
             results = await client.search({
                 "query": "プロジェクト",
                 "filter": {"property": "object", "value": "page"},
+                "filter_properties": ["title", "Status"],
                 "page_size": 20
             })
             ```
         """
+        query = pick(params, ["filter_properties"])
+        body = {
+            key: value
+            for key, value in params.items()
+            if key != "filter_properties" and value is not None
+        }
         response = await self.request(
-            path="search", method="post", body=dict(params), auth=auth
+            path="search",
+            method="post",
+            query=query or None,
+            body=body,
+            auth=auth,
         )
         # dict を SearchResponse に変換
         from .responses.page import PartialPage

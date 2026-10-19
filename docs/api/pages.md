@@ -254,7 +254,18 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
         ),
     )
     print(markdown_page.markdown)
+    for warning in markdown_page.warnings:
+        print(f"{warning.code}: {warning.message}")
 ```
+
+A synchronous response can include `warnings`. Each item has `code` and `message`.
+Parser warnings describe content the parser changed or ignored. An
+`update_content` edit that does not match is still applied for the edits that
+do match, and each miss is a warning: `no_match`, or `indentation_mismatch`
+when the text is on the page with different indentation. The request fails
+only when no content-changing edit matches. The field is omitted when the
+update is clean, and `warnings` is then an empty list. Async task results do
+not include warnings.
 
 To prepend or explicitly append markdown, use `InsertContentMarkdownCommand` with
 `insert_content.position` (`{"type": "start"}` or `{"type": "end"}`). Use either

@@ -23,6 +23,7 @@ async def search(
 - `params.sort` (optional): Sort criteria
 - `params.start_cursor` (optional): Pagination cursor
 - `params.page_size` (optional): Results per page (max 100)
+- `params.filter_properties` (optional): Property names or IDs to include on each page. Sent as a repeated query parameter. Names that do not exist on a page are skipped. Data source results still include their full property schema. Pages that are not in a data source always return only `title`.
 
 **Returns**: `SearchResponse` with pages and databases
 
@@ -65,6 +66,17 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
             "property": "object",
             "value": "database"
         }
+    })
+```
+
+### Limit returned page properties
+
+```python
+async with NotionAsyncClient(auth="secret_xxx") as client:
+    pages = await client.search({
+        "query": "Roadmap",
+        "filter": {"property": "object", "value": "page"},
+        "filter_properties": ["title", "Status"],
     })
 ```
 
