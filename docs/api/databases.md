@@ -102,6 +102,7 @@ async def create(
 - `params.initial_data_source`: Initial data source configuration
   - `properties`: Schema definition
   - `name` (optional): Data source name
+- `params.show_data_source_title` (optional): Whether to show the data source title above each database view. Defaults to `true`. Full-page databases with one data source do not show this title.
 
 **Returns**: Created `NotionDatabase`
 
@@ -117,6 +118,7 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
         "title": [
             {"type": "text", "text": {"content": "Project Tracker"}}
         ],
+        "show_data_source_title": true,
         "initial_data_source": {
             "name": "Main Data",
             "properties": {
@@ -162,6 +164,7 @@ async def update(
 - `params.cover` (optional): New cover image
 - `params.is_inline` (optional): Inline display setting
 - `params.parent` (optional): New parent
+- `params.show_data_source_title` (optional): Show or hide the data source title above the database's views
 
 **Note**: To update data source properties, use `dataSources.update()` instead.
 
@@ -179,7 +182,8 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
         "icon": {
             "type": "emoji",
             "emoji": "📊"
-        }
+        },
+        "show_data_source_title": false
     })
 
     print(f"Updated: {db.title}")
@@ -245,6 +249,7 @@ database: NotionDatabase = {
     "parent": {...},
     "in_trash": false,
     "is_inline": false,
+    "show_data_source_title": true,
     "public_url": "https://...",
     "data_sources": [
         {"id": "ds_abc123", "name": "Main Data"},

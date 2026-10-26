@@ -379,7 +379,8 @@ params: CreateDatabaseParameters = {
     "icon": {
         "type": "emoji",
         "emoji": "📊"
-    }
+    },
+    "show_data_source_title": true
 }
 ```
 
@@ -396,7 +397,8 @@ params: UpdateDatabaseParameters = {
     "icon": {
         "type": "emoji",
         "emoji": "📈"
-    }
+    },
+    "show_data_source_title": false
 }
 ```
 
