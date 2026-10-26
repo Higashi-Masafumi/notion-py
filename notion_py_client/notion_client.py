@@ -871,6 +871,7 @@ class _DatabasesAPI:
 
         新しいデータベースと初期データソースを作成します。
         initial_data_sourceにpropertiesを指定してください。
+        show_data_source_titleで、ビュー上のデータソースタイトル表示を指定できます。
 
         Returns:
             NotionDatabase: 作成されたデータベースオブジェクト
@@ -952,7 +953,7 @@ class _DatabasesAPI:
         Update a database (API version 2025-09-03)
 
         データベースレベルの属性を更新します。
-        更新可能: title, icon, cover, is_inline, parent
+        更新可能: title, icon, cover, is_inline, parent, show_data_source_title
 
         データソースのpropertiesを変更する場合は
         dataSources.update()を使用してください。

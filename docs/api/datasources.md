@@ -109,7 +109,12 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
 
         if config.type == "select":
             print(f"  Options: {[opt.name for opt in config.select.options]}")
+
+        if config.type == "status":
+            print(f"  Default option: {config.status.default_option}")
 ```
+
+`status.default_option` is the name of the option a page shows when it has no explicit Status value, or `null` when no default is configured. Match it against `status.options` rather than assuming the first option is the default. The field is read-only.
 
 ### create
 

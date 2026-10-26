@@ -75,6 +75,10 @@ class NotionDatabase(BaseModel):
     is_inline: StrictBool = Field(False, description="インラインデータベースフラグ")
     in_trash: StrictBool = Field(False, description="ゴミ箱フラグ")
     is_locked: StrictBool = Field(False, description="ロックフラグ")
+    show_data_source_title: StrictBool = Field(
+        True,
+        description="ビュー上にデータソースタイトルを表示する",
+    )
     created_time: StrictStr = Field(..., description="作成日時（ISO 8601形式）")
     last_edited_time: StrictStr = Field(..., description="最終編集日時（ISO 8601形式）")
     data_sources: list[DataSourceReference] = Field(

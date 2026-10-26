@@ -81,6 +81,7 @@ class CreateDatabaseParameters(_CreateDatabaseRequired, total=False):
     icon: dict[str, Any]
     cover: dict[str, Any]
     is_inline: bool
+    show_data_source_title: bool
 
 
 class _UpdateDatabaseRequired(TypedDict):
@@ -101,6 +102,7 @@ class UpdateDatabaseParameters(_UpdateDatabaseRequired, total=False):
     description: list[dict[str, Any]]
     icon: dict[str, Any]
     cover: dict[str, Any]
+    show_data_source_title: bool
 
 
 # ========== Search API Types ==========
