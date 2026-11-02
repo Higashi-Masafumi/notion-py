@@ -46,6 +46,10 @@ class CommentObject(BaseModel):
         ..., description="親オブジェクト（ページまたはブロック）"
     )
     discussion_id: StrictStr = Field(..., description="ディスカッションID")
+    property_id: StrictStr | None = Field(
+        None,
+        description="データベースページのプロパティへのコメントの場合のみ、そのプロパティID",
+    )
     created_time: StrictStr = Field(..., description="作成日時（ISO 8601形式）")
     last_edited_time: StrictStr = Field(..., description="最終編集日時（ISO 8601形式）")
     created_by: PartialUser = Field(..., description="作成者")

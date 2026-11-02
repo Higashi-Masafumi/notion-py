@@ -159,6 +159,9 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
         "page_id": "page_abc123"
     },
     "discussion_id": "discussion_abc123",
+    # Present only for a comment on a database page property.
+    # The value matches that property's id on the page object.
+    "property_id": "%3AUPp",
     "created_time": "2025-01-01T00:00:00.000Z",
     "last_edited_time": "2025-01-01T00:00:00.000Z",
     "created_by": {

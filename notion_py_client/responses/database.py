@@ -9,12 +9,13 @@ from __future__ import annotations
 from typing import Any, Literal
 
 from pydantic import BaseModel, Field, StrictBool, StrictStr
-from typing_extensions import TypedDict
+from typing_extensions import NotRequired, TypedDict
 
 from ..models.parent import NotionParent
 from ..models.icon import NotionIcon
 from ..models.cover import NotionCover
 from ..schema.property_configs import DatabasePropertyConfigResponse
+from .sync_metadata import SyncMetadata
 
 
 class DataSourceReference(TypedDict):
@@ -22,6 +23,7 @@ class DataSourceReference(TypedDict):
 
     id: str
     name: str
+    sync_metadata: NotRequired[SyncMetadata | None]
 
 
 class NotionDatabase(BaseModel):
@@ -78,7 +80,8 @@ class NotionDatabase(BaseModel):
     created_time: StrictStr = Field(..., description="作成日時（ISO 8601形式）")
     last_edited_time: StrictStr = Field(..., description="最終編集日時（ISO 8601形式）")
     data_sources: list[DataSourceReference] = Field(
-        default_factory=list, description="データソース一覧（2025-09-03以降）"
+        default_factory=list,
+        description="データソース一覧。読み取り可能な同期データソースには sync_metadata が付く",
     )
     icon: NotionIcon | None = Field(None, description="アイコン")
     cover: NotionCover | None = Field(None, description="カバー画像")

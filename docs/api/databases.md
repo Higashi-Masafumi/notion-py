@@ -53,6 +53,7 @@ async def retrieve(
 
 - Database metadata (title, icon, cover, etc.)
 - `data_sources` array with IDs and names
+- Optional read-only `sync_metadata` on each readable synced data source. Search, create, and update responses omit it
 
 **Example**:
 
@@ -70,6 +71,9 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
     # List data sources
     for ds in db.data_sources:
         print(f"- {ds['name']} (ID: {ds['id']})")
+        sync = ds.get("sync_metadata")
+        if sync and sync.external_database_sync:
+            print(f"  provider: {sync.external_database_sync.provider}")
 ```
 
 > Tip: Extract a database ID from a URL
@@ -248,7 +252,16 @@ database: NotionDatabase = {
     "public_url": "https://...",
     "data_sources": [
         {"id": "ds_abc123", "name": "Main Data"},
-        {"id": "ds_def456", "name": "Archive"}
+        {
+            "id": "ds_def456",
+            "name": "GitHub Issues",
+            "sync_metadata": {
+                "external_database_sync": {
+                    "sync_id": "2f26ee68-df30-4251-aad4-8ddc420cba3d",
+                    "provider": "github",
+                }
+            },
+        }
     ]
 }
 ```
