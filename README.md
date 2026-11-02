@@ -48,7 +48,8 @@ This library supports the latest Notion API version `2026-03-11`, including:
 
 - **Current breaking changes**: `position`, `in_trash`, and `meeting_notes`
 - **Markdown APIs**: create, read, and update page content as markdown
-- **Comments**: create/update comments with rich text or inline markdown, plus delete support
+- **Comments**: create/update comments with rich text or inline markdown, plus delete support. Property comments include `property_id`
+- **Synced data sources**: retrieve a data source, or a database's data source list, to read optional `sync_metadata`
 - **Meeting notes**: query AI meeting notes through `blocks.meetingNotes.query()`
 - **Custom emojis**: `customEmojis.list()` support
 - **Pagination status**: exposes `request_status` on list responses

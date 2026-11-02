@@ -83,8 +83,10 @@ Located in `notion_py.responses`:
 - `PartialPage` - Page without properties (e.g., in search results)
 - `NotionDatabase` - Database container with data sources
 - `PartialDatabase` - Database without full details
-- `DataSource` - Data source with schema (properties)
+- `DataSource` - Data source with schema (properties). Retrieve can include read-only `sync_metadata`
 - `PartialDataSource` - Data source without schema
+- `SyncMetadata` - Stored sync metadata on a readable synced data source
+- `CommentObject` - Comment. `property_id` is set only for a comment on a database page property
 
 ### Request Types
 

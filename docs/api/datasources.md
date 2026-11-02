@@ -93,7 +93,7 @@ async def retrieve(
 
 - `data_source_id` (str): Data source ID
 
-**Returns**: `DataSource` object with properties schema
+**Returns**: `DataSource` object with properties schema. A readable synced data source can include read-only `sync_metadata`. Create and update responses omit it. Its absence does not mean the data source is unsynced.
 
 **Example**:
 
@@ -109,6 +109,9 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
 
         if config.type == "select":
             print(f"  Options: {[opt.name for opt in config.select.options]}")
+
+    if ds.sync_metadata and ds.sync_metadata.external_database_sync:
+        print(ds.sync_metadata.external_database_sync.provider)
 ```
 
 ### create

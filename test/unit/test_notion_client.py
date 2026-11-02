@@ -401,6 +401,31 @@ class TestCommentsAPI:
             "parent": {"type": "page_id", "page_id": "page_123"},
             "markdown": "**Looks good**",
         }
+        assert result.property_id is None
+
+    @pytest.mark.asyncio
+    async def test_list_comments_keeps_property_id(self):
+        client = NotionAsyncClient(auth="test-token")
+        page_comment = _comment_response("On the page")
+        property_comment = _comment_response("On the property")
+        property_comment["id"] = "comment_property"
+        property_comment["property_id"] = "%3AUPp"
+
+        async def fake_request(*, path, method, query=None, auth=None, **kwargs):
+            return {
+                "object": "list",
+                "results": [page_comment, property_comment],
+                "next_cursor": None,
+                "has_more": False,
+                "type": "comment",
+            }
+
+        client.request = fake_request  # type: ignore[method-assign]
+
+        result = await client.comments.list(block_id="page_123")
+
+        assert result.results[0].property_id is None
+        assert result.results[1].property_id == "%3AUPp"
 
     @pytest.mark.asyncio
     async def test_update_comment_uses_patch(self):
