@@ -1,4 +1,12 @@
 from .responses.datasource import DataSource, PartialDataSource
+from .responses.sync_metadata import (
+    ExternalDatabaseSync,
+    LegacySyncState,
+    SyncHealth,
+    SyncHealthChecks,
+    SyncHealthError,
+    SyncMetadata,
+)
 from .responses.database import NotionDatabase, PartialDatabase
 from .responses.page import NotionPage, PartialPage
 from .responses.file_upload import FileUploadObject
@@ -199,6 +207,12 @@ __all__ = [
     # DataSource
     "DataSource",
     "PartialDataSource",
+    "SyncMetadata",
+    "ExternalDatabaseSync",
+    "LegacySyncState",
+    "SyncHealth",
+    "SyncHealthChecks",
+    "SyncHealthError",
     # Database
     "NotionDatabase",
     "PartialDatabase",

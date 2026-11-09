@@ -83,8 +83,10 @@ Located in `notion_py.responses`:
 - `PartialPage` - Page without properties (e.g., in search results)
 - `NotionDatabase` - Database container with data sources
 - `PartialDatabase` - Database without full details
-- `DataSource` - Data source with schema (properties)
+- `DataSource` - Data source with schema (properties). Retrieve and list responses can include read-only `sync_metadata`
 - `PartialDataSource` - Data source without schema
+- `SyncMetadata` - Sync identity and available health on a readable synced data source. Omitted from search, create, update, and partial responses
+- `SyncHealth` - `sync_metadata.health`. `null` means unavailable. `{"paused": true}` is a paused sync without resource health. Otherwise `stage`, `ok`, and `checks` are present, and `error` is present only when `ok` is false
 
 ### Request Types
 

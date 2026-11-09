@@ -837,7 +837,8 @@ class _DatabasesAPI:
             auth: 認証トークン（オプション）
 
         Returns:
-            NotionDatabase: データベースオブジェクト（data_sources配列を含む）
+            NotionDatabase: データベースオブジェクト（data_sources配列を含む）。
+            読み取り可能な同期データソースには sync_metadata が付く。
 
         Examples:
             ```python
@@ -1009,7 +1010,8 @@ class _DataSourcesAPI:
             auth: 認証トークン（オプション）
 
         Returns:
-            DataSource: データソースオブジェクト（propertiesを含む）
+            DataSource: データソースオブジェクト（propertiesを含む）。
+            同期データソースでは sync_metadata が付くことがある。
 
         Examples:
             ```python
