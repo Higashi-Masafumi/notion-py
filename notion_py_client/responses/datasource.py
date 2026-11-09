@@ -16,6 +16,7 @@ from ..models.icon import NotionIcon
 from ..models.cover import NotionCover
 from ..models.parent import NotionParent
 from ..schema.property_configs import DatabasePropertyConfigResponse
+from .sync_metadata import SyncMetadata
 
 
 class DataSource(BaseModel):
@@ -72,6 +73,10 @@ class DataSource(BaseModel):
     cover: NotionCover | None = Field(None, description="カバー画像")
     url: StrictStr = Field(..., description="データソースURL")
     public_url: StrictStr | None = Field(None, description="パブリックURL")
+    sync_metadata: SyncMetadata | None = Field(
+        None,
+        description="同期メタデータ。一覧と取得でのみ含まれ、検索・作成・更新では省略される",
+    )
 
 
 class PartialDataSource(BaseModel):

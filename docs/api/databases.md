@@ -53,6 +53,7 @@ async def retrieve(
 
 - Database metadata (title, icon, cover, etc.)
 - `data_sources` array with IDs and names
+- Optional read-only `sync_metadata` on each readable synced data source. Search, create, and update responses omit it. `health: null` means health is unavailable, not that the sync is unhealthy.
 
 **Example**:
 
@@ -70,6 +71,9 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
     # List data sources
     for ds in db.data_sources:
         print(f"- {ds['name']} (ID: {ds['id']})")
+        sync = ds.get("sync_metadata")
+        if sync and sync.health and sync.health.ok:
+            print(f"  resource: {sync.resource}")
 ```
 
 > Tip: Extract a database ID from a URL
@@ -248,7 +252,28 @@ database: NotionDatabase = {
     "public_url": "https://...",
     "data_sources": [
         {"id": "ds_abc123", "name": "Main Data"},
-        {"id": "ds_def456", "name": "Archive"}
+        {
+            "id": "ds_def456",
+            "name": "GitHub Issues",
+            "sync_metadata": {
+                "external_database_sync": {
+                    "sync_id": "2f26ee68-df30-4251-aad4-8ddc420cba3d",
+                    "provider": "github",
+                },
+                "owner_user_id": "48d4cadc-82c9-48a7-b3ea-8a54b7787d31",
+                "resource": "issues",
+                "health": {
+                    "paused": false,
+                    "stage": "steady",
+                    "ok": true,
+                    "checks": {
+                        "sync_version_updated_at": "2026-11-01T10:00:00.000Z",
+                        "last_execution_succeeded_at": "2026-11-01T10:01:00.000Z",
+                        "delta_synced_through_at": "2026-11-01T10:02:00.000Z",
+                    },
+                },
+            },
+        },
     ]
 }
 ```
