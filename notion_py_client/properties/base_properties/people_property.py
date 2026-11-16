@@ -6,7 +6,11 @@ from ._base_property import BaseProperty
 
 
 class PeopleProperty(BaseProperty[Literal["people"]]):
-    """Notionのpeopleプロパティ"""
+    """Notionのpeopleプロパティ.
+
+    割り当てられた Custom Agent は bot ユーザーとして入り、`agent_id` に
+    エージェント ID、`id` に bot ユーザー ID を持つ。
+    """
 
     type: Literal["people"] = Field("people", description="プロパティタイプ")
 

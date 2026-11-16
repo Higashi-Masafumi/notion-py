@@ -112,9 +112,15 @@ Users can be either people or bots:
         "workspace_name": "My Workspace"
     },
     "name": "My Integration",
-    "avatar_url": "https://..."
+    "avatar_url": None
 }
 ```
+
+`avatar_url` is `null` when a bot icon is not an image URL.
+
+A Custom Agent assigned to a people property, or mentioned in rich text, is returned as a bot user. `id` is the bot user ID and `agent_id` is the Custom Agent ID. Ordinary integration bots omit `agent_id`.
+
+`users.list` does not include Custom Agents. Read them from people properties and user mentions. To assign or mention one, pass either its agent ID or its bot user ID as the existing user `id`.
 
 ## Common Patterns
 

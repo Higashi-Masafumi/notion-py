@@ -246,7 +246,9 @@ from notion_py_client.requests.property_requests import PeoplePropertyRequest
 request = PeoplePropertyRequest(
     people=[
         {"id": "user_id_1"},
-        {"id": "user_id_2"}
+        {"id": "user_id_2"},
+        # Custom Agent: agent ID or bot user ID
+        {"id": "agent_id"},
     ]
 )
 

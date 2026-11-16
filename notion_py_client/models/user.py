@@ -73,9 +73,19 @@ class BotInfo(BaseModel):
 
 
 class BotUser(BaseFullUser):
-    """botタイプのユーザー"""
+    """botタイプのユーザー.
+
+    Custom Agent は people プロパティとユーザーメンションに、この bot ユーザーとして現れる。
+    `id` は bot ユーザー ID、`agent_id` はその Custom Agent の ID。
+    通常の接続 bot では `agent_id` は省略される。
+    アイコンが画像 URL でないとき `avatar_url` は null。
+    """
 
     type: Literal["bot"] = Field("bot", description="ユーザータイプ")
+    agent_id: StrictStr | None = Field(
+        None,
+        description="この bot が代行する Custom Agent の ID。通常の接続 bot では省略される",
+    )
     bot: EmptyObject | BotInfo = Field(
         default_factory=EmptyObject, description="Bot固有の情報"
     )
