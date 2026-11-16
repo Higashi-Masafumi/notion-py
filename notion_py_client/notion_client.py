@@ -1475,6 +1475,8 @@ class _UsersAPI:
     ) -> ListUsersResponse:
         """List all users
 
+        Custom Agent はこの一覧に含まれない。people プロパティとユーザーメンションから読む。
+
         Returns:
             ListUsersResponse: ユーザーのリスト
         """

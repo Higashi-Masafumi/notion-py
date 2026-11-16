@@ -159,12 +159,26 @@ property: PeopleProperty = {
             "type": "person",
             "name": "John Doe",
             "avatar_url": "https://..."
+        },
+        {
+            "object": "user",
+            "id": "bot_user_id",
+            "type": "bot",
+            "name": "Triage Agent",
+            "avatar_url": None,
+            "agent_id": "agent_id",
+            "bot": {}
         }
     ]
 }
 
 # Access values
 assignees = [person.name for person in property.people]
+agent_ids = [
+    person.agent_id
+    for person in property.people
+    if getattr(person, "type", None) == "bot" and person.agent_id
+]
 ```
 
 ### FilesProperty

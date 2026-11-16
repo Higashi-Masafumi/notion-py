@@ -94,7 +94,8 @@ class StatusPropertyRequest(BaseModel):
 class PeoplePropertyRequest(BaseModel):
     """Peopleプロパティのリクエスト.
 
-    ユーザーまたはグループを指定可能。
+    ユーザー、グループ、または Custom Agent を指定できる。
+    Custom Agent はエージェント ID か bot ユーザー ID を、既存の `id` に入れる。
     """
 
     people: list[PartialUserObjectRequest | GroupObjectRequest]

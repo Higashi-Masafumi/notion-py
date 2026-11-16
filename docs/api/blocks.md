@@ -621,7 +621,7 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
 # Link
 {"type": "text", "text": {"content": "link", "link": {"url": "https://example.com"}}}
 
-# Mention
+# Mention. user.id is a person ID, a bot user ID, or a Custom Agent ID.
 {"type": "mention", "mention": {"type": "user", "user": {"id": "user_id"}}}
 
 # Equation

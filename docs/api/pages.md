@@ -404,7 +404,7 @@ properties = {
         date={"start": "2025-12-31", "end": "2026-01-01"}
     ),
 
-    # People
+    # People. A Custom Agent uses its agent ID or bot user ID.
     "Assignee": PeoplePropertyRequest(
         people=[{"id": "user_abc123"}]
     ),

@@ -24,7 +24,8 @@ class Mention(BaseModel):
         "custom_emoji",
     ] = Field(..., description="メンションタイプ")
     user: PartialUser | User | None = Field(
-        None, description="ユーザーメンションの詳細"
+        None,
+        description="ユーザーメンションの詳細。Custom Agent は bot ユーザーで、agent_id にエージェント ID を持つ",
     )
     date: DateInfo | None = Field(None, description="日付メンションの詳細")
     link_preview: LinkPreviewMention | None = Field(
