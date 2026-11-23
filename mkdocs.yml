@@ -62,6 +62,7 @@ nav:
       - Data Sources: api/datasources.md
       - Pages: api/pages.md
       - Blocks: api/blocks.md
+      - Meeting Notes: api/meeting_notes.md
       - Users: api/users.md
       - Comments: api/comments.md
       - Search: api/search.md

@@ -200,6 +200,8 @@ async with NotionAsyncClient(auth="secret_xxx") as client:
         print(block.id)
 ```
 
+Create or link a full-page meeting note with [`meetingNotes`](meeting_notes.md). Block responses include `meeting_notes.is_full_page`. `calendar_event.event_id` is present when the note is linked to a calendar event.
+
 ## Block Types
 
 ### Text Blocks

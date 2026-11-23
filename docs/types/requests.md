@@ -109,6 +109,45 @@ params = MovePageParameters(
 )
 ```
 
+### CreateMeetingNotePageParameters
+
+Create a full-page meeting note. `calendar_event` cannot be combined with `parent`, `title`, or `markdown`.
+
+```python
+from notion_py_client.requests.meeting_note_requests import (
+    CreateMeetingNotePageParameters,
+)
+
+params = CreateMeetingNotePageParameters(
+    parent={"type": "page_id", "page_id": "page_abc123"},
+    title="Weekly sync",
+    markdown="## Agenda",
+    markdown_version="v2",
+)
+```
+
+### LinkMeetingNotePageParameters
+
+Link a full-page meeting note to a calendar event.
+
+```python
+from notion_py_client.requests.meeting_note_requests import (
+    LinkMeetingNotePageParameters,
+)
+
+params = LinkMeetingNotePageParameters(
+    meeting_note_id="meeting_note_abc123",
+    calendar_event={
+        "calendar": {
+            "account_id": "account_abc123",
+            "calendar_id": "team@example.com",
+        },
+        "event_id": "event_abc123",
+    },
+    allow_other_meeting_notes=True,
+)
+```
+
 ## Property Requests
 
 All property request types are located in `notion_py.requests.property_requests`.

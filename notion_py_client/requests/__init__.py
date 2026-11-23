@@ -28,6 +28,12 @@ from .common import (
     SelectPropertyItemRequest,
     TemplateIdPageTemplateRequest,
 )
+from .meeting_note_requests import (
+    CreateMeetingNotePageParameters,
+    LinkMeetingNotePageParameters,
+    MeetingNoteCalendarEventRequest,
+    MeetingNoteCalendarRequest,
+)
 from .page_requests import (
     CreatePageParameters,
     InsertContentMarkdownCommand,
@@ -70,6 +76,10 @@ __all__ = [
     "CreatePageParameters",
     "UpdatePageParameters",
     "MovePageParameters",
+    "CreateMeetingNotePageParameters",
+    "LinkMeetingNotePageParameters",
+    "MeetingNoteCalendarEventRequest",
+    "MeetingNoteCalendarRequest",
     "PageMarkdownCommand",
     "MarkdownContentUpdateRequest",
     "UpdateContentMarkdownRequest",
