@@ -126,6 +126,9 @@ from .requests import (
     UpdatePageParameters,
     CreatePageParameters,
     MovePageParameters,
+    CreateMeetingNotePageParameters,
+    LinkMeetingNotePageParameters,
+    MeetingNoteCalendarEventRequest,
     PageMarkdownCommand,
     UpdateContentMarkdownCommand,
     ReplaceContentMarkdownCommand,
@@ -179,6 +182,11 @@ from .schema import (
     FormulaPropertyConfig,
 )
 from .notion_client import NotionAsyncClient, NotionErrorCode
+from .responses.meeting_note import (
+    CreateMeetingNotePageResponse,
+    LinkMeetingNotePageResponse,
+    MeetingNotePageBlock,
+)
 from .responses.list_response import (
     ListUsersResponse,
     QueryDatabaseResponse,
@@ -222,6 +230,9 @@ __all__ = [
     "ListFileUploadsResponse",
     "ListCustomEmojisResponse",
     "QueryMeetingNotesResponse",
+    "CreateMeetingNotePageResponse",
+    "LinkMeetingNotePageResponse",
+    "MeetingNotePageBlock",
     "RequestStatusResponse",
     # Comment
     "CommentObject",
@@ -292,6 +303,9 @@ __all__ = [
     "UpdatePageParameters",
     "CreatePageParameters",
     "MovePageParameters",
+    "CreateMeetingNotePageParameters",
+    "LinkMeetingNotePageParameters",
+    "MeetingNoteCalendarEventRequest",
     "PageMarkdownCommand",
     "UpdateContentMarkdownCommand",
     "ReplaceContentMarkdownCommand",

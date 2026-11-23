@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, Field, StrictStr
+from pydantic import BaseModel, Field, StrictBool, StrictStr
 
 from .base import ApiColor, BaseBlockObject
 from ..models.rich_text_item import RichTextItem
@@ -166,11 +166,22 @@ class MeetingNotesChildren(BaseModel):
     )
 
 
+MeetingNotesStatus = Literal[
+    "transcription_not_started",
+    "transcription_paused",
+    "transcription_in_progress",
+    "transcription_failed",
+    "summary_in_progress",
+    "notes_ready",
+]
+
+
 class MeetingNotesCalendarEvent(BaseModel):
     """会議メモのカレンダー情報"""
 
-    start_time: StrictStr | None = Field(None, description="開始時刻")
-    end_time: StrictStr | None = Field(None, description="終了時刻")
+    start_time: StrictStr = Field(..., description="開始時刻")
+    end_time: StrictStr = Field(..., description="終了時刻")
+    event_id: StrictStr | None = Field(None, description="カレンダーイベントID")
     attendees: list[StrictStr] | None = Field(None, description="参加者のユーザーID")
 
 
@@ -184,8 +195,9 @@ class MeetingNotesRecording(BaseModel):
 class MeetingNotesContent(BaseModel):
     """会議メモコンテンツ"""
 
+    is_full_page: StrictBool = Field(..., description="フルページの会議メモかどうか")
     title: list[RichTextItem] | None = Field(None, description="会議タイトル")
-    status: StrictStr | None = Field(None, description="会議メモの状態")
+    status: MeetingNotesStatus | None = Field(None, description="会議メモの状態")
     children: MeetingNotesChildren | None = Field(None, description="子ブロック参照")
     calendar_event: MeetingNotesCalendarEvent | None = Field(
         None, description="カレンダー情報"

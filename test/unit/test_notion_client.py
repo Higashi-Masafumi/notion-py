@@ -5,12 +5,21 @@ from pydantic import ValidationError
 
 from notion_py_client.blocks.special_blocks import MeetingNotesBlock
 from notion_py_client.notion_client import APIErrorCode, NotionAsyncClient
+from notion_py_client.requests.meeting_note_requests import (
+    CreateMeetingNotePageParameters,
+    LinkMeetingNotePageParameters,
+)
 from notion_py_client.requests.page_requests import (
     CreatePageParameters,
     MovePageParameters,
     ReplaceContentMarkdownCommand,
 )
 from notion_py_client.responses.async_task import AsyncTaskResponse
+from notion_py_client.responses.meeting_note import (
+    CreateMeetingNotePageResponse,
+    LinkMeetingNotePageResponse,
+    MeetingNotePageBlock,
+)
 from notion_py_client.responses.list_response import (
     CommentObject,
     PartialCommentObject,
@@ -504,6 +513,7 @@ class TestMeetingNotesAPI:
                         "has_children": True,
                         "in_trash": False,
                         "meeting_notes": {
+                            "is_full_page": False,
                             "title": _rich_text("Weekly sync"),
                             "status": "notes_ready",
                         },
@@ -529,3 +539,221 @@ class TestMeetingNotesAPI:
         }
         assert isinstance(result.results[0], MeetingNotesBlock)
         assert result.results[0].parent["type"] == "agent_id"
+        assert result.results[0].meeting_notes.is_full_page is False
+
+
+def _meeting_note_block(*, is_full_page: bool = True, event_id: str | None = None) -> dict:
+    meeting_notes: dict = {
+        "is_full_page": is_full_page,
+        "title": _rich_text("Weekly sync"),
+        "status": "notes_ready",
+    }
+    if event_id is not None:
+        meeting_notes["calendar_event"] = {
+            "start_time": "2026-11-16T10:00:00.000Z",
+            "end_time": "2026-11-16T10:30:00.000Z",
+            "event_id": event_id,
+        }
+    return {
+        "object": "block",
+        "id": "meeting_note_123",
+        "type": "meeting_notes",
+        "created_time": "2026-11-16T10:00:00.000Z",
+        "last_edited_time": "2026-11-16T10:00:00.000Z",
+        "created_by": {"object": "user", "id": "user_123"},
+        "last_edited_by": {"object": "user", "id": "user_123"},
+        "has_children": True,
+        "in_trash": False,
+        "meeting_notes": meeting_notes,
+    }
+
+
+class TestMeetingNotePagesAPI:
+    """Test full-page meeting note create and link helpers."""
+
+    @pytest.mark.asyncio
+    async def test_create_meeting_note_page(self):
+        client = NotionAsyncClient(auth="test-token")
+        captured: dict = {}
+
+        async def fake_request(*, path, method, body=None, auth=None, **kwargs):
+            captured["path"] = path
+            captured["method"] = method
+            captured["body"] = body
+            return {
+                "object": "meeting_note_page_result",
+                "meeting_note": _meeting_note_block(),
+                "created": True,
+            }
+
+        client.request = fake_request  # type: ignore[method-assign]
+
+        result = await client.meetingNotes.create(
+            CreateMeetingNotePageParameters(
+                parent={
+                    "type": "data_source_id",
+                    "data_source_id": "ds_123",
+                },
+                title="Weekly sync",
+                markdown="## Agenda",
+                markdown_version="v2",
+            )
+        )
+
+        assert isinstance(result, CreateMeetingNotePageResponse)
+        assert isinstance(result.meeting_note, MeetingNotePageBlock)
+        assert result.created is True
+        assert result.meeting_note.meeting_notes.is_full_page is True
+        assert captured["path"] == "meeting_notes"
+        assert captured["method"] == "post"
+        assert captured["body"] == {
+            "parent": {"type": "data_source_id", "data_source_id": "ds_123"},
+            "title": "Weekly sync",
+            "markdown": "## Agenda",
+            "markdown_version": "v2",
+        }
+
+    @pytest.mark.asyncio
+    async def test_create_meeting_note_for_calendar_event(self):
+        client = NotionAsyncClient(auth="test-token")
+        captured: dict = {}
+
+        async def fake_request(*, path, method, body=None, auth=None, **kwargs):
+            captured["body"] = body
+            return {
+                "object": "meeting_note_page_result",
+                "meeting_note": _meeting_note_block(event_id="event_123"),
+                "created": False,
+            }
+
+        client.request = fake_request  # type: ignore[method-assign]
+
+        result = await client.meetingNotes.create(
+            CreateMeetingNotePageParameters(
+                calendar_event={
+                    "calendar": {
+                        "account_id": "account_123",
+                        "calendar_id": "team@example.com",
+                    },
+                    "event_id": "event_123",
+                }
+            )
+        )
+
+        assert result.created is False
+        assert result.meeting_note.meeting_notes.calendar_event is not None
+        assert result.meeting_note.meeting_notes.calendar_event.event_id == "event_123"
+        assert captured["body"] == {
+            "calendar_event": {
+                "calendar": {
+                    "account_id": "account_123",
+                    "calendar_id": "team@example.com",
+                },
+                "event_id": "event_123",
+            }
+        }
+
+    @pytest.mark.asyncio
+    async def test_create_meeting_note_without_fields_sends_empty_body(self):
+        client = NotionAsyncClient(auth="test-token")
+        captured: dict = {}
+
+        async def fake_request(*, path, method, body=None, auth=None, **kwargs):
+            captured["body"] = body
+            return {
+                "object": "meeting_note_page_result",
+                "meeting_note": _meeting_note_block(),
+                "created": True,
+            }
+
+        client.request = fake_request  # type: ignore[method-assign]
+
+        await client.meetingNotes.create()
+
+        assert captured["body"] == {}
+
+    def test_calendar_event_rejects_parent_title_and_markdown(self):
+        with pytest.raises(ValidationError, match="calendar_event"):
+            CreateMeetingNotePageParameters(
+                parent={"type": "page_id", "page_id": "page_123"},
+                calendar_event={
+                    "calendar": {
+                        "account_id": "account_123",
+                        "calendar_id": "team@example.com",
+                    },
+                    "event_id": "event_123",
+                },
+            )
+
+    @pytest.mark.asyncio
+    async def test_link_meeting_note_page(self):
+        client = NotionAsyncClient(auth="test-token")
+        captured: dict = {}
+
+        async def fake_request(*, path, method, body=None, auth=None, **kwargs):
+            captured["path"] = path
+            captured["method"] = method
+            captured["body"] = body
+            return {
+                "object": "meeting_note_page_result",
+                "meeting_note": _meeting_note_block(event_id="event_123"),
+                "other_meeting_note_ids": ["page_456"],
+            }
+
+        client.request = fake_request  # type: ignore[method-assign]
+
+        result = await client.meetingNotes.link(
+            LinkMeetingNotePageParameters(
+                meeting_note_id="meeting_note_123",
+                calendar_event={
+                    "calendar": {
+                        "account_id": "account_123",
+                        "calendar_id": "team@example.com",
+                    },
+                    "event_id": "event_123",
+                },
+                allow_other_meeting_notes=True,
+            )
+        )
+
+        assert isinstance(result, LinkMeetingNotePageResponse)
+        assert result.other_meeting_note_ids == ["page_456"]
+        assert captured["path"] == "meeting_notes/meeting_note_123"
+        assert captured["method"] == "patch"
+        assert captured["body"] == {
+            "calendar_event": {
+                "calendar": {
+                    "account_id": "account_123",
+                    "calendar_id": "team@example.com",
+                },
+                "event_id": "event_123",
+            },
+            "allow_other_meeting_notes": True,
+        }
+
+    @pytest.mark.asyncio
+    async def test_empty_json_body_is_sent(self):
+        client = NotionAsyncClient(auth="test-token")
+        captured: dict = {}
+
+        class Response:
+            status_code = 200
+
+            async def aread(self):
+                return b"{}"
+
+        async def fake_request(
+            method, url, headers=None, content=None, params=None, files=None
+        ):
+            captured["content"] = content
+            captured["content_type"] = (headers or {}).get("content-type")
+            return Response()
+
+        client._client.request = fake_request  # type: ignore[method-assign]
+        try:
+            await client.request(path="meeting_notes", method="post", body={})
+        finally:
+            await client.aclose()
+
+        assert captured["content"] == "{}"
+        assert captured["content_type"] == "application/json"

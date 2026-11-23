@@ -1,7 +1,7 @@
 """Unit tests for block response parsing and block API helpers."""
 
 import pytest
-from pydantic import TypeAdapter
+from pydantic import TypeAdapter, ValidationError
 
 from notion_py_client.blocks import BlockObject
 from notion_py_client.blocks.layout_blocks import TabBlock
@@ -27,6 +27,7 @@ class TestMeetingNotesBlocks:
             "has_children": True,
             "in_trash": False,
             "meeting_notes": {
+                "is_full_page": False,
                 "title": [
                     {
                         "type": "text",
@@ -49,6 +50,11 @@ class TestMeetingNotesBlocks:
                     "notes_block_id": "b2",
                     "transcript_block_id": "c3",
                 },
+                "calendar_event": {
+                    "start_time": "2026-02-24T10:00:00.000Z",
+                    "end_time": "2026-02-24T10:45:00.000Z",
+                    "event_id": "event_123",
+                },
             },
         }
 
@@ -58,6 +64,27 @@ class TestMeetingNotesBlocks:
         assert result.meeting_notes.status == "notes_ready"
         assert result.meeting_notes.children is not None
         assert result.meeting_notes.children.transcript_block_id == "c3"
+        assert result.meeting_notes.is_full_page is False
+        assert result.meeting_notes.calendar_event is not None
+        assert result.meeting_notes.calendar_event.event_id == "event_123"
+
+    def test_meeting_notes_require_is_full_page(self):
+        data = {
+            "object": "block",
+            "id": "block_123",
+            "type": "meeting_notes",
+            "created_time": "2026-02-24T10:00:00.000Z",
+            "last_edited_time": "2026-02-24T10:45:00.000Z",
+            "created_by": {"object": "user", "id": "user_123"},
+            "last_edited_by": {"object": "user", "id": "user_123"},
+            "parent": {"type": "page_id", "page_id": "page_123"},
+            "has_children": True,
+            "in_trash": False,
+            "meeting_notes": {"status": "notes_ready"},
+        }
+
+        with pytest.raises(ValidationError):
+            TypeAdapter(BlockObject).validate_python(data)
 
     def test_parse_heading_4_block(self):
         data = {

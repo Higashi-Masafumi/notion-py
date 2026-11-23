@@ -31,6 +31,10 @@ from .api_types import (
     UpdateDatabaseParameters,
 )
 from .filters import FilterCondition
+from .requests.meeting_note_requests import (
+    CreateMeetingNotePageParameters,
+    LinkMeetingNotePageParameters,
+)
 from .requests.page_requests import (
     CreatePageParameters,
     MovePageParameters,
@@ -44,6 +48,10 @@ from .responses.file_upload import FileUploadObject
 from .responses.page_markdown import PageMarkdownResponse
 from .responses.async_task import AsyncTaskResponse
 from .responses.property_item import PropertyItemListResponse, PropertyItemObject
+from .responses.meeting_note import (
+    CreateMeetingNotePageResponse,
+    LinkMeetingNotePageResponse,
+)
 from .responses.list_response import (
     QueryDatabaseResponse,
     QueryDataSourceResponse,
@@ -310,6 +318,7 @@ class NotionAsyncClient:
     - comments: コメントの管理
     - fileUploads: ファイルアップロード
     - customEmojis: ワークスペース絵文字一覧
+    - meetingNotes: フルページ会議メモの作成とカレンダーイベントへの紐付け
     - search: 検索
 
     重要な概念変更:
@@ -370,6 +379,7 @@ class NotionAsyncClient:
         self.users = _UsersAPI(self)
         self.comments = _CommentsAPI(self)
         self.fileUploads = _FileUploadsAPI(self)
+        self.meetingNotes = _MeetingNotePagesAPI(self)
 
     # ---------- lifecycle ----------
     async def aclose(self) -> None:
@@ -439,7 +449,7 @@ class NotionAsyncClient:
                         data_value = data_value.encode()
                     files_payload[k] = (filename, data_value, None)
         else:
-            if body and len(body) > 0:
+            if body is not None:
                 json_payload = json.dumps(body)
                 req_headers["content-type"] = "application/json"
 
@@ -805,6 +815,51 @@ class _MeetingNotesAPI:
             type=response.get("type"),
             request_status=response.get("request_status"),
         )
+
+
+class _MeetingNotePagesAPI:
+    def __init__(self, client: NotionAsyncClient):
+        self._c = client
+
+    async def create(
+        self,
+        params: CreateMeetingNotePageParameters | None = None,
+        *,
+        auth: AuthParam | None = None,
+    ) -> CreateMeetingNotePageResponse:
+        """Create a full-page meeting note, or get or create one for a calendar event.
+
+        POST /v1/meeting_notes. An omitted body creates the note in the user's
+        meeting notes database.
+        """
+
+        request_params = params or CreateMeetingNotePageParameters()
+        body = request_params.model_dump(exclude_none=True)
+        response = await self._c.request(
+            path="meeting_notes", method="post", body=body, auth=auth
+        )
+        return CreateMeetingNotePageResponse.model_validate(response)
+
+    async def link(
+        self,
+        params: LinkMeetingNotePageParameters,
+        *,
+        auth: AuthParam | None = None,
+    ) -> LinkMeetingNotePageResponse:
+        """Link a full-page meeting note to a calendar event.
+
+        PATCH /v1/meeting_notes/{meeting_note_id}.
+        """
+
+        payload = params.model_dump(exclude_none=True)
+        meeting_note_id = payload.pop("meeting_note_id")
+        response = await self._c.request(
+            path=f"meeting_notes/{meeting_note_id}",
+            method="patch",
+            body=payload,
+            auth=auth,
+        )
+        return LinkMeetingNotePageResponse.model_validate(response)
 
 
 class _DatabasesAPI:

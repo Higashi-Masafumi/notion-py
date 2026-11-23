@@ -56,7 +56,7 @@ This library supports **Notion API version 2026-03-11**, including:
 - **Current breaking changes**: `position`, `in_trash`, and `meeting_notes`
 - **Markdown page APIs**: create, retrieve, and update page markdown
 - **Comments API**: create/update comments with rich text or inline markdown
-- **Meeting notes**: query AI meeting notes blocks
+- **Meeting notes**: query AI meeting notes, and create or link full-page meeting notes
 - **Custom emoji listing**: workspace custom emoji pagination
 - **Result status**: exposes `request_status` for incomplete paginated results
 - **Data source model**: continued support for the 2025-09-03 split
